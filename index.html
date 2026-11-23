@@ -8,6 +8,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#123047">
 <title>ICU Rounds Assistant</title>
+ 
+/* ICU expandable clinical cards */
+
+.clinical-card {
+  background: #FFFFFF;
+  border: 1px solid #E3EAF2;
+  border-radius: 17px;
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(35,60,90,.04);
+}
+
+.clinical-card summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #243447;
+}
+
+.clinical-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.clinical-card summary::after {
+  content: "+";
+  margin-left: auto;
+  color: #4385C5;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.clinical-card[open] summary::after {
+  content: "−";
+}
+
+.card-icon {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 23px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  padding: 15px 17px 18px;
+  border-top: 1px solid #EDF1F5;
+}
+
+.card-subtitle {
+  color: #718096;
+  font-size: 12px;
+  letter-spacing: .5px;
+  margin: 0 0 14px;
+}
+
+.card-neuro { background: #E8F1FC; }
+.card-respiratory { background: #E5F5F3; }
+.card-cardiac { background: #FCEDEA; }
+.card-renal { background: #F0EBFA; }
+.card-infection { background: #FFF3E2; }
+.card-plan { background: #EAF3EB; }
+.card-handover { background: #E9EFFB; }
+
 <style>
 body{font-family:Arial,sans-serif;background:#f2f5f7;color:#17212b;margin:0}
 header{background:#123047;color:white;padding:18px}
