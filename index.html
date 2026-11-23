@@ -284,6 +284,44 @@ button:active { opacity: .8; }
   padding-left: 20px;
 }
 
+/* Ventilator daily assessment */
+.vent-assessment {
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 16px;
+  color: #17212b;
+}
+
+.vent-assessment h3 {
+  color: #123047;
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.vent-assessment h4 {
+  color: #123047;
+  font-size: 14px;
+  margin: 14px 0 6px;
+}
+
+.vent-assessment p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 5px 0;
+}
+
+.vent-report {
+  background: #f2f5f8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
 </style>
 </head>
 
@@ -402,6 +440,7 @@ button:active { opacity: .8; }
 <div id="ventResult" class="vent-table-wrap" aria-live="polite">
   <p>Enter the ventilator and patient measurements, then calculate.</p>
 </div>
+    <div id="ventAssessment"></div>
 <div class="vent-disclaimer">
   Reference values are clinical guides, not automatic ventilator
   prescriptions. Always interpret them alongside the patient's
@@ -1002,6 +1041,98 @@ function calculateVentilator() {
       ⚠ ${alert.message}
     </div>
   `).join("");
+
+  // Generate ventilator daily assessment
+  const vtPerKgValue = pbw > 0 && vt > 0 ? vt / pbw : null;
+  const drivingValue =
+    plateau !== null && peep !== null && plateau > peep
+      ? plateau - peep
+      : null;
+
+  const complianceValue =
+    vt > 0 && drivingValue > 0
+      ? vt / drivingValue
+      : null;
+
+  let ventilationStatus = "Not assessed";
+
+  if (vtPerKgValue !== null) {
+    if (vtPerKgValue > 8) {
+      ventilationStatus = "Review: VT above 8 mL/kg PBW";
+    } else if (vtPerKgValue < 4) {
+      ventilationStatus = "Review: VT below 4 mL/kg PBW";
+    } else {
+      ventilationStatus = "Within the 4–8 mL/kg PBW reference range";
+    }
+  }
+
+  let oxygenationStatus = "Not assessed";
+
+  if (pfRatio !== null) {
+    if (pfRatio <= 100) {
+      oxygenationStatus = "Severe oxygenation impairment";
+    } else if (pfRatio <= 200) {
+      oxygenationStatus = "Moderate oxygenation impairment";
+    } else if (pfRatio <= 300) {
+      oxygenationStatus = "Mild oxygenation impairment";
+    } else {
+      oxygenationStatus = "P/F ratio above 300";
+    }
+  }
+
+  const reviewItems = [];
+
+  if (vtPerKgValue !== null && vtPerKgValue > 8)
+    reviewItems.push("Reassess high tidal volume.");
+
+  if (vtPerKgValue !== null && vtPerKgValue < 4)
+    reviewItems.push("Review very low tidal volume and clinical indication.");
+
+  if (plateau >= 30)
+    reviewItems.push("Reassess elevated plateau pressure.");
+
+  if (pfRatio !== null && pfRatio <= 100)
+    reviewItems.push("Review severe oxygenation impairment.");
+
+  if (reviewItems.length === 0)
+    reviewItems.push("No threshold-based alerts identified by this calculator.");
+
+  const assessmentHTML = `
+    <div class="vent-assessment">
+      <h3>Ventilator Daily Assessment</h3>
+
+      <h4>1. Lung-protective ventilation</h4>
+      <p><strong>PBW:</strong> ${pbw.toFixed(1)} kg</p>
+      <p><strong>VT/PBW:</strong> ${vtPerKgValue !== null ? vtPerKgValue.toFixed(2) + " mL/kg" : "Not available"}</p>
+      <p><strong>Assessment:</strong> ${ventilationStatus}</p>
+
+      <h4>2. Oxygenation</h4>
+      <p><strong>P/F ratio:</strong> ${pfRatio !== null ? pfRatio.toFixed(0) : "Not available"}</p>
+      <p><strong>Assessment:</strong> ${oxygenationStatus}</p>
+
+      <h4>3. Respiratory mechanics</h4>
+      <p><strong>Plateau pressure:</strong> ${plateau} cmH₂O</p>
+      <p><strong>Total PEEP:</strong> ${peep} cmH₂O</p>
+      <p><strong>Driving pressure:</strong> ${drivingValue !== null ? drivingValue.toFixed(1) + " cmH₂O" : "Not available"}</p>
+      <p><strong>Static compliance:</strong> ${complianceValue !== null ? complianceValue.toFixed(1) + " mL/cmH₂O" : "Not available"}</p>
+
+      <h4>4. Parameters requiring review</h4>
+      ${reviewItems.map(item => `<p>• ${item}</p>`).join("")}
+
+      <h4>5. ICU rounds report</h4>
+      <div class="vent-report">
+        Ventilator assessment:
+        VT ${vt} mL (${vtPerKgValue !== null ? vtPerKgValue.toFixed(1) : "—"} mL/kg PBW).
+        P/F ratio ${pfRatio !== null ? pfRatio.toFixed(0) : "—"}.
+        Plateau pressure ${plateau} cmH₂O.
+        Total PEEP ${peep} cmH₂O.
+        Driving pressure ${drivingValue !== null ? drivingValue.toFixed(1) : "—"} cmH₂O.
+        Static compliance ${complianceValue !== null ? complianceValue.toFixed(1) : "—"} mL/cmH₂O.
+      </div>
+    </div>
+  `;
+
+  document.getElementById("ventAssessment").innerHTML = assessmentHTML;
 
   document.getElementById("ventResult").innerHTML = `
    ${alertHTML}
