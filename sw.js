@@ -1,5 +1,5 @@
 
-const CACHE = "icu-rounds-v5";
+const CACHE = "icu-rounds-v6";
 
 const FILES = [
   "./",
@@ -9,7 +9,9 @@ const FILES = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(FILES))
+    caches.open(CACHE)
+      .then(cache => cache.addAll(FILES))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -20,7 +22,7 @@ self.addEventListener("activate", event => {
         keys.filter(key => key !== CACHE)
           .map(key => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
 });
 
