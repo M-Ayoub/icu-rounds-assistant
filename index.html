@@ -687,7 +687,10 @@ function openPatient(i) {
   document.getElementById("sbar").value = "";
   document.getElementById("fluidResult").textContent =
     "Net balance and output rate will appear here.";
+document.getElementById("ventResult").innerHTML =
+  "<p>Enter the ventilator and patient measurements, then calculate.</p>";
 
+document.getElementById("ventAssessment").innerHTML = "";
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -751,7 +754,7 @@ function calculateVentilator() {
   if (peep === null || peep < 0)
     errors.push("Enter a valid total PEEP.");
 
-  if (errors.length > 0) {
+  if (errors.length > 0) {    document.getElementById("ventAssessment").innerHTML = "";
     document.getElementById("ventResult").innerHTML = `
       <div class="vent-validation">
         <strong>Please correct these inputs:</strong>
@@ -1209,9 +1212,7 @@ function makeSBAR() {
 
     "\n\nVerify all details before handover.";
 
-  document.getElementById("sbar").value = summary;
-document.getElementById("ventResult").innerHTML =
-  "<p>Enter the ventilator and patient measurements, then calculate.</p>";
+  
 }
 
 function copySBAR() {
