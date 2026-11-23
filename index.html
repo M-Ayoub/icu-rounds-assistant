@@ -19,6 +19,78 @@ textarea{min-height:65px}
 button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;margin:4px}
 .patient{padding:9px;border-bottom:1px solid #ddd}
 .warning{background:#fff0cc;padding:12px;border-radius:8px;font-size:13px}
+
+ 
+/* ICU expandable clinical cards */
+
+.clinical-card {
+  background: #FFFFFF;
+  border: 1px solid #E3EAF2;
+  border-radius: 17px;
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(35,60,90,.04);
+}
+
+.clinical-card summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #243447;
+}
+
+.clinical-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.clinical-card summary::after {
+  content: "+";
+  margin-left: auto;
+  color: #4385C5;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.clinical-card[open] summary::after {
+  content: "−";
+}
+
+.card-icon {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 23px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  padding: 15px 17px 18px;
+  border-top: 1px solid #EDF1F5;
+}
+
+.card-subtitle {
+  color: #718096;
+  font-size: 12px;
+  letter-spacing: .5px;
+  margin: 0 0 14px;
+}
+
+.card-neuro { background: #E8F1FC; }
+.card-respiratory { background: #E5F5F3; }
+.card-cardiac { background: #FCEDEA; }
+.card-renal { background: #F0EBFA; }
+.card-infection { background: #FFF3E2; }
+.card-plan { background: #EAF3EB; }
+.card-handover { background: #E9EFFB; }
+
 </style>
 </head>
 <body>
