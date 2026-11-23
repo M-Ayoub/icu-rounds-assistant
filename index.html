@@ -188,6 +188,58 @@ button:active { opacity: .8; }
 
 .actions button { flex: 1 1 130px; }
 
+/* Ventilator results table */
+
+.vent-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.vent-table {
+  width: 100%;
+  min-width: 470px;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: white;
+}
+
+.vent-table th {
+  background: #123047;
+  color: white;
+  padding: 11px 8px;
+  text-align: left;
+}
+
+.vent-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e3eaf2;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.vent-table tr:nth-child(even) {
+  background: #f4f7fa;
+}
+
+.vent-status {
+  font-weight: 700;
+}
+
+.vent-good { color: #187448; }
+.vent-warning { color: #a45b00; }
+.vent-info { color: #315f91; }
+
+.vent-disclaimer {
+  background: #fff4df;
+  border-radius: 8px;
+  padding: 11px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #604719;
+}
+
 </style>
 </head>
 
@@ -302,9 +354,16 @@ button:active { opacity: .8; }
 
     <button onclick="calculateVentilator()">Calculate ventilator parameters</button>
 
-    <div id="ventResult" class="result" aria-live="polite">
-      Ventilator calculations will appear here.
-    </div>
+    
+<div id="ventResult" class="vent-table-wrap" aria-live="polite">
+  <p>Enter the ventilator and patient measurements, then calculate.</p>
+</div>
+<div class="vent-disclaimer">
+  Reference values are clinical guides, not automatic ventilator
+  prescriptions. Always interpret them alongside the patient's
+  diagnosis, mechanics, gas exchange and clinical condition.
+</div>
+
 
     <p class="card-note">
       Use measured height where possible. For driving pressure,
@@ -566,13 +625,14 @@ fields.forEach(k => {
   });
 });
 
+
 function calculateVentilator() {
   const getValue = id => {
-    const value = document.getElementById(id).value.trim();
-    if (value === "") return null;
+    const raw = document.getElementById(id).value.trim();
+    if (raw === "") return null;
 
-    const number = Number(value);
-    return Number.isFinite(number) ? number : null;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
   };
 
   const sex = document.getElementById("ventSex").value;
@@ -583,12 +643,25 @@ function calculateVentilator() {
   const plateau = getValue("plateauPressure");
   const peep = getValue("totalPeep");
 
-  const results = [];
+  const rows = [];
 
-  let pbw = null;
-  let drivingPressure = null;
+  function addRow(parameter, measured, reference, interpretation, status) {
+    rows.push(`
+      <tr>
+        <td>${parameter}</td>
+        <td>${measured}</td>
+        <td>${reference}</td>
+        <td class="vent-status ${status}">${interpretation}</td>
+      </tr>
+    `);
+  }
+
+  const show = (value, digits = 1) =>
+    Number.isFinite(value) ? value.toFixed(digits) : "—";
 
   // 1. Predicted body weight
+  let pbw = null;
+
   if (height !== null && height > 0 && sex !== "") {
     if (sex === "male") {
       pbw = 50 + 0.91 * (height - 152.4);
@@ -597,87 +670,241 @@ function calculateVentilator() {
     }
 
     if (pbw !== null && pbw > 0) {
-      results.push(
-        "Predicted body weight: " + pbw.toFixed(1) + " kg"
+      addRow(
+        "Predicted body weight",
+        show(pbw) + " kg",
+        "Calculated from sex and height",
+        "Calculated",
+        "vent-info"
       );
     } else {
-      results.push("PBW: Invalid height or sex selection.");
+      pbw = null;
+      addRow(
+        "Predicted body weight",
+        "—",
+        "Valid adult height and sex required",
+        "Check input",
+        "vent-warning"
+      );
     }
   } else {
-    results.push("PBW: Enter sex and height.");
+    addRow(
+      "Predicted body weight",
+      "—",
+      "Enter sex and height",
+      "Missing data",
+      "vent-warning"
+    );
   }
 
-  // 2. Tidal volume per kg PBW
-  if (vt !== null && vt > 0 && pbw !== null && pbw > 0) {
+  // 2. Tidal volume per kg PBW and individual target volume
+  if (vt !== null && vt > 0 && pbw !== null) {
     const vtPerKg = vt / pbw;
+    const lowVT = pbw * 4;
+    const targetVT = pbw * 6;
+    const highVT = pbw * 8;
 
-    results.push(
-      "Tidal volume: " + vtPerKg.toFixed(1) + " mL/kg PBW"
+    let interpretation = "Within 4–8 mL/kg PBW";
+    let status = "vent-good";
+
+    if (vtPerKg < 4) {
+      interpretation = "Below 4 mL/kg PBW";
+      status = "vent-warning";
+    } else if (vtPerKg > 8) {
+      interpretation = "Above 8 mL/kg PBW";
+      status = "vent-warning";
+    } else if (vtPerKg > 6) {
+      interpretation = "Within range; above 6 mL/kg reference";
+      status = "vent-info";
+    }
+
+    addRow(
+      "Set tidal volume",
+      show(vt, 0) + " mL (" + show(vtPerKg, 2) + " mL/kg PBW)",
+      "4–8 mL/kg PBW in ARDS; initial reference 6 mL/kg",
+      interpretation,
+      status
+    );
+
+    addRow(
+      "Patient-specific VT range",
+      "—",
+      show(lowVT, 0) + "–" + show(highVT, 0) +
+      " mL; 6 mL/kg = " + show(targetVT, 0) + " mL",
+      "Calculated from PBW",
+      "vent-info"
     );
   } else {
-    results.push("Tidal volume/PBW: Enter valid tidal volume, sex and height.");
+    addRow(
+      "Set tidal volume",
+      "—",
+      "Requires valid VT, sex and height",
+      "Missing data",
+      "vent-warning"
+    );
   }
 
-  // 3. P/F ratio
+  // 3. P/F ratio and oxygenation category
+  let pfRatio = null;
+
   if (
     paO2 !== null && paO2 > 0 &&
     fio2 !== null && fio2 > 0 && fio2 <= 100
   ) {
-    const pfRatio = paO2 / (fio2 / 100);
+    pfRatio = paO2 / (fio2 / 100);
 
-    results.push("P/F ratio: " + pfRatio.toFixed(0));
+    let category = "";
+    let interpretation = "";
+    let status = "vent-info";
+
+    if (pfRatio > 300) {
+      category = "Above 300";
+      interpretation = "Above ARDS oxygenation thresholds";
+      status = "vent-good";
+    } else if (pfRatio > 200) {
+      category = "Mild range";
+      interpretation = "Mild oxygenation impairment range";
+      status = "vent-info";
+    } else if (pfRatio > 100) {
+      category = "Moderate range";
+      interpretation = "Moderate oxygenation impairment range";
+      status = "vent-warning";
+    } else {
+      category = "Severe range";
+      interpretation = "Severe oxygenation impairment range";
+      status = "vent-warning";
+    }
+
+    if (peep === null || peep < 5) {
+      interpretation += "; Berlin category requires PEEP ≥5";
+      status = "vent-info";
+    }
+
+    addRow(
+      "P/F ratio",
+      show(pfRatio, 0),
+      "ARDS oxygenation ranges: mild 201–300; moderate 101–200; severe ≤100, with PEEP ≥5",
+      category + " — " + interpretation,
+      status
+    );
   } else {
-    results.push("P/F ratio: Enter PaO₂ and FiO₂ (1–100%).");
+    addRow(
+      "P/F ratio",
+      "—",
+      "PaO₂ ÷ FiO₂ fraction",
+      "Enter PaO₂ and FiO₂ (1–100%)",
+      "vent-warning"
+    );
   }
 
-  // 4. Driving pressure
+  // 4. Plateau pressure
+  if (plateau !== null && plateau >= 0) {
+    const status = plateau < 30 ? "vent-good" : "vent-warning";
+
+    addRow(
+      "Plateau pressure",
+      show(plateau) + " cmH₂O",
+      "<30 cmH₂O in ARDS",
+      plateau < 30 ? "Below ARDS threshold" : "At or above ARDS threshold",
+      status
+    );
+  } else {
+    addRow(
+      "Plateau pressure",
+      "—",
+      "<30 cmH₂O in ARDS",
+      "Enter plateau pressure",
+      "vent-warning"
+    );
+  }
+
+  // 5. PEEP
+  if (peep !== null && peep >= 0) {
+    addRow(
+      "Total PEEP",
+      show(peep) + " cmH₂O",
+      "Individualize according to disease and respiratory mechanics",
+      "Assess intrinsic PEEP and patient response",
+      "vent-info"
+    );
+  } else {
+    addRow(
+      "Total PEEP",
+      "—",
+      "Individualized",
+      "Enter total PEEP",
+      "vent-warning"
+    );
+  }
+
+  // 6. Driving pressure
+  let drivingPressure = null;
+
   if (
     plateau !== null && plateau >= 0 &&
-    peep !== null && peep >= 0
+    peep !== null && peep >= 0 &&
+    plateau > peep
   ) {
     drivingPressure = plateau - peep;
 
-    if (drivingPressure > 0) {
-      results.push(
-        "Driving pressure: " + drivingPressure.toFixed(1) + " cmH₂O"
-      );
-    } else {
-      results.push(
-        "Driving pressure: Cannot calculate; plateau pressure must exceed total PEEP."
-      );
-      drivingPressure = null;
-    }
+    addRow(
+      "Driving pressure",
+      show(drivingPressure) + " cmH₂O",
+      "Minimize where possible; no universally established target",
+      "Trend with compliance and clinical response",
+      "vent-info"
+    );
   } else {
-    results.push("Driving pressure: Enter plateau pressure and total PEEP.");
+    addRow(
+      "Driving pressure",
+      "—",
+      "Plateau pressure − total PEEP",
+      "Requires valid plateau pressure greater than PEEP",
+      "vent-warning"
+    );
   }
 
-  // 5. Static compliance
+  // 7. Static compliance
   if (
     vt !== null && vt > 0 &&
     drivingPressure !== null && drivingPressure > 0
   ) {
     const compliance = vt / drivingPressure;
 
-    results.push(
-      "Static compliance: " + compliance.toFixed(1) + " mL/cmH₂O"
+    addRow(
+      "Static compliance",
+      show(compliance) + " mL/cmH₂O",
+      "No single universal target; compare with prior measurements",
+      "Interpret with lung/chest-wall mechanics and trend",
+      "vent-info"
     );
   } else {
-    results.push(
-      "Static compliance: Requires valid tidal volume and driving pressure."
+    addRow(
+      "Static compliance",
+      "—",
+      "VT ÷ driving pressure",
+      "Requires valid VT and driving pressure",
+      "vent-warning"
     );
   }
 
-  results.push("");
-  results.push(
-    "Reference for adult ARDS: tidal volume 4–8 mL/kg PBW and plateau pressure <30 cmH₂O."
-  );
-  results.push(
-    "These values are not universal targets for every patient."
-  );
-
-  document.getElementById("ventResult").textContent =
-    results.join("\n");
+  document.getElementById("ventResult").innerHTML = `
+    <table class="vent-table">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Calculated</th>
+          <th>Reference / target</th>
+          <th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join("")}
+      </tbody>
+    </table>
+  `;
 }
+
 
 function calculateFluid() {
   const weight = Number(document.getElementById("weight").value);
@@ -736,6 +963,8 @@ function makeSBAR() {
     "\n\nVerify all details before handover.";
 
   document.getElementById("sbar").value = summary;
+document.getElementById("ventResult").innerHTML =
+  "<p>Enter the ventilator and patient measurements, then calculate.</p>";
 }
 
 function copySBAR() {
