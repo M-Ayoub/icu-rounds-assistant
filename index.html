@@ -137,6 +137,27 @@ fields.forEach(k=>{
   localStorage.setItem(KEY,JSON.stringify(data));
  });
 });
+ 
+function calculateFluid(){
+ const weight=Number(document.getElementById("weight").value);
+ const input=Number(document.getElementById("fluidIn").value);
+ const output=Number(document.getElementById("fluidOut").value);
+ const hours=Number(document.getElementById("duration").value);
+
+ if(input<0 || output<0 || weight<=0 || hours<=0){
+  alert("Enter valid positive weight and duration, and non-negative fluid values.");
+  return;
+ }
+
+ const balance=input-output;
+ const urineRate=output/(weight*hours);
+
+ document.getElementById("fluidResult").innerHTML=
+  "<h4>Calculation results</h4>"+
+  "<p>Net fluid balance: <b>"+balance.toFixed(0)+" mL</b></p>"+
+  "<p>Output rate: <b>"+urineRate.toFixed(2)+" mL/kg/hour</b></p>";
+}
+
 function makeSBAR(){
  let p=data[active];
  document.getElementById("sbar").value=
