@@ -97,7 +97,7 @@ Net balance and urine output will appear here.
 const KEY="icu_rounds_data";
 let data=JSON.parse(localStorage.getItem(KEY)||"[]");
 let active=null;
-const fields=["diagnosis","events","cns","resp","cv","renal","infection","other","labs","plan"];
+const fields=["diagnosis","events","cns","resp","cv","renal","infection","other","labs","weight","fluidIn","fluidOut","duration","plan"];
 
 function save(){
  localStorage.setItem(KEY,JSON.stringify(data));
