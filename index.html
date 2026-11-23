@@ -1,7 +1,6 @@
+
 <!DOCTYPE html>
 <html lang="en">
- 
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,26 +9,90 @@
 <link rel="manifest" href="./manifest.webmanifest">
 
 <style>
-body{font-family:Arial,sans-serif;background:#f2f5f7;color:#17212b;margin:0}
-header{background:#123047;color:white;padding:18px}
-main{padding:14px;max-width:700px;margin:auto}
-section{background:white;padding:14px;border-radius:12px;margin:12px 0}
-input,textarea{width:100%;padding:11px;margin:5px 0 12px;box-sizing:border-box;border:1px solid #bbb;border-radius:7px;font:inherit}
-textarea{min-height:65px}
-button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;margin:4px}
-.patient{padding:9px;border-bottom:1px solid #ddd}
-.warning{background:#fff0cc;padding:12px;border-radius:8px;font-size:13px}
+* { box-sizing: border-box; }
 
- 
-/* ICU expandable clinical cards */
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f5f7;
+  color: #17212b;
+  margin: 0;
+}
+
+header {
+  background: #123047;
+  color: white;
+  padding: 18px;
+}
+
+main {
+  padding: 14px;
+  max-width: 700px;
+  margin: auto;
+}
+
+section {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
+h3 { margin-top: 8px; }
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 11px;
+  margin: 5px 0 12px;
+  border: 1px solid #bbb;
+  border-radius: 7px;
+  font: inherit;
+  background: white;
+  color: #17212b;
+}
+
+textarea { min-height: 75px; }
+
+button {
+  padding: 11px 14px;
+  background: #145b78;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  margin: 4px;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:active { opacity: .8; }
+
+.warning {
+  background: #fff0cc;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.patient {
+  padding: 9px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Expandable clinical cards */
 
 .clinical-card {
-  background: #FFFFFF;
-  border: 1px solid #E3EAF2;
-  border-radius: 17px;
+  background: #fff;
+  border: 1px solid #e3eaf2;
+  border-radius: 15px;
   margin: 14px 0;
   overflow: hidden;
-  box-shadow: 0 3px 12px rgba(35,60,90,.04);
+  box-shadow: 0 3px 12px rgba(35,60,90,.05);
 }
 
 .clinical-card summary {
@@ -37,15 +100,14 @@ button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;ma
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 17px;
+  padding: 15px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 700;
-  color: #FFFFFF !important;
-  background: #123047 !important;
+  color: #fff;
+  background: #123047;
+  min-height: 72px;
 }
-
-
 
 .clinical-card summary::-webkit-details-marker {
   display: none;
@@ -54,7 +116,7 @@ button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;ma
 .clinical-card summary::after {
   content: "+";
   margin-left: auto;
-  color: #4385C5;
+  color: #fff;
   font-size: 24px;
   font-weight: 400;
 }
@@ -62,6 +124,8 @@ button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;ma
 .clinical-card[open] summary::after {
   content: "−";
 }
+
+/* The icon keeps its own light background */
 
 .card-icon {
   width: 45px;
@@ -74,239 +138,495 @@ button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;ma
   flex-shrink: 0;
 }
 
+.card-neuro { background: #e8f1fc; }
+.card-respiratory { background: #e5f5f3; }
+.card-cardiac { background: #fce9e6; }
+.card-renal { background: #f0ebfa; }
+.card-infection { background: #fff3e2; }
+.card-other { background: #f0f2f5; }
+.card-labs { background: #e9effb; }
+.card-plan { background: #eaf3eb; }
+.card-handover { background: #e9effb; }
+.card-fluid { background: #e5f5f3; }
+
 .card-content {
   padding: 15px 17px 18px;
-  border-top: 1px solid #EDF1F5;
+  border-top: 1px solid #edf1f5;
+  color: #243447;
 }
+
+.card-content label { color: #243447; }
 
 .card-subtitle {
   color: #718096;
   font-size: 12px;
   letter-spacing: .5px;
   margin: 0 0 14px;
+  font-weight: 700;
 }
 
-.card-neuro { background: #E8F1FC; }
-.card-respiratory { background: #E5F5F3; }
-.card-cardiac { background: #FCEDEA; }
-.card-renal { background: #F0EBFA; }
-.card-infection { background: #FFF3E2; }
-.card-plan { background: #EAF3EB; }
-.card-handover { background: #E9EFFB; }
-
-/* Force readable text inside all clinical cards */
-
-.clinical-card,
-.clinical-card .card-content,
-.clinical-card .card-content label,
-.clinical-card .card-subtitle {
-  color: #243447 !important;
+.card-note {
+  color: #526273;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: -5px;
 }
 
-.clinical-card summary,
-.clinical-card summary span {
-  color: #FFFFFF !important;
-  background-color: #123047 !important;
+.result {
+  background: #f2f6f9;
+  border-radius: 8px;
+  padding: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
 
-
+.actions button { flex: 1 1 130px; }
 
 </style>
 </head>
+
 <body>
+
 <header>
-<h2>ICU Rounds Assistant</h2>
-Personal offline clinical organizer
+  <h2>ICU Rounds Assistant</h2>
+  Personal offline clinical organizer
 </header>
+
 <main>
-<p class="warning"><b>Important:</b> Prototype only. Not a validated medical record system. Do not enter identifiable patient information. Data is stored locally and is not encrypted.</p>
+
+<p class="warning">
+  <b>Important:</b> Prototype only. Not a validated medical record system.
+  Do not enter identifiable patient information. Data is stored locally
+  and is not encrypted.
+</p>
 
 <section>
-<h3>Patient / Bed list</h3>
-<div id="patients"></div>
-<label>Bed label</label>
-<input id="bed" placeholder="Example: Bed 01">
-<button onclick="addPatient()">Add patient</button>
+  <h3>Patient / Bed list</h3>
+  <div id="patients"></div>
+
+  <label for="bed">Bed label</label>
+  <input id="bed" placeholder="Example: Bed 01">
+
+  <button onclick="addPatient()">Add patient</button>
 </section>
 
 <section id="record" hidden>
-<h3 id="heading"></h3>
-<label>Working diagnosis</label>
-<textarea id="diagnosis"></textarea>
-<label>Events in last 24 hours</label>
-<textarea id="events"></textarea>
- <details class="clinical-card">
-  <summary>
-    <span class="card-icon card-neuro">🧠</span>
-    <span>Neurological assessment</span>
-  </summary>
-  <div class="card-content">
-    <p class="card-subtitle">NEUROLOGICAL STATUS</p>
-<label>CNS</label>
-<textarea id="cns" placeholder="GCS, pupils, sedation..."></textarea>
+
+  <h3 id="heading">Patient record</h3>
+
+  <details class="clinical-card" open>
+    <summary>
+      <span class="card-icon card-other">📋</span>
+      <span>Diagnosis and daily events</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">PATIENT OVERVIEW</p>
+
+      <label for="diagnosis">Working diagnosis</label>
+      <textarea id="diagnosis" placeholder="Main diagnosis and active problems..."></textarea>
+
+      <label for="events">Events in last 24 hours</label>
+      <textarea id="events" placeholder="Clinical events, procedures, changes..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-neuro">🧠</span>
+      <span>Neurological assessment</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">NEUROLOGICAL STATUS</p>
+      <label for="cns">CNS</label>
+      <textarea id="cns" placeholder="GCS, pupils, sedation, motor response..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-respiratory">🫁</span>
+      <span>Respiratory assessment</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">RESPIRATORY STATUS</p>
+      <label for="resp">Respiratory</label>
+      <textarea id="resp" placeholder="Mode, VT, RR, PEEP, FiO2, ABG, P/F ratio..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-cardiac">❤️</span>
+      <span>Cardiovascular assessment</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">HEMODYNAMIC STATUS</p>
+      <label for="cv">Cardiovascular</label>
+      <textarea id="cv" placeholder="HR, BP, MAP, perfusion, vasopressors, echo..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-renal">🩺</span>
+      <span>Renal and metabolic assessment</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">RENAL / METABOLIC STATUS</p>
+      <label for="renal">Renal / Metabolic</label>
+      <textarea id="renal" placeholder="Urine output, creatinine, electrolytes, acid-base status..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-infection">🦠</span>
+      <span>Infection assessment</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">INFECTION / SEPSIS</p>
+      <label for="infection">Infection</label>
+      <textarea id="infection" placeholder="Cultures, antibiotics, source, inflammatory markers, source control..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-other">🍽️</span>
+      <span>Other systems and nutrition</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">ADDITIONAL ASSESSMENT</p>
+      <label for="other">Other / Nutrition</label>
+      <textarea id="other" placeholder="GI, skin, lines, nutrition, prophylaxis, other issues..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-labs">🧪</span>
+      <span>Investigations and laboratory results</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">INVESTIGATIONS</p>
+      <label for="labs">Investigations / Labs</label>
+      <textarea id="labs" placeholder="CBC, renal profile, ABG, lactate, imaging, cultures..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-fluid">💧</span>
+      <span>Fluid balance calculator</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">FLUID BALANCE</p>
+
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" type="number" min="0" step="0.1" placeholder="70">
+
+      <label for="fluidIn">Total fluid intake (mL)</label>
+      <input id="fluidIn" type="number" min="0" placeholder="2500">
+
+      <label for="fluidOut">Total fluid output (mL)</label>
+      <input id="fluidOut" type="number" min="0" placeholder="1800">
+
+      <label for="duration">Duration (hours)</label>
+      <input id="duration" type="number" min="0" step="0.1" placeholder="24">
+
+      <p class="card-note">
+        The output rate below uses the total output entered. For urine
+        output in mL/kg/hour, enter urine volume alone as the output.
+      </p>
+
+      <button onclick="calculateFluid()">Calculate</button>
+      <div id="fluidResult" class="result" aria-live="polite">
+        Net balance and output rate will appear here.
+      </div>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-plan">📝</span>
+      <span>Assessment and daily plan</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">DAILY MANAGEMENT PLAN</p>
+      <label for="plan">Assessment and plan</label>
+      <textarea id="plan" placeholder="Problems, targets, interventions, pending tasks..."></textarea>
+    </div>
+  </details>
+
+  <details class="clinical-card">
+    <summary>
+      <span class="card-icon card-handover">📄</span>
+      <span>SBAR handover</span>
+    </summary>
+    <div class="card-content">
+      <p class="card-subtitle">STRUCTURED HANDOVER</p>
+
+      <button onclick="makeSBAR()">Generate SBAR</button>
+
+      <label for="sbar">SBAR summary</label>
+      <textarea id="sbar" placeholder="SBAR summary will appear here..."></textarea>
+
+      <div class="actions">
+        <button onclick="copySBAR()">Copy SBAR</button>
+        <button onclick="exportData()">Export this patient</button>
+      </div>
+    </div>
+  </details>
+
+  <div class="actions">
+    <button onclick="exportData()">Export patient backup</button>
+    <button onclick="deletePatient()">Delete patient</button>
   </div>
- </details>
-   
-<details class="clinical-card">
-  <summary>
-    <span class="card-icon card-respiratory">🫁</span>
-    <span>Respiratory assessment</span>
-  </summary>
-  <div class="card-content">
-    <p class="card-subtitle">RESPIRATORY STATUS</p>
-    <label>Respiratory</label>
-    <textarea id="resp" placeholder="Mode, VT, PEEP, FiO2, ABG..."></textarea>
-  </div>
-</details>
 
-<label>Cardiovascular</label>
-<textarea id="cv" placeholder="HR, BP, MAP, vasopressors..."></textarea>
-<label>Renal / Metabolic</label>
-<textarea id="renal" placeholder="Urine output, fluid balance, creatinine..."></textarea>
-<label>Infection</label>
-<textarea id="infection" placeholder="Cultures, antibiotics, source control..."></textarea>
-<label>Other / Nutrition</label>
-<textarea id="other"></textarea>
-<label>Investigations / Labs</label>
-<textarea id="labs"></textarea>
- 
-<h3>Fluid Balance Calculator</h3>
-
-<label>Weight (kg)</label>
-<input id="weight" type="number" min="0" step="0.1" placeholder="70">
-
-<label>Total fluid intake (mL)</label>
-<input id="fluidIn" type="number" min="0" placeholder="2500">
-
-<label>Total fluid output (mL)</label>
-<input id="fluidOut" type="number" min="0" placeholder="1800">
-
-<label>Duration (hours)</label>
-<input id="duration" type="number" min="0" placeholder="24">
-
-<button onclick="calculateFluid()">Calculate</button>
-
-<div id="fluidResult">
-Net balance and urine output will appear here.
-</div>
-
-<label>Assessment and plan</label>
-<textarea id="plan"></textarea>
-<button onclick="makeSBAR()">Generate SBAR</button>
-<textarea id="sbar" placeholder="SBAR summary will appear here"></textarea>
-<button onclick="copySBAR()">Copy SBAR</button>
-<button onclick="exportData()">Export backup</button>
-<button onclick="deletePatient()">Delete patient</button>
 </section>
 
 <section>
-<h3>Backup</h3>
-<button onclick="exportAll()">Export all patients</button>
-<p>Export backups regularly. Browser data can be lost if cleared or reset.</p>
+  <h3>Backup</h3>
+  <button onclick="exportAll()">Export all patients</button>
+  <p class="card-note">
+    Export backups regularly. Browser data can be lost if browser storage
+    is cleared or reset.
+  </p>
 </section>
+
 </main>
 
 <script>
-const KEY="icu_rounds_data";
-let data=JSON.parse(localStorage.getItem(KEY)||"[]");
-let active=null;
-const fields=["diagnosis","events","cns","resp","cv","renal","infection","other","labs","weight","fluidIn","fluidOut","duration","plan"];
+/* Keep this storage key unchanged to preserve existing patient records. */
+const KEY = "icu_rounds_data";
 
-function save(){
- localStorage.setItem(KEY,JSON.stringify(data));
- render();
+let data = [];
+
+try {
+  const stored = localStorage.getItem(KEY);
+  data = stored ? JSON.parse(stored) : [];
+  if (!Array.isArray(data)) data = [];
+} catch (error) {
+  alert("Stored data could not be read. Do not clear browser data. Export or recover your backup before making further changes.");
+  data = [];
 }
-function render(){
- document.getElementById("patients").innerHTML="";
- data.forEach((p,i)=>{
-  let d=document.createElement("div");
-  d.className="patient";
-  let b=document.createElement("button");
-  b.textContent="Open";
-  b.onclick=()=>openPatient(i);
-  d.append(p.bed+" ",b);
-  document.getElementById("patients").append(d);
- });
+
+let active = null;
+
+/* Keep all original field IDs unchanged. */
+const fields = [
+  "diagnosis", "events", "cns", "resp", "cv", "renal",
+  "infection", "other", "labs", "weight", "fluidIn",
+  "fluidOut", "duration", "plan"
+];
+
+function save() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    render();
+    return true;
+  } catch (error) {
+    alert("Could not save data. Check available device storage.");
+    return false;
+  }
 }
-function addPatient(){
- let bed=document.getElementById("bed").value.trim();
- if(!bed)return alert("Enter a bed label");
- data.push({bed});
- document.getElementById("bed").value="";
- save();
- openPatient(data.length-1);
+
+function render() {
+  const container = document.getElementById("patients");
+  container.innerHTML = "";
+
+  data.forEach((p, i) => {
+    const row = document.createElement("div");
+    row.className = "patient";
+
+    const button = document.createElement("button");
+    button.textContent = "Open";
+    button.onclick = () => openPatient(i);
+
+    row.append(document.createTextNode((p.bed || "Unnamed bed") + " "));
+    row.append(button);
+    container.append(row);
+  });
 }
-function openPatient(i){
- active=i;
- let p=data[i];
- document.getElementById("record").hidden=false;
- document.getElementById("heading").textContent=p.bed;
- fields.forEach(k=>document.getElementById(k).value=p[k]||"");
+
+function addPatient() {
+  const bed = document.getElementById("bed").value.trim();
+
+  if (!bed) {
+    alert("Enter a bed label.");
+    return;
+  }
+
+  data.push({ bed: bed });
+  document.getElementById("bed").value = "";
+
+  if (save()) {
+    openPatient(data.length - 1);
+  }
 }
-fields.forEach(k=>{
- document.getElementById(k).addEventListener("input",()=>{
-  if(active===null)return;
-  data[active][k]=document.getElementById(k).value;
-  localStorage.setItem(KEY,JSON.stringify(data));
- });
+
+function openPatient(i) {
+  if (!data[i]) return;
+
+  active = i;
+  const p = data[i];
+
+  document.getElementById("record").hidden = false;
+  document.getElementById("heading").textContent = p.bed || "Patient record";
+
+  fields.forEach(k => {
+    const element = document.getElementById(k);
+    if (element) element.value = p[k] ?? "";
+  });
+
+  document.getElementById("sbar").value = "";
+  document.getElementById("fluidResult").textContent =
+    "Net balance and output rate will appear here.";
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* Auto-save all original patient fields. */
+fields.forEach(k => {
+  const element = document.getElementById(k);
+
+  element.addEventListener("input", () => {
+    if (active === null || !data[active]) return;
+
+    data[active][k] = element.value;
+
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (error) {
+      alert("Could not save changes. Check available device storage.");
+    }
+  });
 });
- 
-function calculateFluid(){
- const weight=Number(document.getElementById("weight").value);
- const input=Number(document.getElementById("fluidIn").value);
- const output=Number(document.getElementById("fluidOut").value);
- const hours=Number(document.getElementById("duration").value);
 
- if(input<0 || output<0 || weight<=0 || hours<=0){
-  alert("Enter valid positive weight and duration, and non-negative fluid values.");
-  return;
- }
+function calculateFluid() {
+  const weight = Number(document.getElementById("weight").value);
+  const input = Number(document.getElementById("fluidIn").value);
+  const output = Number(document.getElementById("fluidOut").value);
+  const hours = Number(document.getElementById("duration").value);
 
- const balance=input-output;
- const urineRate=output/(weight*hours);
+  if (
+    !Number.isFinite(weight) ||
+    !Number.isFinite(input) ||
+    !Number.isFinite(output) ||
+    !Number.isFinite(hours) ||
+    weight <= 0 || input < 0 || output < 0 || hours <= 0
+  ) {
+    alert("Enter a valid positive weight and duration, and non-negative fluid values.");
+    return;
+  }
 
- document.getElementById("fluidResult").innerHTML=
-  "<h4>Calculation results</h4>"+
-  "<p>Net fluid balance: <b>"+balance.toFixed(0)+" mL</b></p>"+
-  "<p>Output rate: <b>"+urineRate.toFixed(2)+" mL/kg/hour</b></p>";
+  const balance = input - output;
+  const outputRate = output / (weight * hours);
+
+  document.getElementById("fluidResult").innerHTML =
+    "<h4>Calculation results</h4>" +
+    "<p>Net fluid balance: <b>" + balance.toFixed(0) + " mL</b></p>" +
+    "<p>Average output rate: <b>" + outputRate.toFixed(2) +
+    " mL/kg/hour</b></p>";
 }
 
-function makeSBAR(){
- let p=data[active];
- document.getElementById("sbar").value=
- "SITUATION\\n"+p.bed+" — "+(p.diagnosis||"")+
- "\\n\\nBACKGROUND\\n"+(p.events||"")+
- "\\n\\nASSESSMENT\\nCNS: "+(p.cns||"")+
- "\\nRespiratory: "+(p.resp||"")+
- "\\nCardiovascular: "+(p.cv||"")+
- "\\nRenal: "+(p.renal||"")+
- "\\nInfection: "+(p.infection||"")+
- "\\nOther: "+(p.other||"")+
- "\\nLabs: "+(p.labs||"")+
- "\\n\\nRECOMMENDATION / PLAN\\n"+(p.plan||"")+
- "\\n\\nVerify all details before handover.";
+function makeSBAR() {
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
+    return;
+  }
+
+  const p = data[active];
+
+  const summary =
+    "SITUATION\n" +
+    (p.bed || "") + " — " + (p.diagnosis || "") +
+
+    "\n\nBACKGROUND\n" +
+    (p.events || "") +
+
+    "\n\nASSESSMENT\n" +
+    "CNS: " + (p.cns || "") +
+    "\nRespiratory: " + (p.resp || "") +
+    "\nCardiovascular: " + (p.cv || "") +
+    "\nRenal: " + (p.renal || "") +
+    "\nInfection: " + (p.infection || "") +
+    "\nOther: " + (p.other || "") +
+    "\nLabs: " + (p.labs || "") +
+
+    "\n\nRECOMMENDATION / PLAN\n" +
+    (p.plan || "") +
+
+    "\n\nVerify all details before handover.";
+
+  document.getElementById("sbar").value = summary;
 }
-function copySBAR(){
- navigator.clipboard.writeText(document.getElementById("sbar").value)
- .then(()=>alert("Copied")).catch(()=>alert("Copy not available"));
+
+function copySBAR() {
+  const text = document.getElementById("sbar").value;
+
+  if (!text) {
+    alert("Generate the SBAR summary first.");
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("SBAR copied."))
+      .catch(() => alert("Copy not available on this device."));
+  } else {
+    alert("Copy is not available in this browser.");
+  }
 }
-function download(obj,name){
- let a=document.createElement("a");
- let u=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));
- a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+
+function download(obj, name) {
+  const blob = new Blob(
+    [JSON.stringify(obj, null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-function exportData(){
- if(active!==null)download(data[active],"icu-bed-backup.json");
+
+function exportData() {
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
+    return;
+  }
+
+  download(data[active], "icu-bed-backup.json");
 }
-function exportAll(){download(data,"icu-rounds-backup.json")}
-function deletePatient(){
- if(active===null)return;
- if(confirm("Delete this patient record?")){
-  data.splice(active,1);active=null;
-  document.getElementById("record").hidden=true;save();
- }
+
+function exportAll() {
+  download(data, "icu-rounds-backup.json");
 }
+
+function deletePatient() {
+  if (active === null || !data[active]) return;
+
+  if (confirm("Delete this patient record? This cannot be undone unless you have a backup.")) {
+    data.splice(active, 1);
+    active = null;
+    document.getElementById("record").hidden = true;
+    save();
+  }
+}
+
 render();
 </script>
 
