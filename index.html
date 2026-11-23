@@ -45,7 +45,7 @@ label {
   margin-top: 10px;
 }
 
-input, textarea {
+input, textarea, select {
   width: 100%;
   padding: 11px;
   margin: 5px 0 12px;
@@ -478,7 +478,9 @@ let active = null;
 const fields = [
   "diagnosis", "events", "cns", "resp", "cv", "renal",
   "infection", "other", "labs", "weight", "fluidIn",
-  "fluidOut", "duration", "plan"
+  "fluidOut", "duration", "plan",
+  "ventSex", "heightCm", "setVT", "paO2",
+  "fio2Percent", "plateauPressure", "totalPeep"
 ];
 
 function save() {
@@ -563,6 +565,119 @@ fields.forEach(k => {
     }
   });
 });
+
+function calculateVentilator() {
+  const getValue = id => {
+    const value = document.getElementById(id).value.trim();
+    if (value === "") return null;
+
+    const number = Number(value);
+    return Number.isFinite(number) ? number : null;
+  };
+
+  const sex = document.getElementById("ventSex").value;
+  const height = getValue("heightCm");
+  const vt = getValue("setVT");
+  const paO2 = getValue("paO2");
+  const fio2 = getValue("fio2Percent");
+  const plateau = getValue("plateauPressure");
+  const peep = getValue("totalPeep");
+
+  const results = [];
+
+  let pbw = null;
+  let drivingPressure = null;
+
+  // 1. Predicted body weight
+  if (height !== null && height > 0 && sex !== "") {
+    if (sex === "male") {
+      pbw = 50 + 0.91 * (height - 152.4);
+    } else if (sex === "female") {
+      pbw = 45.5 + 0.91 * (height - 152.4);
+    }
+
+    if (pbw !== null && pbw > 0) {
+      results.push(
+        "Predicted body weight: " + pbw.toFixed(1) + " kg"
+      );
+    } else {
+      results.push("PBW: Invalid height or sex selection.");
+    }
+  } else {
+    results.push("PBW: Enter sex and height.");
+  }
+
+  // 2. Tidal volume per kg PBW
+  if (vt !== null && vt > 0 && pbw !== null && pbw > 0) {
+    const vtPerKg = vt / pbw;
+
+    results.push(
+      "Tidal volume: " + vtPerKg.toFixed(1) + " mL/kg PBW"
+    );
+  } else {
+    results.push("Tidal volume/PBW: Enter valid tidal volume, sex and height.");
+  }
+
+  // 3. P/F ratio
+  if (
+    paO2 !== null && paO2 > 0 &&
+    fio2 !== null && fio2 > 0 && fio2 <= 100
+  ) {
+    const pfRatio = paO2 / (fio2 / 100);
+
+    results.push("P/F ratio: " + pfRatio.toFixed(0));
+  } else {
+    results.push("P/F ratio: Enter PaO₂ and FiO₂ (1–100%).");
+  }
+
+  // 4. Driving pressure
+  if (
+    plateau !== null && plateau >= 0 &&
+    peep !== null && peep >= 0
+  ) {
+    drivingPressure = plateau - peep;
+
+    if (drivingPressure > 0) {
+      results.push(
+        "Driving pressure: " + drivingPressure.toFixed(1) + " cmH₂O"
+      );
+    } else {
+      results.push(
+        "Driving pressure: Cannot calculate; plateau pressure must exceed total PEEP."
+      );
+      drivingPressure = null;
+    }
+  } else {
+    results.push("Driving pressure: Enter plateau pressure and total PEEP.");
+  }
+
+  // 5. Static compliance
+  if (
+    vt !== null && vt > 0 &&
+    drivingPressure !== null && drivingPressure > 0
+  ) {
+    const compliance = vt / drivingPressure;
+
+    results.push(
+      "Static compliance: " + compliance.toFixed(1) + " mL/cmH₂O"
+    );
+  } else {
+    results.push(
+      "Static compliance: Requires valid tidal volume and driving pressure."
+    );
+  }
+
+  results.push("");
+  results.push(
+    "Reference for adult ARDS: tidal volume 4–8 mL/kg PBW and plateau pressure <30 cmH₂O."
+  );
+  results.push(
+    "These values are not universal targets for every patient."
+  );
+
+  document.getElementById("ventResult").textContent =
+    results.join("\n");
+}
 
 function calculateFluid() {
   const weight = Number(document.getElementById("weight").value);
