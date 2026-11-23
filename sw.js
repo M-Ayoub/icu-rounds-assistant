@@ -1,5 +1,5 @@
 
-const CACHE = "icu-rounds-v1";
+const CACHE = "icu-rounds-v2";
 
 const FILES = [
   "./",
