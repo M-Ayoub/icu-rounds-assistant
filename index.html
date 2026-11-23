@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123047">
+<title>ICU Rounds Assistant</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f2f5f7;color:#17212b;margin:0}
+header{background:#123047;color:white;padding:18px}
+main{padding:14px;max-width:700px;margin:auto}
+section{background:white;padding:14px;border-radius:12px;margin:12px 0}
+input,textarea{width:100%;padding:11px;margin:5px 0 12px;box-sizing:border-box;border:1px solid #bbb;border-radius:7px;font:inherit}
+textarea{min-height:65px}
+button{padding:11px;background:#145b78;color:white;border:0;border-radius:7px;margin:4px}
+.patient{padding:9px;border-bottom:1px solid #ddd}
+.warning{background:#fff0cc;padding:12px;border-radius:8px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+<h2>ICU Rounds Assistant</h2>
+Personal offline clinical organizer
+</header>
+<main>
+<p class="warning"><b>Important:</b> Prototype only. Not a validated medical record system. Do not enter identifiable patient information. Data is stored locally and is not encrypted.</p>
+
+<section>
+<h3>Patient / Bed list</h3>
+<div id="patients"></div>
+<label>Bed label</label>
+<input id="bed" placeholder="Example: Bed 01">
+<button onclick="addPatient()">Add patient</button>
+</section>
+
+<section id="record" hidden>
+<h3 id="heading"></h3>
+<label>Working diagnosis</label>
+<textarea id="diagnosis"></textarea>
+<label>Events in last 24 hours</label>
+<textarea id="events"></textarea>
+<label>CNS</label>
+<textarea id="cns" placeholder="GCS, pupils, sedation..."></textarea>
+<label>Respiratory</label>
+<textarea id="resp" placeholder="Mode, VT, PEEP, FiO2, ABG..."></textarea>
+<label>Cardiovascular</label>
+<textarea id="cv" placeholder="HR, BP, MAP, vasopressors..."></textarea>
+<label>Renal / Metabolic</label>
+<textarea id="renal" placeholder="Urine output, fluid balance, creatinine..."></textarea>
+<label>Infection</label>
+<textarea id="infection" placeholder="Cultures, antibiotics, source control..."></textarea>
+<label>Other / Nutrition</label>
+<textarea id="other"></textarea>
+<label>Investigations / Labs</label>
+<textarea id="labs"></textarea>
+<label>Assessment and plan</label>
+<textarea id="plan"></textarea>
+<button onclick="makeSBAR()">Generate SBAR</button>
+<textarea id="sbar" placeholder="SBAR summary will appear here"></textarea>
+<button onclick="copySBAR()">Copy SBAR</button>
+<button onclick="exportData()">Export backup</button>
+<button onclick="deletePatient()">Delete patient</button>
+</section>
+
+<section>
+<h3>Backup</h3>
+<button onclick="exportAll()">Export all patients</button>
+<p>Export backups regularly. Browser data can be lost if cleared or reset.</p>
+</section>
+</main>
+
+<script>
+const KEY="icu_rounds_data";
+let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+let active=null;
+const fields=["diagnosis","events","cns","resp","cv","renal","infection","other","labs","plan"];
+
+function save(){
+ localStorage.setItem(KEY,JSON.stringify(data));
+ render();
+}
+function render(){
+ document.getElementById("patients").innerHTML="";
+ data.forEach((p,i)=>{
+  let d=document.createElement("div");
+  d.className="patient";
+  let b=document.createElement("button");
+  b.textContent="Open";
+  b.onclick=()=>openPatient(i);
+  d.append(p.bed+" ",b);
+  document.getElementById("patients").append(d);
+ });
+}
+function addPatient(){
+ let bed=document.getElementById("bed").value.trim();
+ if(!bed)return alert("Enter a bed label");
+ data.push({bed});
+ document.getElementById("bed").value="";
+ save();
+ openPatient(data.length-1);
+}
+function openPatient(i){
+ active=i;
+ let p=data[i];
+ document.getElementById("record").hidden=false;
+ document.getElementById("heading").textContent=p.bed;
+ fields.forEach(k=>document.getElementById(k).value=p[k]||"");
+}
+fields.forEach(k=>{
+ document.getElementById(k).addEventListener("input",()=>{
+  if(active===null)return;
+  data[active][k]=document.getElementById(k).value;
+  localStorage.setItem(KEY,JSON.stringify(data));
+ });
+});
+function makeSBAR(){
+ let p=data[active];
+ document.getElementById("sbar").value=
+ "SITUATION\\n"+p.bed+" — "+(p.diagnosis||"")+
+ "\\n\\nBACKGROUND\\n"+(p.events||"")+
+ "\\n\\nASSESSMENT\\nCNS: "+(p.cns||"")+
+ "\\nRespiratory: "+(p.resp||"")+
+ "\\nCardiovascular: "+(p.cv||"")+
+ "\\nRenal: "+(p.renal||"")+
+ "\\nInfection: "+(p.infection||"")+
+ "\\nOther: "+(p.other||"")+
+ "\\nLabs: "+(p.labs||"")+
+ "\\n\\nRECOMMENDATION / PLAN\\n"+(p.plan||"")+
+ "\\n\\nVerify all details before handover.";
+}
+function copySBAR(){
+ navigator.clipboard.writeText(document.getElementById("sbar").value)
+ .then(()=>alert("Copied")).catch(()=>alert("Copy not available"));
+}
+function download(obj,name){
+ let a=document.createElement("a");
+ let u=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));
+ a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);
+}
+function exportData(){
+ if(active!==null)download(data[active],"icu-bed-backup.json");
+}
+function exportAll(){download(data,"icu-rounds-backup.json")}
+function deletePatient(){
+ if(active===null)return;
+ if(confirm("Delete this patient record?")){
+  data.splice(active,1);active=null;
+  document.getElementById("record").hidden=true;save();
+ }
+}
+render();
+</script>
+</body>
+</html>
