@@ -9,22 +9,23 @@
 <meta name="theme-color" content="#123047">
 <title>ICU Rounds Assistant</title>
  
-/* ICU expandable clinical cards */
+/* Expandable clinical cards */
 
 .clinical-card {
   background: #FFFFFF;
   border: 1px solid #E3EAF2;
   border-radius: 17px;
   margin: 14px 0;
+  padding: 0;
   overflow: hidden;
-  box-shadow: 0 3px 12px rgba(35,60,90,.04);
+  box-shadow: 0 3px 12px rgba(35, 60, 90, 0.04);
 }
 
 .clinical-card summary {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   padding: 17px;
   cursor: pointer;
   font-size: 16px;
@@ -40,7 +41,7 @@
   content: "+";
   margin-left: auto;
   color: #4385C5;
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 400;
 }
 
@@ -48,9 +49,9 @@
   content: "−";
 }
 
-.card-icon {
-  width: 45px;
-  height: 45px;
+.clinical-card .card-icon {
+  width: 43px;
+  height: 43px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,16 +60,20 @@
   flex-shrink: 0;
 }
 
-.card-content {
-  padding: 15px 17px 18px;
+.clinical-card .card-content {
+  padding: 0 17px 17px;
   border-top: 1px solid #EDF1F5;
 }
 
-.card-subtitle {
+.clinical-card .card-subtitle {
   color: #718096;
   font-size: 12px;
-  letter-spacing: .5px;
-  margin: 0 0 14px;
+  margin: 12px 0;
+  letter-spacing: .4px;
+}
+
+.clinical-card summary:active {
+  background: #F7FAFD;
 }
 
 .card-neuro { background: #E8F1FC; }
