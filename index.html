@@ -260,6 +260,61 @@ button:active { opacity: .8; }
     </div>
   </details>
 
+<details class="clinical-card">
+  <summary>
+    <span class="card-icon card-respiratory">🫁</span>
+    <span>Ventilator monitoring and calculators</span>
+  </summary>
+
+  <div class="card-content">
+    <p class="card-subtitle">VENTILATOR PARAMETERS</p>
+
+    <label for="ventSex">Sex used for PBW calculation</label>
+    <select id="ventSex">
+      <option value="">Select</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+
+    <label for="heightCm">Height (cm)</label>
+    <input id="heightCm" type="number" min="1" step="0.1"
+           placeholder="Example: 170">
+
+    <label for="setVT">Tidal volume (mL)</label>
+    <input id="setVT" type="number" min="1" step="1"
+           placeholder="Example: 420">
+
+    <label for="paO2">PaO₂ (mmHg)</label>
+    <input id="paO2" type="number" min="0" step="0.1"
+           placeholder="Example: 80">
+
+    <label for="fio2Percent">FiO₂ (%)</label>
+    <input id="fio2Percent" type="number" min="1" max="100"
+           step="1" placeholder="Example: 40">
+
+    <label for="plateauPressure">Plateau pressure (cmH₂O)</label>
+    <input id="plateauPressure" type="number" min="0" step="0.1"
+           placeholder="Example: 25">
+
+    <label for="totalPeep">Total PEEP (cmH₂O)</label>
+    <input id="totalPeep" type="number" min="0" step="0.1"
+           placeholder="Example: 10">
+
+    <button onclick="calculateVentilator()">Calculate ventilator parameters</button>
+
+    <div id="ventResult" class="result" aria-live="polite">
+      Ventilator calculations will appear here.
+    </div>
+
+    <p class="card-note">
+      Use measured height where possible. For driving pressure,
+      use total PEEP, including intrinsic PEEP when present.
+      Static compliance calculation assumes a valid plateau
+      pressure measurement during passive conditions.
+    </p>
+  </div>
+</details>
+
   <details class="clinical-card">
     <summary>
       <span class="card-icon card-cardiac">❤️</span>
