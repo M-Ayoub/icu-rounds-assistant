@@ -1,0 +1,10 @@
+
+{
+  "name": "ICU Rounds Assistant",
+  "short_name": "ICU Rounds",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f2f5f7",
+  "theme_color": "#123047"
+}
