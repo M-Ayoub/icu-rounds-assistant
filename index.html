@@ -965,7 +965,46 @@ function calculateVentilator() {
     );
   }
 
+  // Clinical alerts
+  if (pbw !== null && vt !== null && pbw > 0) {
+    const vtPerKg = vt / pbw;
+
+    if (vtPerKg > 8) {
+      alerts.push({
+        type: "danger",
+        message: "High tidal volume: above 8 mL/kg PBW. Reassess lung-protective ventilation."
+      });
+    } else if (vtPerKg < 4) {
+      alerts.push({
+        type: "warning",
+        message: "Tidal volume below 4 mL/kg PBW. Review the clinical indication and patient response."
+      });
+    }
+  }
+
+  if (plateau >= 30) {
+    alerts.push({
+      type: "danger",
+      message: "Plateau pressure ≥30 cmH₂O: above the recommended ARDS target."
+    });
+  }
+
+  if (pfRatio !== null && pfRatio <= 100) {
+    alerts.push({
+      type: "danger",
+      message: "Severe oxygenation impairment: P/F ratio ≤100. This does not independently diagnose ARDS."
+    });
+  }
+
+  // Build alert display
+  const alertHTML = alerts.map(alert => `
+    <div class="vent-alert vent-alert-${alert.type}">
+      ⚠ ${alert.message}
+    </div>
+  `).join("");
+
   document.getElementById("ventResult").innerHTML = `
+   ${alertHTML}
     <table class="vent-table">
       <thead>
         <tr>
