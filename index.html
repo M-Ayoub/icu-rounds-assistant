@@ -688,6 +688,39 @@ function calculateVentilator() {
   const peep = getValue("totalPeep");
 
   const rows = [];
+  const alerts = [];
+  const errors = [];
+
+  // Validate required inputs
+  if (!sex) errors.push("Select patient sex.");
+
+  if (height === null || height <= 0 || height > 250)
+    errors.push("Enter a valid height in cm.");
+
+  if (vt === null || vt <= 0)
+    errors.push("Enter a valid tidal volume in mL.");
+
+  if (paO2 === null || paO2 <= 0)
+    errors.push("Enter a valid PaO₂ in mmHg.");
+
+  if (fio2 === null || fio2 < 21 || fio2 > 100)
+    errors.push("Enter FiO₂ as a percentage between 21 and 100.");
+
+  if (plateau === null || plateau < 0)
+    errors.push("Enter a valid plateau pressure.");
+
+  if (peep === null || peep < 0)
+    errors.push("Enter a valid total PEEP.");
+
+  if (errors.length > 0) {
+    document.getElementById("ventResult").innerHTML = `
+      <div class="vent-validation">
+        <strong>Please correct these inputs:</strong>
+        <ul>${errors.map(error => `<li>${error}</li>`).join("")}</ul>
+      </div>
+    `;
+    return;
+  }
 
   function addRow(parameter, measured, reference, interpretation, status) {
     rows.push(`
