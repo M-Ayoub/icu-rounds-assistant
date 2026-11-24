@@ -494,22 +494,50 @@ button:active { opacity: .8; }
 <section id="record" hidden>
 
   <h3 id="heading">Patient record</h3>
+<details class="clinical-card" open>
+  <summary>
+    <span class="card-icon card-other">📋</span>
+    <span>Diagnosis and daily events</span>
+  </summary>
 
-  <details class="clinical-card" open>
-    <summary>
-      <span class="card-icon card-other">📋</span>
-      <span>Diagnosis and daily events</span>
-    </summary>
-    <div class="card-content">
-      <p class="card-subtitle">PATIENT OVERVIEW</p>
+  <div class="card-content">
+    <p class="card-subtitle">PATIENT OVERVIEW</p>
 
-      <label for="diagnosis">Working diagnosis</label>
-      <textarea id="diagnosis" placeholder="Main diagnosis and active problems..."></textarea>
+    <label for="age">Age (years)</label>
+    <input
+      id="age"
+      type="number"
+      min="0"
+      max="120"
+      step="1"
+      placeholder="Example: 65"
+    >
 
-      <label for="events">Events in last 24 hours</label>
-      <textarea id="events" placeholder="Clinical events, procedures, changes..."></textarea>
-    </div>
-  </details>
+    <label for="admissionDate">Date of admission</label>
+    <input
+      id="admissionDate"
+      type="date"
+    >
+
+    <label for="diagnosis">Working diagnosis</label>
+    <textarea
+      id="diagnosis"
+      placeholder="Main diagnosis and active problems..."
+    ></textarea>
+
+    <label for="presentIllness">Present illness (HPI)</label>
+    <textarea
+      id="presentIllness"
+      placeholder="Presenting symptoms, onset, duration, progression, relevant history..."
+    ></textarea>
+
+    <label for="events">Events in last 24 hours</label>
+    <textarea
+      id="events"
+      placeholder="Clinical events, procedures, changes..."
+    ></textarea>
+  </div>
+</details>
 
 
 <details class="clinical-card">
@@ -774,10 +802,11 @@ let active = null;
 
 /* Keep all original field IDs unchanged. */
 const fields = [
-  "diagnosis", "events", "cns", "resp", "cv", "renal",
-  "infection", "other", "labs", "weight", "fluidIn",
-  "fluidOut", "duration", "plan",
-  "ventSex", "heightCm", "setVT", "paO2",
+  "age", "admissionDate",
+  "diagnosis", "presentIllness", "events", "cns",
+  "resp", "cv", "renal", "infection", "other",
+  "labs", "weight", "fluidIn", "fluidOut", "duration",
+  "plan", "ventSex", "heightCm", "setVT", "paO2",
   "fio2Percent", "plateauPressure", "totalPeep"
 ];
 
