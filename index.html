@@ -1082,14 +1082,28 @@ function renderInvestigations() {
           data-investigation-index="${index}"
           data-investigation-field="date">
 
-        <input class="investigation-field"
-          type="text"
-          placeholder="Result"
-          aria-label="${escapeInvestigationText(item.name)} result"
-          value="${escapeInvestigationText(item.result)}"
-          data-investigation-type="laboratory"
-          data-investigation-index="${index}"
-          data-investigation-field="result">
+                <div class="lab-result-cell">
+
+          <input class="investigation-field lab-result-input"
+            type="text"
+            inputmode="decimal"
+            placeholder="Result"
+            aria-label="${escapeInvestigationText(item.name)} result"
+            value="${escapeInvestigationText(item.result)}"
+            data-investigation-type="laboratory"
+            data-investigation-index="${index}"
+            data-investigation-field="result">
+
+          ${(() => {
+  const assessment = getLabAssessment(item, patient);
+
+  return `<span class="lab-alert ${assessment ? assessment.className : ""}"
+    title="${escapeInvestigationText(assessment ? assessment.reference : "")}">
+    ${escapeInvestigationText(assessment ? assessment.label : "")}
+  </span>`;
+})()}
+
+        </div>
 
         <input class="investigation-field investigation-unit"
           type="text"
@@ -1175,7 +1189,27 @@ function saveInvestigationField(event) {
   if (!items || !items[index]) return;
 
   items[index][field] = element.value;
+// Update laboratory alert without re-rendering the row
+if (
+  type === "laboratory" &&
+  (field === "result" || field === "unit")
+) {
+  const row = element.closest(".investigation-row");
+  const alertElement = row?.querySelector(".lab-alert");
 
+  if (alertElement) {
+    const assessment = getLabAssessment(items[index], data[active]);
+
+    alertElement.textContent = assessment ? assessment.label : "";
+    alertElement.className = assessment
+      ? "lab-alert " + assessment.className
+      : "lab-alert";
+
+    alertElement.title = assessment
+      ? assessment.reference
+      : "";
+  }
+}
   // Update arrow color immediately
   if (field === "trend") {
     element.classList.remove(
