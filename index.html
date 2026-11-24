@@ -827,6 +827,9 @@ document.getElementById("ventAssessment").innerHTML = "";
 fields.forEach(k => {
   const element = document.getElementById(k);
 
+  // Skip fields that do not exist in the HTML
+  if (!element) return;
+
   element.addEventListener("input", () => {
     if (active === null || !data[active]) return;
 
