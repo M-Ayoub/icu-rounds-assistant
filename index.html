@@ -494,6 +494,7 @@ button:active { opacity: .8; }
 <section id="record" hidden>
 
   <h3 id="heading">Patient record</h3>
+
 <details class="clinical-card" open>
   <summary>
     <span class="card-icon card-other">📋</span>
@@ -504,40 +505,22 @@ button:active { opacity: .8; }
     <p class="card-subtitle">PATIENT OVERVIEW</p>
 
     <label for="age">Age (years)</label>
-    <input
-      id="age"
-      type="number"
-      min="0"
-      max="120"
-      step="1"
-      placeholder="Example: 65"
-    >
+    <input id="age" type="number" min="0" max="120" step="1" placeholder="Example: 65">
 
     <label for="admissionDate">Date of admission</label>
-    <input
-      id="admissionDate"
-      type="date"
-    >
+    <input id="admissionDate" type="date">
 
     <label for="diagnosis">Working diagnosis</label>
-    <textarea
-      id="diagnosis"
-      placeholder="Main diagnosis and active problems..."
-    ></textarea>
+    <textarea id="diagnosis" placeholder="Main diagnosis and active problems..."></textarea>
 
     <label for="presentIllness">Present illness (HPI)</label>
-    <textarea
-      id="presentIllness"
-      placeholder="Presenting symptoms, onset, duration, progression, relevant history..."
-    ></textarea>
+    <textarea id="presentIllness" placeholder="Presenting symptoms, onset, duration, progression, relevant history..."></textarea>
 
     <label for="events">Events in last 24 hours</label>
-    <textarea
-      id="events"
-      placeholder="Clinical events, procedures, changes..."
-    ></textarea>
+    <textarea id="events" placeholder="Clinical events, procedures, changes..."></textarea>
   </div>
 </details>
+
 
 
 <details class="clinical-card">
