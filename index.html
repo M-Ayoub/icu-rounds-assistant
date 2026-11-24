@@ -322,6 +322,109 @@ button:active { opacity: .8; }
   white-space: pre-wrap;
 }
 
+/* Structured laboratory and radiology investigations */
+
+.investigation-heading {
+  color: #103954;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 16px;
+  margin: 18px 0 12px;
+}
+
+.investigation-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.investigation-row {
+  display: grid;
+  grid-template-columns: max-content 125px 95px 70px 65px 95px;
+  align-items: center;
+  gap: 6px;
+  min-width: 650px;
+  margin-bottom: 8px;
+}
+
+.radiology-row {
+  display: grid;
+  grid-template-columns: max-content 125px minmax(150px, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-width: 350px;
+  margin-bottom: 8px;
+}
+
+.investigation-name {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  white-space: nowrap;
+  background: #ADE3FF;
+  color: #103954;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 9px 8px;
+  border-radius: 7px;
+}
+
+.investigation-field {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 7px 6px;
+  margin: 0;
+  border: 1px solid #cbd5df;
+  border-radius: 7px;
+  font-size: 12px;
+  background: white;
+  color: #17212b;
+}
+
+.investigation-unit {
+  text-align: center;
+}
+
+.trend-select {
+  width: 100%;
+  height: 38px;
+  padding: 4px;
+  margin: 0;
+  border: 1px solid #cbd5df;
+  border-radius: 7px;
+  background: white;
+  font-size: 19px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.trend-up {
+  color: #16833d;
+}
+
+.trend-down {
+  color: #d62828;
+}
+
+.trend-stable {
+  color: #526273;
+}
+
+.investigation-add {
+  font-size: 13px;
+  padding: 8px 12px;
+  margin: 5px 0 12px;
+}
+
+.investigation-note {
+  font-size: 11px;
+  color: #718096;
+  margin: 5px 0 12px;
+}
+
 </style>
 </head>
 
@@ -370,17 +473,42 @@ button:active { opacity: .8; }
     </div>
   </details>
 
-  <details class="clinical-card">
-    <summary>
-      <span class="card-icon card-neuro">🧠</span>
-      <span>Neurological assessment</span>
-    </summary>
-    <div class="card-content">
-      <p class="card-subtitle">NEUROLOGICAL STATUS</p>
-      <label for="cns">CNS</label>
-      <textarea id="cns" placeholder="GCS, pupils, sedation, motor response..."></textarea>
-    </div>
-  </details>
+
+<details class="clinical-card">
+  <summary>
+    <span class="card-icon card-labs">🧪</span>
+    <span>Investigations and laboratory results</span>
+  </summary>
+
+  <div class="card-content">
+
+    <p class="card-subtitle">INVESTIGATIONS</p>
+
+    <h4 class="investigation-heading">Laboratory</h4>
+
+    <div id="laboratoryRows"></div>
+
+    <button type="button" class="investigation-add"
+            onclick="addCustomInvestigation('laboratory')">
+      + Add laboratory test
+    </button>
+
+    <h4 class="investigation-heading">Radiology</h4>
+
+    <div id="radiologyRows"></div>
+
+    <button type="button" class="investigation-add"
+            onclick="addCustomInvestigation('radiology')">
+      + Add radiology investigation
+    </button>
+
+    <label for="labs">Additional investigation notes</label>
+    <textarea id="labs"
+      placeholder="Additional results, cultures, comments..."></textarea>
+
+  </div>
+</details>
+
 
   <details class="clinical-card">
     <summary>
@@ -675,7 +803,8 @@ function openPatient(i) {
 
   active = i;
   const p = data[i];
-
+ensureInvestigations(p);
+renderInvestigations();
   document.getElementById("record").hidden = false;
   document.getElementById("heading").textContent = p.bed || "Patient record";
 
@@ -710,6 +839,277 @@ fields.forEach(k => {
     }
   });
 });
+
+/* =========================================
+   STRUCTURED INVESTIGATIONS
+   Saved separately for each patient
+========================================= */
+
+const defaultLaboratory = [
+  ["Urea", "mg/dL"],
+  ["Creat", "mg/dL"],
+  ["Na", "mmol/L"],
+  ["K", "mmol/L"],
+  ["Ca T", "mg/dL"],
+  ["Ca I", "mmol/L"],
+  ["Mg", "mg/dL"],
+  ["Po4", "mg/dL"],
+  ["Alb", "g/dL"],
+  ["Alt", "U/L"],
+  ["Ast", "U/L"],
+  ["Bil T", "mg/dL"],
+  ["Bil D", "mg/dL"],
+  ["PT", "sec"],
+  ["PTT", "sec"],
+  ["INR", "ratio"],
+  ["Hb", "g/dL"],
+  ["Plts", "10³/µL"],
+  ["WBC", "10³/µL"],
+  ["CRP", "mg/L"],
+  ["Tgen", ""]
+];
+
+const defaultRadiology = [
+  "CT brain",
+  "CT chest",
+  "Echo",
+  "U/S"
+];
+
+function ensureInvestigations(patient) {
+  if (!patient.investigations ||
+      typeof patient.investigations !== "object") {
+    patient.investigations = {};
+  }
+
+  if (!Array.isArray(patient.investigations.laboratory)) {
+    patient.investigations.laboratory =
+      defaultLaboratory.map(item => ({
+        name: item[0],
+        date: "",
+        result: "",
+        unit: item[1],
+        trend: "",
+        lastResult: ""
+      }));
+  } else {
+    // Add new fields to existing saved laboratory rows
+    patient.investigations.laboratory.forEach(item => {
+      if (item.trend === undefined) item.trend = "";
+      if (item.lastResult === undefined) item.lastResult = "";
+    });
+  }
+
+  if (!Array.isArray(patient.investigations.radiology)) {
+    patient.investigations.radiology =
+      defaultRadiology.map(name => ({
+        name: name,
+        date: "",
+        result: ""
+      }));
+  }
+}
+
+function escapeInvestigationText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function getTrendClass(trend) {
+  if (trend === "up") return "trend-up";
+  if (trend === "down") return "trend-down";
+  if (trend === "stable") return "trend-stable";
+  return "";
+}
+
+function renderInvestigations() {
+  if (active === null || !data[active]) return;
+
+  const patient = data[active];
+  ensureInvestigations(patient);
+
+  const laboratoryContainer =
+    document.getElementById("laboratoryRows");
+
+  const radiologyContainer =
+    document.getElementById("radiologyRows");
+
+  laboratoryContainer.innerHTML =
+    '<div class="investigation-scroll">' +
+    patient.investigations.laboratory.map((item, index) => `
+      <div class="investigation-row">
+
+        <span class="investigation-name">
+          ${escapeInvestigationText(item.name)}
+        </span>
+
+        <input class="investigation-field"
+          type="date"
+          aria-label="${escapeInvestigationText(item.name)} date"
+          value="${escapeInvestigationText(item.date)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="date">
+
+        <input class="investigation-field"
+          type="text"
+          placeholder="Result"
+          aria-label="${escapeInvestigationText(item.name)} result"
+          value="${escapeInvestigationText(item.result)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="result">
+
+        <input class="investigation-field investigation-unit"
+          type="text"
+          placeholder="Unit"
+          aria-label="${escapeInvestigationText(item.name)} unit"
+          value="${escapeInvestigationText(item.unit)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="unit">
+
+        <select class="trend-select ${getTrendClass(item.trend)}"
+          aria-label="${escapeInvestigationText(item.name)} trend"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="trend">
+
+          <option value="" ${item.trend === "" ? "selected" : ""}>—</option>
+          <option value="up" ${item.trend === "up" ? "selected" : ""}>↑</option>
+          <option value="down" ${item.trend === "down" ? "selected" : ""}>↓</option>
+          <option value="stable" ${item.trend === "stable" ? "selected" : ""}>→</option>
+
+        </select>
+
+        <input class="investigation-field"
+          type="text"
+          placeholder="Last result"
+          aria-label="${escapeInvestigationText(item.name)} last result"
+          value="${escapeInvestigationText(item.lastResult)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="lastResult">
+
+      </div>
+    `).join("") +
+    '</div>';
+
+  radiologyContainer.innerHTML =
+    '<div class="investigation-scroll">' +
+    patient.investigations.radiology.map((item, index) => `
+      <div class="radiology-row">
+
+        <span class="investigation-name">
+          ${escapeInvestigationText(item.name)}
+        </span>
+
+        <input class="investigation-field"
+          type="date"
+          aria-label="${escapeInvestigationText(item.name)} date"
+          value="${escapeInvestigationText(item.date)}"
+          data-investigation-type="radiology"
+          data-investigation-index="${index}"
+          data-investigation-field="date">
+
+        <input class="investigation-field"
+          type="text"
+          placeholder="Result"
+          aria-label="${escapeInvestigationText(item.name)} result"
+          value="${escapeInvestigationText(item.result)}"
+          data-investigation-type="radiology"
+          data-investigation-index="${index}"
+          data-investigation-field="result">
+
+      </div>
+    `).join("") +
+    '</div>';
+}
+
+function saveInvestigationField(event) {
+  const element = event.target;
+
+  if (!element.dataset.investigationType) return;
+
+  if (active === null || !data[active]) return;
+
+  const type = element.dataset.investigationType;
+  const index = Number(element.dataset.investigationIndex);
+  const field = element.dataset.investigationField;
+
+  ensureInvestigations(data[active]);
+
+  const items = data[active].investigations[type];
+
+  if (!items || !items[index]) return;
+
+  items[index][field] = element.value;
+
+  // Update arrow color immediately
+  if (field === "trend") {
+    element.classList.remove(
+      "trend-up", "trend-down", "trend-stable"
+    );
+    element.classList.add(getTrendClass(element.value));
+  }
+
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (error) {
+    alert("Could not save investigation. Check available device storage.");
+  }
+}
+
+document.addEventListener("input", saveInvestigationField);
+document.addEventListener("change", saveInvestigationField);
+
+function addCustomInvestigation(type) {
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
+    return;
+  }
+
+  const name = prompt(
+    type === "laboratory"
+      ? "Enter the laboratory test name:"
+      : "Enter the radiology investigation name:"
+  );
+
+  if (!name || !name.trim()) return;
+
+  ensureInvestigations(data[active]);
+
+  if (type === "laboratory") {
+    data[active].investigations.laboratory.push({
+      name: name.trim(),
+      date: "",
+      result: "",
+      unit: "",
+      trend: "",
+      lastResult: ""
+    });
+  } else if (type === "radiology") {
+    data[active].investigations.radiology.push({
+      name: name.trim(),
+      date: "",
+      result: ""
+    });
+  } else {
+    return;
+  }
+
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    renderInvestigations();
+  } catch (error) {
+    alert("Could not save investigation. Check available device storage.");
+  }
+}
 
 
 function calculateVentilator() {
