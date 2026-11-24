@@ -906,7 +906,102 @@ const defaultRadiology = [
   "Echo",
   "U/S"
 ];
+/* Adult laboratory reference ranges
+   Units must match the unit entered in the row.
+   Local laboratory reference intervals take priority.
+*/
 
+const laboratoryRanges = {
+  "urea":   { min: 15, max: 40, unit: "mg/dL" },
+  "creat":  { min: 0.6, max: 1.2, unit: "mg/dL" },
+  "na":     { min: 136, max: 146, unit: "mmol/L" },
+  "k":      { min: 3.5, max: 5.0, unit: "mmol/L" },
+  "ca t":   { min: 8.4, max: 10.2, unit: "mg/dL" },
+  "mg":     { min: 1.5, max: 2.0, unit: "mg/dL" },
+  "po4":    { min: 3.0, max: 4.5, unit: "mg/dL" },
+  "alb":    { min: 3.5, max: 5.5, unit: "g/dL" },
+  "alt":    { min: 10, max: 40, unit: "U/L" },
+  "ast":    { min: 12, max: 38, unit: "U/L" },
+  "bil t":  { min: 0.1, max: 1.0, unit: "mg/dL" },
+  "bil d":  { min: 0, max: 0.3, unit: "mg/dL" },
+  "inr":    { min: 0.8, max: 1.2, unit: "ratio" },
+  "plts":   { min: 150, max: 400, unit: "10³/µL" },
+  "wbc":    { min: 4.5, max: 11, unit: "10³/µL" },
+  "crp":    { min: 0, max: 5, unit: "mg/L", inclusiveMax: true }
+};
+
+function getLabAssessment(item, patient) {
+  const name = String(item.name || "").trim().toLowerCase();
+  const unit = String(item.unit || "").trim().toLowerCase();
+  const resultText = String(item.result || "").trim();
+
+  if (resultText === "") return null;
+
+  const value = Number(resultText);
+
+  if (!Number.isFinite(value)) return null;
+
+  let range = laboratoryRanges[name];
+
+  // Hemoglobin reference range depends on sex.
+  if (name === "hb") {
+    if (patient.ventSex === "male") {
+      range = { min: 13, max: 17, unit: "g/dL" };
+    } else if (patient.ventSex === "female") {
+      range = { min: 12, max: 16, unit: "g/dL" };
+    } else {
+      return {
+        label: "NO RANGE SET",
+        className: "lab-alert-unavailable",
+        reference: "Select patient sex"
+      };
+    }
+  }
+
+  // No automatic range for tests requiring local assay-specific limits.
+  if (!range) {
+    return {
+      label: "NO RANGE SET",
+      className: "lab-alert-unavailable",
+      reference: "Use local laboratory range"
+    };
+  }
+
+  // Do not compare results when units do not match.
+  if (unit !== range.unit.toLowerCase()) {
+    return {
+      label: "CHECK UNIT",
+      className: "lab-alert-unavailable",
+      reference: `Expected ${range.unit}`
+    };
+  }
+
+  if (value < range.min) {
+    return {
+      label: "LOW ↓",
+      className: "lab-alert-low",
+      reference: `${range.min}–${range.max} ${range.unit}`
+    };
+  }
+
+  if (
+    range.inclusiveMax
+      ? value >= range.max
+      : value > range.max
+  ) {
+    return {
+      label: "HIGH ↑",
+      className: "lab-alert-high",
+      reference: `${range.min}–${range.max} ${range.unit}`
+    };
+  }
+
+  return {
+    label: "NORMAL",
+    className: "lab-alert-normal",
+    reference: `${range.min}–${range.max} ${range.unit}`
+  };
+}
 function ensureInvestigations(patient) {
   if (!patient.investigations ||
       typeof patient.investigations !== "object") {
