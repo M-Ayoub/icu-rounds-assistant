@@ -10,188 +10,549 @@
 
 <style>
 * { box-sizing: border-box; }
-body { font-family:Arial,sans-serif;background:#f2f5f7;color:#17212b;margin:0; }
-header { background:#123047;color:white;padding:18px; }
-main { padding:14px;max-width:700px;margin:auto; }
-section { background:white;padding:14px;border-radius:12px;margin:12px 0; }
-h3 { margin-top:8px; }
-label { display:block;font-weight:600;margin-top:10px; }
-input,textarea,select {
-  width:100%;padding:11px;margin:5px 0 12px;border:1px solid #bbb;
-  border-radius:7px;font:inherit;background:white;color:#17212b;
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f5f7;
+  color: #17212b;
+  margin: 0;
 }
-textarea { min-height:75px; }
+
+header {
+  background: #123047;
+  color: white;
+  padding: 18px;
+}
+
+main {
+  padding: 14px;
+  max-width: 700px;
+  margin: auto;
+}
+
+section {
+  background: white;
+  padding: 14px;
+  border-radius: 12px;
+  margin: 12px 0;
+}
+
+h3 { margin-top: 8px; }
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 11px;
+  margin: 5px 0 12px;
+  border: 1px solid #bbb;
+  border-radius: 7px;
+  font: inherit;
+  background: white;
+  color: #17212b;
+}
+
+textarea { min-height: 75px; }
+
 button {
-  padding:11px 14px;background:#145b78;color:white;border:0;
-  border-radius:7px;margin:4px;font:inherit;cursor:pointer;
+  padding: 11px 14px;
+  background: #145b78;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  margin: 4px;
+  font: inherit;
+  cursor: pointer;
 }
-button:active { opacity:.8; }
-button.secondary { background:#526779; }
-button.danger { background:#a3211b; }
-.warning { background:#fff0cc;padding:12px;border-radius:8px;font-size:13px;line-height:1.5; }
-.patient { padding:9px;border-bottom:1px solid #ddd; }
+
+button:active { opacity: .8; }
+
+.warning {
+  background: #fff0cc;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.patient {
+  padding: 9px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Expandable clinical cards */
 
 .clinical-card {
-  background:#fff;border:1px solid #e3eaf2;border-radius:15px;
-  margin:14px 0;overflow:hidden;box-shadow:0 3px 12px rgba(35,60,90,.05);
+  background: #fff;
+  border: 1px solid #e3eaf2;
+  border-radius: 15px;
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: 0 3px 12px rgba(35,60,90,.05);
 }
+
 .clinical-card summary {
-  list-style:none;display:flex;align-items:center;gap:13px;padding:15px;
-  cursor:pointer;font-size:16px;font-weight:700;color:#fff;background:#123047;min-height:72px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: #123047;
+  min-height: 72px;
 }
-.clinical-card summary::-webkit-details-marker { display:none; }
-.clinical-card summary::after { content:"+";margin-left:auto;color:white;font-size:24px;font-weight:400; }
-.clinical-card[open] summary::after { content:"−"; }
+
+.clinical-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.clinical-card summary::after {
+  content: "+";
+  margin-left: auto;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.clinical-card[open] summary::after {
+  content: "−";
+}
+
+/* The icon keeps its own light background */
+
 .card-icon {
-  width:45px;height:45px;display:flex;align-items:center;justify-content:center;
-  border-radius:12px;font-size:23px;flex-shrink:0;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 23px;
+  flex-shrink: 0;
 }
-.card-neuro{background:#e8f1fc}.card-respiratory{background:#e5f5f3}
-.card-cardiac{background:#fce9e6}.card-renal{background:#f0ebfa}
-.card-infection{background:#fff3e2}.card-other{background:#f0f2f5}
-.card-labs{background:#e9effb}.card-plan{background:#eaf3eb}
-.card-handover{background:#e9effb}.card-fluid{background:#e5f5f3}
-.card-content { padding:15px 17px 18px;border-top:1px solid #edf1f5;color:#243447; }
-.card-content label { color:#243447; }
-.card-subtitle { color:#718096;font-size:12px;letter-spacing:.5px;margin:0 0 14px;font-weight:700; }
-.card-note { color:#526273;font-size:12px;line-height:1.5;margin-top:8px; }
-.result { background:#f2f6f9;border-radius:8px;padding:12px;line-height:1.6;overflow-wrap:anywhere; }
-.actions { display:flex;flex-wrap:wrap;gap:5px; }
-.actions button { flex:1 1 130px; }
 
-.vent-table-wrap { width:100%;overflow-x:auto;margin-top:14px; }
-.vent-table { width:100%;min-width:470px;border-collapse:collapse;font-size:13px;background:white; }
-.vent-table th { background:#123047;color:white;padding:11px 8px;text-align:left; }
-.vent-table td { padding:10px 8px;border-bottom:1px solid #e3eaf2;vertical-align:top;line-height:1.45; }
-.vent-table tr:nth-child(even) { background:#f4f7fa; }
-.vent-status { font-weight:700; }
-.vent-good{color:#187448}.vent-warning{color:#f50707}.vent-info{color:#315f91}
-.vent-disclaimer { background:#fff4df;border-radius:8px;padding:11px;margin-top:12px;font-size:12px;line-height:1.5;color:#604719; }
-.vent-alert { padding:12px;margin:12px 0;border-radius:8px;font-size:13px;line-height:1.5;font-weight:600; }
-.vent-alert-danger { background:#fde8e7;color:#a3211b;border-left:5px solid #c62828; }
-.vent-alert-warning { background:#fff3df;color:#805000;border-left:5px solid #e39a20; }
-.vent-alert-success { background:#e7f5ec;color:#17643b;border-left:5px solid #26945b; }
-.vent-validation { background:#fff3df;color:#805000;border:1px solid #e5b85c;border-radius:8px;padding:12px;margin-top:12px;font-size:13px;line-height:1.6; }
-.vent-validation ul { margin:6px 0 0;padding-left:20px; }
-.vent-assessment { background:white;border:1px solid #dce5ed;border-radius:10px;padding:14px;margin-top:16px;color:#17212b; }
-.vent-assessment h3 { color:#123047;font-size:16px;margin:0 0 12px; }
-.vent-assessment h4 { color:#123047;font-size:14px;margin:14px 0 6px; }
-.vent-assessment p { font-size:13px;line-height:1.6;margin:5px 0; }
-.vent-report { background:#f2f5f8;border-radius:8px;padding:12px;margin-top:12px;font-size:13px;line-height:1.6;white-space:pre-wrap; }
+.card-neuro { background: #e8f1fc; }
+.card-respiratory { background: #e5f5f3; }
+.card-cardiac { background: #fce9e6; }
+.card-renal { background: #f0ebfa; }
+.card-infection { background: #fff3e2; }
+.card-other { background: #f0f2f5; }
+.card-labs { background: #e9effb; }
+.card-plan { background: #eaf3eb; }
+.card-handover { background: #e9effb; }
+.card-fluid { background: #e5f5f3; }
 
-.investigation-heading { color:#103954;font-weight:800;font-style:italic;font-size:16px;margin:18px 0 12px; }
-.investigation-scroll { width:100%;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch; }
+.card-content {
+  padding: 15px 17px 18px;
+  border-top: 1px solid #edf1f5;
+  color: #243447;
+}
+
+.card-content label { color: #243447; }
+
+.card-subtitle {
+  color: #718096;
+  font-size: 12px;
+  letter-spacing: .5px;
+  margin: 0 0 14px;
+  font-weight: 700;
+}
+
+.card-note {
+  color: #526273;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: -5px;
+}
+
+.result {
+  background: #f2f6f9;
+  border-radius: 8px;
+  padding: 12px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.actions button { flex: 1 1 130px; }
+
+/* Ventilator results table */
+
+.vent-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.vent-table {
+  width: 100%;
+  min-width: 470px;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: white;
+}
+
+.vent-table th {
+  background: #123047;
+  color: white;
+  padding: 11px 8px;
+  text-align: left;
+}
+
+.vent-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #e3eaf2;
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+.vent-table tr:nth-child(even) {
+  background: #f4f7fa;
+}
+
+.vent-status {
+  font-weight: 700;
+}
+
+.vent-good { color: #187448; }
+.vent-warning { color: #f50707; }
+.vent-info { color: #315f91; }
+
+.vent-disclaimer {
+  background: #fff4df;
+  border-radius: 8px;
+  padding: 11px;
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #604719;
+}
+
+/* Ventilator clinical alerts */
+.vent-alert {
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.vent-alert-danger {
+  background: #fde8e7;
+  color: #a3211b;
+  border-left: 5px solid #c62828;
+}
+
+.vent-alert-warning {
+  background: #fff3df;
+  color: #805000;
+  border-left: 5px solid #e39a20;
+}
+
+.vent-alert-success {
+  background: #e7f5ec;
+  color: #17643b;
+  border-left: 5px solid #26945b;
+}
+
+.vent-validation {
+  background: #fff3df;
+  color: #805000;
+  border: 1px solid #e5b85c;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.vent-validation ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+/* Ventilator daily assessment */
+.vent-assessment {
+  background: #ffffff;
+  border: 1px solid #dce5ed;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 16px;
+  color: #17212b;
+}
+
+.vent-assessment h3 {
+  color: #123047;
+  font-size: 16px;
+  margin: 0 0 12px;
+}
+
+.vent-assessment h4 {
+  color: #123047;
+  font-size: 14px;
+  margin: 14px 0 6px;
+}
+
+.vent-assessment p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 5px 0;
+}
+
+.vent-report {
+  background: #f2f5f8;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Structured laboratory and radiology investigations */
+
+.investigation-heading {
+  color: #103954;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 16px;
+  margin: 18px 0 12px;
+}
+
+.investigation-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
 .investigation-row {
-  display:grid;grid-template-columns:max-content 125px 95px 70px 65px 95px;
-  align-items:center;gap:6px;min-width:650px;margin-bottom:8px;
+  display: grid;
+  grid-template-columns: max-content 125px 95px 70px 65px 95px;
+  align-items: center;
+  gap: 6px;
+  min-width: 650px;
+  margin-bottom: 8px;
 }
+
 .radiology-row {
-  display:grid;grid-template-columns:minmax(100px,max-content) 125px 110px;
-  gap:6px;min-width:350px;margin-bottom:8px;
+  display: grid;
+  grid-template-columns: max-content 125px minmax(150px, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-width: 350px;
+  margin-bottom: 8px;
 }
+
 .investigation-name {
-  display:inline-flex;align-items:center;justify-content:center;width:max-content;
-  white-space:nowrap;background:#ADE3FF;color:#103954;font-weight:700;
-  font-size:12px;padding:9px 8px;border-radius:7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  white-space: nowrap;
+  background: #ADE3FF;
+  color: #103954;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 9px 8px;
+  border-radius: 7px;
 }
+
 .investigation-field {
-  width:100%;min-width:0;height:38px;padding:7px 6px;margin:0;
-  border:1px solid #cbd5df;border-radius:7px;font-size:12px;background:white;color:#17212b;
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 7px 6px;
+  margin: 0;
+  border: 1px solid #cbd5df;
+  border-radius: 7px;
+  font-size: 12px;
+  background: white;
+  color: #17212b;
 }
-.investigation-unit { text-align:center; }
-.lab-result-input { text-align:center;font-weight:800;font-size:14px; }
-.lab-result-cell { display:flex;flex-direction:column;align-items:center;gap:3px;width:100%;min-width:0; }
-.lab-alert { font-size:10px;font-weight:800;text-align:center;white-space:nowrap; }
-.lab-alert-high{color:#c62828}.lab-alert-low{color:#1769aa}
-.lab-alert-normal{color:#187448}.lab-alert-unavailable{color:#718096}
-.trend-select { width:100%;height:38px;padding:4px;margin:0;border:1px solid #cbd5df;border-radius:7px;background:white;font-size:19px;font-weight:bold;text-align:center; }
-.trend-up{color:#16833d}.trend-down{color:#d62828}.trend-stable{color:#526273}
-.investigation-add { font-size:13px;padding:8px 12px;margin:5px 0 12px; }
-.investigation-note { font-size:11px;color:#718096;margin:5px 0 12px; }
-.history-box { background:#f3f7fa;border:1px solid #dce5ed;border-radius:8px;padding:10px;margin:8px 0 12px;font-size:12px; }
-.history-box table { width:100%;border-collapse:collapse; }
-.history-box td,.history-box th { text-align:left;padding:6px;border-bottom:1px solid #dce5ed; }
-.range-box { background:#f3f7fa;border:1px solid #dce5ed;border-radius:8px;padding:12px;margin:10px 0; }
-.range-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px; }
-.range-grid input { margin:3px 0 8px; }
-.small-button { font-size:11px;padding:7px 9px;margin:2px; }
-.status-tag { display:inline-block;padding:4px 7px;border-radius:5px;font-size:11px;font-weight:bold;background:#e8eef4;color:#31475a; }
-.abg-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px; }
-.abg-grid label { font-size:12px; }
-.abg-grid input { margin-top:4px; }
-.abg-result { background:#f2f6f9;border-radius:9px;padding:12px;margin-top:12px;line-height:1.6;font-size:13px; }
-.abg-result h4 { margin:8px 0;color:#123047; }
-.radiology-record { background:#f3f7fa;border:1px solid #dce5ed;border-radius:9px;padding:12px;margin:10px 0; }
-.radiology-record h4 { margin:0 0 8px;color:#123047; }
-.radiology-record label { font-size:12px; }
-.radiology-record textarea { min-height:55px; }
-@media(max-width:430px) {
-  main { padding:9px; }
-  .card-content { padding:12px; }
-  .abg-grid { grid-template-columns:1fr 1fr; }
+
+.investigation-unit {
+  text-align: center;
 }
+/* Laboratory result appearance */
+.lab-result-input {
+  text-align: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* High / low / normal result indicators */
+.lab-result-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+}
+
+.lab-alert {
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.lab-alert-high {
+  color: #c62828;
+}
+
+.lab-alert-low {
+  color: #1769aa;
+}
+
+.lab-alert-normal {
+  color: #187448;
+}
+
+.lab-alert-unavailable {
+  color: #718096;
+}
+.trend-select {
+  width: 100%;
+  height: 38px;
+  padding: 4px;
+  margin: 0;
+  border: 1px solid #cbd5df;
+  border-radius: 7px;
+  background: white;
+  font-size: 19px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.trend-up {
+  color: #16833d;
+}
+
+.trend-down {
+  color: #d62828;
+}
+
+.trend-stable {
+  color: #526273;
+}
+
+.investigation-add {
+  font-size: 13px;
+  padding: 8px 12px;
+  margin: 5px 0 12px;
+}
+
+.investigation-note {
+  font-size: 11px;
+  color: #718096;
+  margin: 5px 0 12px;
+}
+
 </style>
 </head>
 
 <body>
+
 <header>
   <h2>ICU Rounds Assistant</h2>
   Personal offline clinical organizer
 </header>
 
 <main>
+
 <p class="warning">
   <b>Important:</b> Prototype only. Not a validated medical record system.
-  Do not enter identifiable patient information. Data is stored locally and is not encrypted.
-  Clinical calculations are educational aids and must be checked against the clinical context and local protocols.
+  Do not enter identifiable patient information. Data is stored locally
+  and is not encrypted.
 </p>
 
 <section>
   <h3>Patient / Bed list</h3>
   <div id="patients"></div>
+
   <label for="bed">Bed label</label>
   <input id="bed" placeholder="Example: Bed 01">
+
   <button onclick="addPatient()">Add patient</button>
 </section>
 
 <section id="record" hidden>
+
   <h3 id="heading">Patient record</h3>
 
   <details class="clinical-card" open>
-    <summary><span class="card-icon card-other">📋</span><span>Diagnosis and daily events</span></summary>
+    <summary>
+      <span class="card-icon card-other">📋</span>
+      <span>Diagnosis and daily events</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">PATIENT OVERVIEW</p>
+
       <label for="diagnosis">Working diagnosis</label>
       <textarea id="diagnosis" placeholder="Main diagnosis and active problems..."></textarea>
+
       <label for="events">Events in last 24 hours</label>
       <textarea id="events" placeholder="Clinical events, procedures, changes..."></textarea>
-      <label for="cns">CNS / Neurological assessment</label>
-      <textarea id="cns" placeholder="GCS, pupils, sedation, motor response, seizures..."></textarea>
     </div>
   </details>
 
+
+<details class="clinical-card">
+  <summary>
+    <span class="card-icon card-labs">🧪</span>
+    <span>Investigations and laboratory results</span>
+  </summary>
+
+  <div class="card-content">
+
+    <p class="card-subtitle">INVESTIGATIONS</p>
+
+    <h4 class="investigation-heading">Laboratory</h4>
+
+    <div id="laboratoryRows"></div>
+
+    <button type="button" class="investigation-add"
+            onclick="addCustomInvestigation('laboratory')">
+      + Add laboratory test
+    </button>
+
+    <h4 class="investigation-heading">Radiology</h4>
+
+    <div id="radiologyRows"></div>
+
+    <button type="button" class="investigation-add"
+            onclick="addCustomInvestigation('radiology')">
+      + Add radiology investigation
+    </button>
+
+    <label for="labs">Additional investigation notes</label>
+    <textarea id="labs"
+      placeholder="Additional results, cultures, comments..."></textarea>
+
+  </div>
+</details>
+
+
   <details class="clinical-card">
-    <summary><span class="card-icon card-labs">🧪</span><span>Investigations and laboratory results</span></summary>
-    <div class="card-content">
-      <p class="card-subtitle">INVESTIGATIONS</p>
-      <h4 class="investigation-heading">Laboratory</h4>
-      <p class="investigation-note">The current result is displayed in the row. Use “Add dated result” to record a new result and preserve the previous one in history.</p>
-      <div id="laboratoryRows"></div>
-      <button type="button" class="investigation-add" onclick="addCustomInvestigation('laboratory')">+ Add laboratory test</button>
-      <button type="button" class="investigation-add" onclick="configureLabRange()">⚙ Configure reference / critical ranges</button>
-      <div id="rangeEditor"></div>
-
-      <h4 class="investigation-heading">Radiology</h4>
-      <div id="radiologyRows"></div>
-      <button type="button" class="investigation-add" onclick="addCustomInvestigation('radiology')">+ Add radiology investigation</button>
-
-      <label for="labs">Additional investigation notes</label>
-      <textarea id="labs" placeholder="Additional results, cultures, comments..."></textarea>
-    </div>
-  </details>
-
-  <details class="clinical-card">
-    <summary><span class="card-icon card-respiratory">🫁</span><span>Respiratory assessment</span></summary>
+    <summary>
+      <span class="card-icon card-respiratory">🫁</span>
+      <span>Respiratory assessment</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">RESPIRATORY STATUS</p>
       <label for="resp">Respiratory</label>
@@ -199,55 +560,74 @@ button.danger { background:#a3211b; }
     </div>
   </details>
 
-  <details class="clinical-card">
-    <summary><span class="card-icon card-respiratory">🫁</span><span>Ventilator monitoring and calculators</span></summary>
-    <div class="card-content">
-      <p class="card-subtitle">VENTILATOR PARAMETERS</p>
-      <label for="ventSex">Sex used for PBW calculation</label>
-      <select id="ventSex"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option></select>
-      <label for="heightCm">Height (cm)</label>
-      <input id="heightCm" type="number" min="1" step="0.1" placeholder="Example: 170">
-      <label for="setVT">Tidal volume (mL)</label>
-      <input id="setVT" type="number" min="1" step="1" placeholder="Example: 420">
-      <label for="paO2">PaO₂ (mmHg)</label>
-      <input id="paO2" type="number" min="0" step="0.1" placeholder="Example: 80">
-      <label for="fio2Percent">FiO₂ (%)</label>
-      <input id="fio2Percent" type="number" min="1" max="100" step="1" placeholder="Example: 40">
-      <label for="plateauPressure">Plateau pressure (cmH₂O)</label>
-      <input id="plateauPressure" type="number" min="0" step="0.1" placeholder="Example: 25">
-      <label for="totalPeep">Total PEEP (cmH₂O)</label>
-      <input id="totalPeep" type="number" min="0" step="0.1" placeholder="Example: 10">
-      <button onclick="calculateVentilator()">Calculate ventilator parameters</button>
-      <div id="ventResult" class="vent-table-wrap" aria-live="polite"><p>Enter the ventilator and patient measurements, then calculate.</p></div>
-      <div id="ventAssessment"></div>
-      <div class="vent-disclaimer">Reference values are clinical guides, not automatic ventilator prescriptions. Interpret alongside diagnosis, mechanics, gas exchange and clinical condition.</div>
-      <p class="card-note">Use measured height where possible. For driving pressure, use total PEEP, including intrinsic PEEP when present. Static compliance assumes a valid plateau pressure measurement during passive conditions.</p>
-    </div>
-  </details>
+<details class="clinical-card">
+  <summary>
+    <span class="card-icon card-respiratory">🫁</span>
+    <span>Ventilator monitoring and calculators</span>
+  </summary>
+
+  <div class="card-content">
+    <p class="card-subtitle">VENTILATOR PARAMETERS</p>
+
+    <label for="ventSex">Sex used for PBW calculation</label>
+    <select id="ventSex">
+      <option value="">Select</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+
+    <label for="heightCm">Height (cm)</label>
+    <input id="heightCm" type="number" min="1" step="0.1"
+           placeholder="Example: 170">
+
+    <label for="setVT">Tidal volume (mL)</label>
+    <input id="setVT" type="number" min="1" step="1"
+           placeholder="Example: 420">
+
+    <label for="paO2">PaO₂ (mmHg)</label>
+    <input id="paO2" type="number" min="0" step="0.1"
+           placeholder="Example: 80">
+
+    <label for="fio2Percent">FiO₂ (%)</label>
+    <input id="fio2Percent" type="number" min="1" max="100"
+           step="1" placeholder="Example: 40">
+
+    <label for="plateauPressure">Plateau pressure (cmH₂O)</label>
+    <input id="plateauPressure" type="number" min="0" step="0.1"
+           placeholder="Example: 25">
+
+    <label for="totalPeep">Total PEEP (cmH₂O)</label>
+    <input id="totalPeep" type="number" min="0" step="0.1"
+           placeholder="Example: 10">
+
+    <button onclick="calculateVentilator()">Calculate ventilator parameters</button>
+
+    
+<div id="ventResult" class="vent-table-wrap" aria-live="polite">
+  <p>Enter the ventilator and patient measurements, then calculate.</p>
+</div>
+    <div id="ventAssessment"></div>
+<div class="vent-disclaimer">
+  Reference values are clinical guides, not automatic ventilator
+  prescriptions. Always interpret them alongside the patient's
+  diagnosis, mechanics, gas exchange and clinical condition.
+</div>
+
+
+    <p class="card-note">
+      Use measured height where possible. For driving pressure,
+      use total PEEP, including intrinsic PEEP when present.
+      Static compliance calculation assumes a valid plateau
+      pressure measurement during passive conditions.
+    </p>
+  </div>
+</details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-respiratory">🧪</span><span>ABG analyzer</span></summary>
-    <div class="card-content">
-      <p class="card-subtitle">ACID–BASE AND OXYGENATION</p>
-      <div class="abg-grid">
-        <div><label for="abgPH">pH</label><input id="abgPH" type="number" step="0.001" placeholder="7.40"></div>
-        <div><label for="abgCO2">PaCO₂ (mmHg)</label><input id="abgCO2" type="number" step="0.1" placeholder="40"></div>
-        <div><label for="abgHCO3">HCO₃⁻ (mmol/L)</label><input id="abgHCO3" type="number" step="0.1" placeholder="24"></div>
-        <div><label for="abgO2">PaO₂ (mmHg)</label><input id="abgO2" type="number" step="0.1" placeholder="90"></div>
-        <div><label for="abgFiO2">FiO₂ (%)</label><input id="abgFiO2" type="number" min="21" max="100" step="1" placeholder="40"></div>
-        <div><label for="abgNa">Na⁺ (mmol/L)</label><input id="abgNa" type="number" step="0.1" placeholder="140"></div>
-        <div><label for="abgCl">Cl⁻ (mmol/L)</label><input id="abgCl" type="number" step="0.1" placeholder="104"></div>
-        <div><label for="abgAlbumin">Albumin (g/dL)</label><input id="abgAlbumin" type="number" step="0.1" placeholder="4"></div>
-      </div>
-      <button onclick="calculateABG()">Analyze ABG</button>
-      <button class="secondary" onclick="clearABG()">Clear ABG inputs</button>
-      <div id="abgResult" class="abg-result" aria-live="polite">Enter ABG values to calculate acid–base parameters.</div>
-      <p class="card-note">Assumes an arterial sample and standard units. The analyzer provides a preliminary pattern, not a definitive diagnosis. Check the clinical context, sample validity, compensation, lactate, ketones and other causes of mixed disorders.</p>
-    </div>
-  </details>
-
-  <details class="clinical-card">
-    <summary><span class="card-icon card-cardiac">❤️</span><span>Cardiovascular assessment</span></summary>
+    <summary>
+      <span class="card-icon card-cardiac">❤️</span>
+      <span>Cardiovascular assessment</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">HEMODYNAMIC STATUS</p>
       <label for="cv">Cardiovascular</label>
@@ -256,7 +636,10 @@ button.danger { background:#a3211b; }
   </details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-renal">🩺</span><span>Renal and metabolic assessment</span></summary>
+    <summary>
+      <span class="card-icon card-renal">🩺</span>
+      <span>Renal and metabolic assessment</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">RENAL / METABOLIC STATUS</p>
       <label for="renal">Renal / Metabolic</label>
@@ -265,7 +648,10 @@ button.danger { background:#a3211b; }
   </details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-infection">🦠</span><span>Infection assessment</span></summary>
+    <summary>
+      <span class="card-icon card-infection">🦠</span>
+      <span>Infection assessment</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">INFECTION / SEPSIS</p>
       <label for="infection">Infection</label>
@@ -274,7 +660,10 @@ button.danger { background:#a3211b; }
   </details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-other">🍽️</span><span>Other systems and nutrition</span></summary>
+    <summary>
+      <span class="card-icon card-other">🍽️</span>
+      <span>Other systems and nutrition</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">ADDITIONAL ASSESSMENT</p>
       <label for="other">Other / Nutrition</label>
@@ -282,22 +671,45 @@ button.danger { background:#a3211b; }
     </div>
   </details>
 
+  
+
   <details class="clinical-card">
-    <summary><span class="card-icon card-fluid">💧</span><span>Fluid balance calculator</span></summary>
+    <summary>
+      <span class="card-icon card-fluid">💧</span>
+      <span>Fluid balance calculator</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">FLUID BALANCE</p>
-      <label for="weight">Weight (kg)</label><input id="weight" type="number" min="0" step="0.1" placeholder="70">
-      <label for="fluidIn">Total fluid intake (mL)</label><input id="fluidIn" type="number" min="0" placeholder="2500">
-      <label for="fluidOut">Total fluid output (mL)</label><input id="fluidOut" type="number" min="0" placeholder="1800">
-      <label for="duration">Duration (hours)</label><input id="duration" type="number" min="0" step="0.1" placeholder="24">
-      <p class="card-note">The output rate uses the total output entered. For urine output in mL/kg/hour, enter urine volume alone as the output.</p>
+
+      <label for="weight">Weight (kg)</label>
+      <input id="weight" type="number" min="0" step="0.1" placeholder="70">
+
+      <label for="fluidIn">Total fluid intake (mL)</label>
+      <input id="fluidIn" type="number" min="0" placeholder="2500">
+
+      <label for="fluidOut">Total fluid output (mL)</label>
+      <input id="fluidOut" type="number" min="0" placeholder="1800">
+
+      <label for="duration">Duration (hours)</label>
+      <input id="duration" type="number" min="0" step="0.1" placeholder="24">
+
+      <p class="card-note">
+        The output rate below uses the total output entered. For urine
+        output in mL/kg/hour, enter urine volume alone as the output.
+      </p>
+
       <button onclick="calculateFluid()">Calculate</button>
-      <div id="fluidResult" class="result" aria-live="polite">Net balance and output rate will appear here.</div>
+      <div id="fluidResult" class="result" aria-live="polite">
+        Net balance and output rate will appear here.
+      </div>
     </div>
   </details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-plan">📝</span><span>Assessment and daily plan</span></summary>
+    <summary>
+      <span class="card-icon card-plan">📝</span>
+      <span>Assessment and daily plan</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">DAILY MANAGEMENT PLAN</p>
       <label for="plan">Assessment and plan</label>
@@ -306,57 +718,70 @@ button.danger { background:#a3211b; }
   </details>
 
   <details class="clinical-card">
-    <summary><span class="card-icon card-handover">📄</span><span>SBAR handover</span></summary>
+    <summary>
+      <span class="card-icon card-handover">📄</span>
+      <span>SBAR handover</span>
+    </summary>
     <div class="card-content">
       <p class="card-subtitle">STRUCTURED HANDOVER</p>
+
       <button onclick="makeSBAR()">Generate SBAR</button>
+
       <label for="sbar">SBAR summary</label>
       <textarea id="sbar" placeholder="SBAR summary will appear here..."></textarea>
-      <div class="actions"><button onclick="copySBAR()">Copy SBAR</button><button onclick="exportData()">Export this patient</button></div>
+
+      <div class="actions">
+        <button onclick="copySBAR()">Copy SBAR</button>
+        <button onclick="exportData()">Export this patient</button>
+      </div>
     </div>
   </details>
 
   <div class="actions">
     <button onclick="exportData()">Export patient backup</button>
-    <button class="danger" onclick="deletePatient()">Delete patient</button>
+    <button onclick="deletePatient()">Delete patient</button>
   </div>
+
 </section>
 
 <section>
   <h3>Backup</h3>
   <button onclick="exportAll()">Export all patients</button>
-  <p class="card-note">Export backups regularly. Browser data can be lost if browser storage is cleared or reset.</p>
+  <p class="card-note">
+    Export backups regularly. Browser data can be lost if browser storage
+    is cleared or reset.
+  </p>
 </section>
+
 </main>
 
 <script>
-/* IMPORTANT: Do not change this key. */
+/* Keep this storage key unchanged to preserve existing patient records. */
 const KEY = "icu_rounds_data";
+
 let data = [];
-let active = null;
-let storageReadError = false;
 
 try {
   const stored = localStorage.getItem(KEY);
   data = stored ? JSON.parse(stored) : [];
-  if (!Array.isArray(data)) throw new Error("Stored data is not an array.");
+  if (!Array.isArray(data)) data = [];
 } catch (error) {
-  storageReadError = true;
-  alert("Stored data could not be read. The app has entered safe mode. Do not clear browser data or save new records. Recover using your exported backup.");
+  alert("Stored data could not be read. Do not clear browser data. Export or recover your backup before making further changes.");
+  data = [];
 }
 
+let active = null;
+
+/* Keep all original field IDs unchanged. */
 const fields = [
-  "diagnosis","events","cns","resp","cv","renal","infection","other","labs",
-  "weight","fluidIn","fluidOut","duration","plan",
-  "ventSex","heightCm","setVT","paO2","fio2Percent","plateauPressure","totalPeep",
-  "abgPH","abgCO2","abgHCO3","abgO2","abgFiO2","abgNa","abgCl","abgAlbumin"
+  "diagnosis", "events", "cns", "resp", "cv", "renal",
+  "infection", "other", "labs", "weight", "fluidIn",
+  "fluidOut", "duration", "plan",
+  "ventSex", "heightCm", "setVT", "paO2",
+  "fio2Percent", "plateauPressure", "totalPeep"
 ];
 
 function save() {
-  if (storageReadError) {
-    alert("Safe mode: saving is disabled because existing stored data could not be read.");
-    return false;
-  }
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
     render();
@@ -367,26 +792,18 @@ function save() {
   }
 }
 
-function persistWithoutRender() {
-  if (storageReadError) return false;
-  try {
-    localStorage.setItem(KEY, JSON.stringify(data));
-    return true;
-  } catch (error) {
-    alert("Could not save data. Check available device storage.");
-    return false;
-  }
-}
-
 function render() {
   const container = document.getElementById("patients");
   container.innerHTML = "";
-  data.forEach((p,i) => {
+
+  data.forEach((p, i) => {
     const row = document.createElement("div");
     row.className = "patient";
+
     const button = document.createElement("button");
     button.textContent = "Open";
     button.onclick = () => openPatient(i);
+
     row.append(document.createTextNode((p.bed || "Unnamed bed") + " "));
     row.append(button);
     container.append(row);
@@ -394,654 +811,1030 @@ function render() {
 }
 
 function addPatient() {
-  if (storageReadError) return alert("Safe mode: cannot add records.");
   const bed = document.getElementById("bed").value.trim();
-  if (!bed) return alert("Enter a bed label.");
-  data.push({bed});
+
+  if (!bed) {
+    alert("Enter a bed label.");
+    return;
+  }
+
+  data.push({ bed: bed });
   document.getElementById("bed").value = "";
-  if (save()) openPatient(data.length-1);
+
+  if (save()) {
+    openPatient(data.length - 1);
+  }
 }
 
 function openPatient(i) {
   if (!data[i]) return;
+
   active = i;
   const p = data[i];
-  ensureInvestigations(p);
+ensureInvestigations(p);
+renderInvestigations();
   document.getElementById("record").hidden = false;
   document.getElementById("heading").textContent = p.bed || "Patient record";
+
   fields.forEach(k => {
-    const el = document.getElementById(k);
-    if (el) el.value = p[k] ?? "";
+    const element = document.getElementById(k);
+    if (element) element.value = p[k] ?? "";
   });
+
   document.getElementById("sbar").value = "";
-  document.getElementById("fluidResult").textContent = "Net balance and output rate will appear here.";
-  document.getElementById("ventResult").innerHTML = "<p>Enter the ventilator and patient measurements, then calculate.</p>";
-  document.getElementById("ventAssessment").innerHTML = "";
-  document.getElementById("abgResult").textContent = "Enter ABG values to calculate acid–base parameters.";
-  renderInvestigations();
-  window.scrollTo({top:0,behavior:"smooth"});
+  document.getElementById("fluidResult").textContent =
+    "Net balance and output rate will appear here.";
+document.getElementById("ventResult").innerHTML =
+  "<p>Enter the ventilator and patient measurements, then calculate.</p>";
+
+document.getElementById("ventAssessment").innerHTML = "";
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* Auto-save all original patient fields. */
 fields.forEach(k => {
   const element = document.getElementById(k);
+
+  // Skip fields that do not exist in the HTML
   if (!element) return;
+
   element.addEventListener("input", () => {
     if (active === null || !data[active]) return;
+
     data[active][k] = element.value;
-    persistWithoutRender();
+
+    try {
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (error) {
+      alert("Could not save changes. Check available device storage.");
+    }
   });
 });
 
-/* ---------------- INVESTIGATIONS AND MIGRATION ---------------- */
+/* =========================================
+   STRUCTURED INVESTIGATIONS
+   Saved separately for each patient
+========================================= */
 
 const defaultLaboratory = [
-  ["Urea","mg/dL"],["Creat","mg/dL"],["Na","mmol/L"],["K","mmol/L"],
-  ["Ca T","mg/dL"],["Ca I","mmol/L"],["Mg","mg/dL"],["Po4","mg/dL"],
-  ["Alb","g/dL"],["Alt","U/L"],["Ast","U/L"],["Bil T","mg/dL"],
-  ["Bil D","mg/dL"],["PT","sec"],["PTT","sec"],["INR","ratio"],
-  ["Hb","g/dL"],["Plts","10³/µL"],["WBC","10³/µL"],["CRP","mg/L"],["Tgen",""]
+  ["Urea", "mg/dL"],
+  ["Creat", "mg/dL"],
+  ["Na", "mmol/L"],
+  ["K", "mmol/L"],
+  ["Ca T", "mg/dL"],
+  ["Ca I", "mmol/L"],
+  ["Mg", "mg/dL"],
+  ["Po4", "mg/dL"],
+  ["Alb", "g/dL"],
+  ["Alt", "U/L"],
+  ["Ast", "U/L"],
+  ["Bil T", "mg/dL"],
+  ["Bil D", "mg/dL"],
+  ["PT", "sec"],
+  ["PTT", "sec"],
+  ["INR", "ratio"],
+  ["Hb", "g/dL"],
+  ["Plts", "10³/µL"],
+  ["WBC", "10³/µL"],
+  ["CRP", "mg/L"],
+  ["Tgen", ""]
 ];
-const defaultRadiology = ["CT brain","CT chest","Echo","U/S"];
 
-/* Educational defaults only. Local lab ranges must take priority. */
+const defaultRadiology = [
+  "CT brain",
+  "CT chest",
+  "Echo",
+  "U/S"
+];
+/* Adult laboratory reference ranges
+   Units must match the unit entered in the row.
+   Local laboratory reference intervals take priority.
+*/
+
 const laboratoryRanges = {
-  "urea":{min:15,max:40,unit:"mg/dL"},
-  "creat":{min:0.6,max:1.2,unit:"mg/dL"},
-  "na":{min:136,max:146,unit:"mmol/L"},
-  "k":{min:3.5,max:5,unit:"mmol/L"},
-  "ca t":{min:8.4,max:10.2,unit:"mg/dL"},
-  "mg":{min:1.5,max:2,unit:"mg/dL"},
-  "po4":{min:3,max:4.5,unit:"mg/dL"},
-  "alb":{min:3.5,max:5.5,unit:"g/dL"},
-  "alt":{min:10,max:40,unit:"U/L"},
-  "ast":{min:12,max:38,unit:"U/L"},
-  "bil t":{min:0.1,max:1,unit:"mg/dL"},
-  "bil d":{min:0,max:0.3,unit:"mg/dL"},
-  "inr":{min:0.8,max:1.2,unit:"ratio"},
-  "plts":{min:150,max:400,unit:"10³/µL"},
-  "wbc":{min:4.5,max:11,unit:"10³/µL"},
-  "crp":{min:0,max:5,unit:"mg/L"}
+  "urea":   { min: 15, max: 40, unit: "mg/dL" },
+  "creat":  { min: 0.6, max: 1.2, unit: "mg/dL" },
+  "na":     { min: 136, max: 146, unit: "mmol/L" },
+  "k":      { min: 3.5, max: 5.0, unit: "mmol/L" },
+  "ca t":   { min: 8.4, max: 10.2, unit: "mg/dL" },
+  "mg":     { min: 1.5, max: 2.0, unit: "mg/dL" },
+  "po4":    { min: 3.0, max: 4.5, unit: "mg/dL" },
+  "alb":    { min: 3.5, max: 5.5, unit: "g/dL" },
+  "alt":    { min: 10, max: 40, unit: "U/L" },
+  "ast":    { min: 12, max: 38, unit: "U/L" },
+  "bil t":  { min: 0.1, max: 1.0, unit: "mg/dL" },
+  "bil d":  { min: 0, max: 0.3, unit: "mg/dL" },
+  "inr":    { min: 0.8, max: 1.2, unit: "ratio" },
+  "plts":   { min: 150, max: 400, unit: "10³/µL" },
+  "wbc":    { min: 4.5, max: 11, unit: "10³/µL" },
+  "crp":    { min: 0, max: 5, unit: "mg/L", inclusiveMax: true }
 };
 
+function getLabAssessment(item, patient) {
+  const name = String(item.name || "").trim().toLowerCase();
+  const unit = String(item.unit || "").trim().toLowerCase();
+  const resultText = String(item.result || "").trim();
+
+  if (resultText === "") return null;
+
+  const value = Number(resultText);
+
+  if (!Number.isFinite(value)) return null;
+
+  let range = laboratoryRanges[name];
+
+  // Hemoglobin reference range depends on sex.
+  if (name === "hb") {
+    if (patient.ventSex === "male") {
+      range = { min: 13, max: 17, unit: "g/dL" };
+    } else if (patient.ventSex === "female") {
+      range = { min: 12, max: 16, unit: "g/dL" };
+    } else {
+      return {
+        label: "NO RANGE SET",
+        className: "lab-alert-unavailable",
+        reference: "Select patient sex"
+      };
+    }
+  }
+
+  // No automatic range for tests requiring local assay-specific limits.
+  if (!range) {
+    return {
+      label: "NO RANGE SET",
+      className: "lab-alert-unavailable",
+      reference: "Use local laboratory range"
+    };
+  }
+
+  // Do not compare results when units do not match.
+  if (unit !== range.unit.toLowerCase()) {
+    return {
+      label: "CHECK UNIT",
+      className: "lab-alert-unavailable",
+      reference: `Expected ${range.unit}`
+    };
+  }
+
+  if (value < range.min) {
+    return {
+      label: "LOW ↓",
+      className: "lab-alert-low",
+      reference: `${range.min}–${range.max} ${range.unit}`
+    };
+  }
+
+  if (
+    range.inclusiveMax
+      ? value >= range.max
+      : value > range.max
+  ) {
+    return {
+      label: "HIGH ↑",
+      className: "lab-alert-high",
+      reference: `${range.min}–${range.max} ${range.unit}`
+    };
+  }
+
+  return {
+    label: "NORMAL",
+    className: "lab-alert-normal",
+    reference: `${range.min}–${range.max} ${range.unit}`
+  };
+}
 function ensureInvestigations(patient) {
-  if (!patient.investigations || typeof patient.investigations !== "object") {
+  if (!patient.investigations ||
+      typeof patient.investigations !== "object") {
     patient.investigations = {};
   }
-  const inv = patient.investigations;
 
-  if (!Array.isArray(inv.laboratory)) {
-    inv.laboratory = defaultLaboratory.map(([name,unit]) => ({
-      name,date:"",result:"",unit,trend:"",lastResult:"",history:[]
-    }));
+  if (!Array.isArray(patient.investigations.laboratory)) {
+    patient.investigations.laboratory =
+      defaultLaboratory.map(item => ({
+        name: item[0],
+        date: "",
+        result: "",
+        unit: item[1],
+        trend: "",
+        lastResult: ""
+      }));
   } else {
-    inv.laboratory.forEach(item => {
-      if (!Array.isArray(item.history)) item.history = [];
+    // Add new fields to existing saved laboratory rows
+    patient.investigations.laboratory.forEach(item => {
       if (item.trend === undefined) item.trend = "";
       if (item.lastResult === undefined) item.lastResult = "";
-      if (item.date === undefined) item.date = "";
-      if (item.result === undefined) item.result = "";
-      if (item.unit === undefined) item.unit = "";
-      if (item.name === undefined) item.name = "Unnamed test";
     });
   }
 
-  if (!Array.isArray(inv.radiology)) {
-    inv.radiology = defaultRadiology.map(name => ({
-      name,date:"",result:"",modality:"",status:"",findings:"",impression:""
-    }));
-  } else {
-    inv.radiology.forEach(item => {
-      if (item.name === undefined) item.name = "Radiology";
-      if (item.date === undefined) item.date = "";
-      /* Preserve legacy result text in the new structured impression field. */
-      if (item.impression === undefined) item.impression = item.result || "";
-      if (item.findings === undefined) item.findings = "";
-      if (item.modality === undefined) item.modality = "";
-      if (item.status === undefined) item.status = "";
-    });
+  if (!Array.isArray(patient.investigations.radiology)) {
+    patient.investigations.radiology =
+      defaultRadiology.map(name => ({
+        name: name,
+        date: "",
+        result: ""
+      }));
   }
-
-  if (!inv.labRanges || typeof inv.labRanges !== "object") inv.labRanges = {};
-  persistWithoutRender();
 }
 
-function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
+function escapeInvestigationText(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
 }
 
-function labRangeFor(item,patient) {
-  const key = String(item.name || "").trim().toLowerCase();
-  const custom = patient.investigations.labRanges[key];
-  if (custom && custom.unit) return {...custom,source:"Local range"};
-  if (key === "hb") {
-    if (patient.ventSex === "male") return {min:13,max:17,unit:"g/dL",source:"Educational default"};
-    if (patient.ventSex === "female") return {min:12,max:16,unit:"g/dL",source:"Educational default"};
-    return null;
-  }
-  const standard = laboratoryRanges[key];
-  return standard ? {...standard,source:"Educational default"} : null;
-}
-
-function getLabAssessment(item,patient) {
-  const text = String(item.result ?? "").trim();
-  if (!text) return null;
-  const value = Number(text);
-  if (!Number.isFinite(value)) return {
-    label:"NON-NUMERIC",className:"lab-alert-unavailable",reference:"Cannot compare non-numeric result"
-  };
-  const range = labRangeFor(item,patient);
-  if (!range) return {
-    label:"NO RANGE SET",className:"lab-alert-unavailable",reference:"Configure a local reference interval"
-  };
-  if (String(item.unit || "").trim().toLowerCase() !== String(range.unit).trim().toLowerCase()) {
-    return {label:"CHECK UNIT",className:"lab-alert-unavailable",reference:"Expected unit: "+range.unit};
-  }
-  if (value < Number(range.min)) return {
-    label:"LOW ↓",className:"lab-alert-low",reference:`${range.min}–${range.max} ${range.unit} (${range.source})`
-  };
-  if (value > Number(range.max)) return {
-    label:"HIGH ↑",className:"lab-alert-high",reference:`${range.min}–${range.max} ${range.unit} (${range.source})`
-  };
-  return {
-    label:"IN RANGE",className:"lab-alert-normal",reference:`${range.min}–${range.max} ${range.unit} (${range.source})`
-  };
-}
-
-function trendFromHistory(item) {
-  const values = (item.history || [])
-    .map(x => Number(x.result))
-    .filter(Number.isFinite);
-  const current = Number(item.result);
-  if (Number.isFinite(current)) values.push(current);
-  if (values.length < 2) return item.trend || "";
-  const previous = values[values.length-2];
-  const latest = values[values.length-1];
-  if (latest > previous) return "up";
-  if (latest < previous) return "down";
-  return "stable";
-}
-
-function getTrendClass(t) {
-  return t==="up"?"trend-up":t==="down"?"trend-down":t==="stable"?"trend-stable":"";
+function getTrendClass(trend) {
+  if (trend === "up") return "trend-up";
+  if (trend === "down") return "trend-down";
+  if (trend === "stable") return "trend-stable";
+  return "";
 }
 
 function renderInvestigations() {
   if (active === null || !data[active]) return;
+
   const patient = data[active];
   ensureInvestigations(patient);
 
-  const labContainer = document.getElementById("laboratoryRows");
-  const radContainer = document.getElementById("radiologyRows");
+  const laboratoryContainer =
+    document.getElementById("laboratoryRows");
 
-  labContainer.innerHTML = patient.investigations.laboratory.map((item,index) => {
-    const assessment = getLabAssessment(item,patient);
-    const history = item.history || [];
-    const trend = trendFromHistory(item);
-    return `
-      <div class="investigation-scroll">
-        <div class="investigation-row">
-          <span class="investigation-name">${esc(item.name)}</span>
-          <input class="investigation-field" type="date" aria-label="${esc(item.name)} date"
-            value="${esc(item.date)}" data-type="laboratory" data-index="${index}" data-field="date">
-          <div class="lab-result-cell">
-            <input class="investigation-field lab-result-input" type="text" inputmode="decimal"
-              placeholder="Result" aria-label="${esc(item.name)} result"
-              value="${esc(item.result)}" data-type="laboratory" data-index="${index}" data-field="result">
-            <span class="lab-alert ${assessment ? assessment.className : ""}"
-              title="${esc(assessment ? assessment.reference : "")}">
-              ${esc(assessment ? assessment.label : "")}
-            </span>
-          </div>
-          <input class="investigation-field investigation-unit" type="text" placeholder="Unit"
-            aria-label="${esc(item.name)} unit" value="${esc(item.unit)}"
-            data-type="laboratory" data-index="${index}" data-field="unit">
-          <span class="status-tag ${getTrendClass(trend)}">${trend==="up"?"↑":trend==="down"?"↓":trend==="stable"?"→":"—"}</span>
-          <button class="small-button" onclick="addLabHistory(${index})">Add dated result</button>
-        </div>
-        <div class="history-box">
-          <b>Previous results: ${history.length}</b>
-          ${history.length ? `
-            <table><thead><tr><th>Date</th><th>Result</th><th>Unit</th></tr></thead>
-            <tbody>${history.slice().reverse().map(h=>`
-              <tr><td>${esc(h.date || "—")}</td><td>${esc(h.result)}</td><td>${esc(h.unit)}</td></tr>
-            `).join("")}</tbody></table>
-          ` : `<p>No historical results recorded.</p>`}
-          ${item.lastResult ? `<p>Legacy last result: ${esc(item.lastResult)}</p>` : ""}
-        </div>
-      </div>`;
-  }).join("");
+  const radiologyContainer =
+    document.getElementById("radiologyRows");
 
-  radContainer.innerHTML = patient.investigations.radiology.map((item,index) => `
-    <div class="radiology-record">
-      <h4>${esc(item.name)}</h4>
-      <div class="range-grid">
-        <div><label>Date</label><input type="date" value="${esc(item.date)}" data-type="radiology" data-index="${index}" data-field="date"></div>
-        <div><label>Modality</label><input type="text" placeholder="CT / MRI / X-ray / US" value="${esc(item.modality)}" data-type="radiology" data-index="${index}" data-field="modality"></div>
-        <div><label>Status</label>
-          <select data-type="radiology" data-index="${index}" data-field="status">
-            <option value="" ${!item.status?"selected":""}>Select status</option>
-            <option value="Requested" ${item.status==="Requested"?"selected":""}>Requested</option>
-            <option value="Pending" ${item.status==="Pending"?"selected":""}>Pending</option>
-            <option value="Completed" ${item.status==="Completed"?"selected":""}>Completed</option>
-          </select>
+  laboratoryContainer.innerHTML =
+    '<div class="investigation-scroll">' +
+    patient.investigations.laboratory.map((item, index) => `
+      <div class="investigation-row">
+
+        <span class="investigation-name">
+          ${escapeInvestigationText(item.name)}
+        </span>
+
+        <input class="investigation-field"
+          type="date"
+          aria-label="${escapeInvestigationText(item.name)} date"
+          value="${escapeInvestigationText(item.date)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="date">
+
+                <div class="lab-result-cell">
+
+          <input class="investigation-field lab-result-input"
+            type="text"
+            inputmode="decimal"
+            placeholder="Result"
+            aria-label="${escapeInvestigationText(item.name)} result"
+            value="${escapeInvestigationText(item.result)}"
+            data-investigation-type="laboratory"
+            data-investigation-index="${index}"
+            data-investigation-field="result">
+
+          ${(() => {
+  const assessment = getLabAssessment(item, patient);
+
+  return `<span class="lab-alert ${assessment ? assessment.className : ""}"
+    title="${escapeInvestigationText(assessment ? assessment.reference : "")}">
+    ${escapeInvestigationText(assessment ? assessment.label : "")}
+  </span>`;
+})()}
+
         </div>
+
+        <input class="investigation-field investigation-unit"
+          type="text"
+          placeholder="Unit"
+          aria-label="${escapeInvestigationText(item.name)} unit"
+          value="${escapeInvestigationText(item.unit)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="unit">
+
+        <select class="trend-select ${getTrendClass(item.trend)}"
+          aria-label="${escapeInvestigationText(item.name)} trend"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="trend">
+
+          <option value="" ${item.trend === "" ? "selected" : ""}>—</option>
+          <option value="up" ${item.trend === "up" ? "selected" : ""}>↑</option>
+          <option value="down" ${item.trend === "down" ? "selected" : ""}>↓</option>
+          <option value="stable" ${item.trend === "stable" ? "selected" : ""}>→</option>
+
+        </select>
+
+        <input class="investigation-field"
+          type="text"
+          placeholder="Last result"
+          aria-label="${escapeInvestigationText(item.name)} last result"
+          value="${escapeInvestigationText(item.lastResult)}"
+          data-investigation-type="laboratory"
+          data-investigation-index="${index}"
+          data-investigation-field="lastResult">
+
       </div>
-      <label>Findings</label>
-      <textarea data-type="radiology" data-index="${index}" data-field="findings" placeholder="Describe findings...">${esc(item.findings)}</textarea>
-      <label>Impression / conclusion</label>
-      <textarea data-type="radiology" data-index="${index}" data-field="impression" placeholder="Radiological impression...">${esc(item.impression)}</textarea>
-      <button class="small-button danger" onclick="deleteRadiology(${index})">Delete this record</button>
-    </div>
-  `).join("");
+    `).join("") +
+    '</div>';
+
+  radiologyContainer.innerHTML =
+    '<div class="investigation-scroll">' +
+    patient.investigations.radiology.map((item, index) => `
+      <div class="radiology-row">
+
+        <span class="investigation-name">
+          ${escapeInvestigationText(item.name)}
+        </span>
+
+        <input class="investigation-field"
+          type="date"
+          aria-label="${escapeInvestigationText(item.name)} date"
+          value="${escapeInvestigationText(item.date)}"
+          data-investigation-type="radiology"
+          data-investigation-index="${index}"
+          data-investigation-field="date">
+
+        <input class="investigation-field"
+          type="text"
+          placeholder="Result"
+          aria-label="${escapeInvestigationText(item.name)} result"
+          value="${escapeInvestigationText(item.result)}"
+          data-investigation-type="radiology"
+          data-investigation-index="${index}"
+          data-investigation-field="result">
+
+      </div>
+    `).join("") +
+    '</div>';
 }
 
 function saveInvestigationField(event) {
-  const el = event.target;
-  if (!el.dataset.type || active === null || !data[active]) return;
-  const type = el.dataset.type;
-  const index = Number(el.dataset.index);
-  const field = el.dataset.field;
+  const element = event.target;
+
+  if (!element.dataset.investigationType) return;
+
+  if (active === null || !data[active]) return;
+
+  const type = element.dataset.investigationType;
+  const index = Number(element.dataset.investigationIndex);
+  const field = element.dataset.investigationField;
+
   ensureInvestigations(data[active]);
-  const item = data[active].investigations[type]?.[index];
-  if (!item) return;
-  item[field] = el.value;
-  if (type === "laboratory" && ["result","unit","date"].includes(field)) {
-    const row = el.closest(".investigation-scroll");
-    const assessment = getLabAssessment(item,data[active]);
-    const alertEl = row?.querySelector(".lab-alert");
-    if (alertEl) {
-      alertEl.textContent = assessment ? assessment.label : "";
-      alertEl.className = "lab-alert " + (assessment ? assessment.className : "");
-      alertEl.title = assessment ? assessment.reference : "";
-    }
+
+  const items = data[active].investigations[type];
+
+  if (!items || !items[index]) return;
+
+  items[index][field] = element.value;
+// Update laboratory alert without re-rendering the row
+if (
+  type === "laboratory" &&
+  (field === "result" || field === "unit")
+) {
+  const row = element.closest(".investigation-row");
+  const alertElement = row?.querySelector(".lab-alert");
+
+  if (alertElement) {
+    const assessment = getLabAssessment(items[index], data[active]);
+
+    alertElement.textContent = assessment ? assessment.label : "";
+    alertElement.className = assessment
+      ? "lab-alert " + assessment.className
+      : "lab-alert";
+
+    alertElement.title = assessment
+      ? assessment.reference
+      : "";
   }
-  persistWithoutRender();
 }
-document.addEventListener("input",saveInvestigationField);
-document.addEventListener("change",saveInvestigationField);
-
-function addLabHistory(index) {
-  if (active === null || !data[active]) return;
-  const item = data[active].investigations.laboratory[index];
-  if (!item) return;
-  const date = prompt("Date of new result (YYYY-MM-DD):",new Date().toISOString().slice(0,10));
-  if (date === null || !date.trim()) return;
-  const result = prompt("New laboratory result:");
-  if (result === null || !result.trim()) return;
-  const unit = prompt("Unit:",item.unit || "");
-  if (unit === null) return;
-
-  if (String(item.result || "").trim() && String(item.date || "").trim()) {
-    item.history.push({date:item.date,result:item.result,unit:item.unit || ""});
-  } else if (String(item.result || "").trim()) {
-    item.history.push({date:"Date not recorded",result:item.result,unit:item.unit || ""});
+  // Update arrow color immediately
+  if (field === "trend") {
+    element.classList.remove(
+      "trend-up", "trend-down", "trend-stable"
+    );
+    element.classList.add(getTrendClass(element.value));
   }
-  item.date = date.trim();
-  item.result = result.trim();
-  item.unit = unit.trim();
-  item.trend = trendFromHistory(item);
-  if (persistWithoutRender()) renderInvestigations();
-}
 
-function configureLabRange() {
-  if (active === null || !data[active]) return;
-  const name = prompt("Exact laboratory test name (for example: Na, K, Hb):");
-  if (!name || !name.trim()) return;
-  const key = name.trim().toLowerCase();
-  const old = data[active].investigations.labRanges[key] || {};
-  const min = prompt("Lower reference limit (leave blank if not applicable):",old.min ?? "");
-  if (min === null) return;
-  const max = prompt("Upper reference limit (leave blank if not applicable):",old.max ?? "");
-  if (max === null) return;
-  const unit = prompt("Exact unit:",old.unit || "");
-  if (unit === null || !unit.trim()) return;
-  const criticalLow = prompt("Optional critical low threshold (leave blank if not configured):",old.criticalLow ?? "");
-  if (criticalLow === null) return;
-  const criticalHigh = prompt("Optional critical high threshold (leave blank if not configured):",old.criticalHigh ?? "");
-  if (criticalHigh === null) return;
-
-  const entry = {unit:unit.trim()};
-  if (min.trim() !== "") entry.min = Number(min);
-  if (max.trim() !== "") entry.max = Number(max);
-  if (criticalLow.trim() !== "") entry.criticalLow = Number(criticalLow);
-  if (criticalHigh.trim() !== "") entry.criticalHigh = Number(criticalHigh);
-
-  if ((entry.min !== undefined && !Number.isFinite(entry.min)) ||
-      (entry.max !== undefined && !Number.isFinite(entry.max)) ||
-      (entry.criticalLow !== undefined && !Number.isFinite(entry.criticalLow)) ||
-      (entry.criticalHigh !== undefined && !Number.isFinite(entry.criticalHigh))) {
-    return alert("Please enter valid numeric limits.");
-  }
-  if (entry.min !== undefined && entry.max !== undefined && entry.min > entry.max) {
-    return alert("Lower reference limit cannot exceed upper reference limit.");
-  }
-  data[active].investigations.labRanges[key] = entry;
-  if (persistWithoutRender()) {
-    renderInvestigations();
-    renderRangeSummary();
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (error) {
+    alert("Could not save investigation. Check available device storage.");
   }
 }
 
-function renderRangeSummary() {
-  if (active === null || !data[active]) return;
-  const box = document.getElementById("rangeEditor");
-  const ranges = data[active].investigations.labRanges || {};
-  const keys = Object.keys(ranges);
-  box.innerHTML = `
-    <div class="range-box">
-      <b>Locally configured ranges</b>
-      ${keys.length ? keys.map(key => {
-        const r = ranges[key];
-        return `<p><b>${esc(key)}</b>: ${esc(r.min ?? "—")} to ${esc(r.max ?? "—")} ${esc(r.unit)}
-          <br><span class="card-note">Critical low: ${esc(r.criticalLow ?? "Not configured")} | Critical high: ${esc(r.criticalHigh ?? "Not configured")}</span>
-          <button class="small-button" onclick="removeLabRange('${esc(key)}')">Remove local range</button></p>`;
-      }).join("") : "<p>No local ranges configured. Educational defaults may be shown for selected tests.</p>"}
-      <p class="card-note">Critical thresholds are stored separately from reference intervals. They are not automatically treated as validated alarms.</p>
-    </div>`;
-}
-
-function removeLabRange(key) {
-  if (active === null || !data[active]) return;
-  if (!confirm("Remove the locally configured range for " + key + "?")) return;
-  delete data[active].investigations.labRanges[key];
-  persistWithoutRender();
-  renderInvestigations();
-  renderRangeSummary();
-}
+document.addEventListener("input", saveInvestigationField);
+document.addEventListener("change", saveInvestigationField);
 
 function addCustomInvestigation(type) {
-  if (active === null || !data[active]) return alert("Open a patient record first.");
-  const name = prompt(type==="laboratory"?"Enter the laboratory test name:":"Enter the radiology investigation name:");
-  if (!name || !name.trim()) return;
-  ensureInvestigations(data[active]);
-  if (type === "laboratory") {
-    data[active].investigations.laboratory.push({
-      name:name.trim(),date:"",result:"",unit:"",trend:"",lastResult:"",history:[]
-    });
-  } else {
-    data[active].investigations.radiology.push({
-      name:name.trim(),date:"",result:"",modality:"",status:"",findings:"",impression:""
-    });
-  }
-  if (persistWithoutRender()) renderInvestigations();
-}
-
-function deleteRadiology(index) {
-  if (active === null || !data[active]) return;
-  if (!confirm("Delete this radiology record?")) return;
-  data[active].investigations.radiology.splice(index,1);
-  if (persistWithoutRender()) renderInvestigations();
-}
-
-/* ---------------- ABG ANALYZER ---------------- */
-
-function abgValue(id) {
-  const raw = document.getElementById(id).value.trim();
-  if (!raw) return null;
-  const n = Number(raw);
-  return Number.isFinite(n) ? n : null;
-}
-
-function calculateABG() {
-  const pH=abgValue("abgPH"), co2=abgValue("abgCO2"), hco3=abgValue("abgHCO3");
-  const o2=abgValue("abgO2"), fio2=abgValue("abgFiO2");
-  const na=abgValue("abgNa"), cl=abgValue("abgCl"), alb=abgValue("abgAlbumin");
-
-  const errors=[];
-  if (pH===null || pH<6.8 || pH>7.8) errors.push("Enter a plausible pH.");
-  if (co2===null || co2<=0) errors.push("Enter PaCO₂ in mmHg.");
-  if (hco3===null || hco3<=0) errors.push("Enter HCO₃⁻ in mmol/L.");
-  if (fio2!==null && (fio2<21 || fio2>100)) errors.push("FiO₂ must be entered as a percentage between 21 and 100.");
-  if (errors.length) {
-    document.getElementById("abgResult").innerHTML = "<b>Check inputs:</b><br>"+errors.map(esc).join("<br>");
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
     return;
   }
 
-  const lines=[];
-  let primary="Pattern indeterminate";
-  if (pH<7.35) {
-    primary = hco3<22 ? "Acidemia with a metabolic acidosis component" :
-      co2>45 ? "Acidemia with a respiratory acidosis component" : "Acidemia; primary process needs further assessment";
-  } else if (pH>7.45) {
-    primary = hco3>26 ? "Alkalemia with a metabolic alkalosis component" :
-      co2<35 ? "Alkalemia with a respiratory alkalosis component" : "Alkalemia; primary process needs further assessment";
+  const name = prompt(
+    type === "laboratory"
+      ? "Enter the laboratory test name:"
+      : "Enter the radiology investigation name:"
+  );
+
+  if (!name || !name.trim()) return;
+
+  ensureInvestigations(data[active]);
+
+  if (type === "laboratory") {
+    data[active].investigations.laboratory.push({
+      name: name.trim(),
+      date: "",
+      result: "",
+      unit: "",
+      trend: "",
+      lastResult: ""
+    });
+  } else if (type === "radiology") {
+    data[active].investigations.radiology.push({
+      name: name.trim(),
+      date: "",
+      result: ""
+    });
   } else {
-    if (hco3<22 && co2<35) primary="Near-normal pH with low HCO₃⁻ and low PaCO₂: possible compensated or mixed disorder";
-    else if (hco3>26 && co2>45) primary="Near-normal pH with high HCO₃⁻ and high PaCO₂: possible compensated or mixed disorder";
-    else primary="pH within conventional range; assess for compensated or mixed disorders";
-  }
-  lines.push("<b>Initial acid–base pattern:</b> "+esc(primary));
-
-  if (hco3<22) {
-    const expected=1.5*hco3+8;
-    lines.push("<b>Winter's formula:</b> expected PaCO₂ "+expected.toFixed(1)+" ± 2 mmHg.");
-    if (co2<expected-2) lines.push("Measured PaCO₂ is lower than expected: additional respiratory alkalosis may be present.");
-    else if (co2>expected+2) lines.push("Measured PaCO₂ is higher than expected: additional respiratory acidosis may be present.");
-    else lines.push("Measured PaCO₂ is within the expected compensation range.");
-  } else if (hco3>26) {
-    const expected=0.7*(hco3-24)+40;
-    lines.push("<b>Metabolic alkalosis compensation estimate:</b> expected PaCO₂ approximately "+expected.toFixed(1)+" ± 5 mmHg.");
-    if (co2<expected-5) lines.push("Measured PaCO₂ is lower than expected: additional respiratory alkalosis may be present.");
-    else if (co2>expected+5) lines.push("Measured PaCO₂ is higher than expected: additional respiratory acidosis may be present.");
+    return;
   }
 
-  if (na!==null && cl!==null) {
-    const ag=na-(cl+hco3);
-    lines.push("<b>Anion gap (without potassium):</b> "+ag.toFixed(1)+" mmol/L.");
-    if (alb!==null) {
-      const corrected=ag+2.5*(4-alb);
-      lines.push("<b>Albumin-corrected anion gap:</b> "+corrected.toFixed(1)+" mmol/L (albumin in g/dL).");
-    } else {
-      lines.push("Albumin not entered: anion gap is not corrected for hypoalbuminemia.");
-    }
-  } else {
-    lines.push("Enter Na⁺ and Cl⁻ to calculate anion gap.");
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+    renderInvestigations();
+  } catch (error) {
+    alert("Could not save investigation. Check available device storage.");
   }
-
-  if (o2!==null && fio2!==null) {
-    const pf=o2/(fio2/100);
-    lines.push("<b>P/F ratio:</b> "+pf.toFixed(0)+" mmHg.");
-    lines.push("P/F ratio is an oxygenation index; it does not independently diagnose ARDS.");
-  } else {
-    lines.push("Enter PaO₂ and FiO₂ to calculate P/F ratio.");
-  }
-
-  document.getElementById("abgResult").innerHTML =
-    "<h4>Results</h4>"+lines.map(x=>"<p>"+x+"</p>").join("");
 }
 
-function clearABG() {
-  ["abgPH","abgCO2","abgHCO3","abgO2","abgFiO2","abgNa","abgCl","abgAlbumin"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("abgResult").textContent="Enter ABG values to calculate acid–base parameters.";
-}
-
-/* ---------------- VENTILATOR CALCULATOR ---------------- */
 
 function calculateVentilator() {
   const getValue = id => {
-    const raw=document.getElementById(id).value.trim();
-    if(raw==="") return null;
-    const value=Number(raw);
-    return Number.isFinite(value)?value:null;
+    const raw = document.getElementById(id).value.trim();
+    if (raw === "") return null;
+
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
   };
-  const sex=document.getElementById("ventSex").value;
-  const height=getValue("heightCm"),vt=getValue("setVT"),paO2=getValue("paO2");
-  const fio2=getValue("fio2Percent"),plateau=getValue("plateauPressure"),peep=getValue("totalPeep");
-  const rows=[],alerts=[],errors=[];
-  if(!sex) errors.push("Select patient sex.");
-  if(height===null||height<=0||height>250) errors.push("Enter a valid height in cm.");
-  if(vt===null||vt<=0) errors.push("Enter a valid tidal volume in mL.");
-  if(paO2===null||paO2<=0) errors.push("Enter a valid PaO₂ in mmHg.");
-  if(fio2===null||fio2<21||fio2>100) errors.push("Enter FiO₂ as a percentage between 21 and 100.");
-  if(plateau===null||plateau<0) errors.push("Enter a valid plateau pressure.");
-  if(peep===null||peep<0) errors.push("Enter a valid total PEEP.");
-  if(errors.length) {
-    document.getElementById("ventAssessment").innerHTML="";
-    document.getElementById("ventResult").innerHTML=`<div class="vent-validation"><b>Please correct these inputs:</b><ul>${errors.map(esc).map(x=>"<li>"+x+"</li>").join("")}</ul></div>`;
+
+  const sex = document.getElementById("ventSex").value;
+  const height = getValue("heightCm");
+  const vt = getValue("setVT");
+  const paO2 = getValue("paO2");
+  const fio2 = getValue("fio2Percent");
+  const plateau = getValue("plateauPressure");
+  const peep = getValue("totalPeep");
+
+  const rows = [];
+  const alerts = [];
+  const errors = [];
+
+  // Validate required inputs
+  if (!sex) errors.push("Select patient sex.");
+
+  if (height === null || height <= 0 || height > 250)
+    errors.push("Enter a valid height in cm.");
+
+  if (vt === null || vt <= 0)
+    errors.push("Enter a valid tidal volume in mL.");
+
+  if (paO2 === null || paO2 <= 0)
+    errors.push("Enter a valid PaO₂ in mmHg.");
+
+  if (fio2 === null || fio2 < 21 || fio2 > 100)
+    errors.push("Enter FiO₂ as a percentage between 21 and 100.");
+
+  if (plateau === null || plateau < 0)
+    errors.push("Enter a valid plateau pressure.");
+
+  if (peep === null || peep < 0)
+    errors.push("Enter a valid total PEEP.");
+
+  if (errors.length > 0) {    document.getElementById("ventAssessment").innerHTML = "";
+    document.getElementById("ventResult").innerHTML = `
+      <div class="vent-validation">
+        <strong>Please correct these inputs:</strong>
+        <ul>${errors.map(error => `<li>${error}</li>`).join("")}</ul>
+      </div>
+    `;
     return;
   }
-  function addRow(parameter,measured,reference,interpretation,status) {
-    rows.push(`<tr><td>${parameter}</td><td>${measured}</td><td>${reference}</td><td class="vent-status ${status}">${interpretation}</td></tr>`);
-  }
-  const show=(value,digits=1)=>Number.isFinite(value)?value.toFixed(digits):"—";
-  let pbw=sex==="male"?50+0.91*(height-152.4):45.5+0.91*(height-152.4);
-  if(pbw<=0) {
-    document.getElementById("ventResult").innerHTML="<div class='vent-validation'>Check height and sex.</div>";
-    return;
-  }
-  addRow("Predicted body weight",show(pbw)+" kg","Calculated from sex and height","Calculated","vent-info");
-  const vtPerKg=vt/pbw,lowVT=pbw*4,targetVT=pbw*6,highVT=pbw*8;
-  let vtInterpretation="Within 4–8 mL/kg PBW",vtStatus="vent-good";
-  if(vtPerKg<4){vtInterpretation="Below 4 mL/kg PBW";vtStatus="vent-warning";}
-  else if(vtPerKg>8){vtInterpretation="Above 8 mL/kg PBW";vtStatus="vent-warning";}
-  else if(vtPerKg>6){vtInterpretation="Within range; above 6 mL/kg reference";vtStatus="vent-info";}
-  addRow("Set tidal volume",show(vt,0)+" mL ("+show(vtPerKg,2)+" mL/kg PBW)","4–8 mL/kg PBW in ARDS; initial reference 6 mL/kg",vtInterpretation,vtStatus);
-  addRow("Patient-specific VT range","—",show(lowVT,0)+"–"+show(highVT,0)+" mL; 6 mL/kg = "+show(targetVT,0)+" mL","Calculated from PBW","vent-info");
 
-  const pfRatio=paO2/(fio2/100);
-  let category="",interpretation="",status="vent-info";
-  if(pfRatio>300){category="Above 300";interpretation="Above ARDS oxygenation thresholds";status="vent-good";}
-  else if(pfRatio>200){category="Mild range";interpretation="Mild oxygenation impairment range";}
-  else if(pfRatio>100){category="Moderate range";interpretation="Moderate oxygenation impairment range";status="vent-warning";}
-  else{category="Severe range";interpretation="Severe oxygenation impairment range";status="vent-warning";}
-  if(peep<5){interpretation+="; Berlin category requires PEEP ≥5";status="vent-info";}
-  addRow("P/F ratio",show(pfRatio,0),"ARDS oxygenation ranges: mild 201–300; moderate 101–200; severe ≤100, with PEEP ≥5",category+" — "+interpretation,status);
-  addRow("Plateau pressure",show(plateau)+" cmH₂O","<30 cmH₂O in ARDS",plateau<30?"Below ARDS threshold":"At or above ARDS threshold",plateau<30?"vent-good":"vent-warning");
-  addRow("Total PEEP",show(peep)+" cmH₂O","Individualize according to disease and mechanics","Assess intrinsic PEEP and response","vent-info");
+  function addRow(parameter, measured, reference, interpretation, status) {
+    rows.push(`
+      <tr>
+        <td>${parameter}</td>
+        <td>${measured}</td>
+        <td>${reference}</td>
+        <td class="vent-status ${status}">${interpretation}</td>
+      </tr>
+    `);
+  }
 
-  let driving=null,compliance=null;
-  if(plateau>peep) {
-    driving=plateau-peep;
-    addRow("Driving pressure",show(driving)+" cmH₂O","Minimize where possible; no universally established target","Trend with compliance and response","vent-info");
-    compliance=vt/driving;
-    addRow("Static compliance",show(compliance)+" mL/cmH₂O","No single universal target; compare with prior measurements","Interpret with lung/chest-wall mechanics","vent-info");
+  const show = (value, digits = 1) =>
+    Number.isFinite(value) ? value.toFixed(digits) : "—";
+
+  // 1. Predicted body weight
+  let pbw = null;
+
+  if (height !== null && height > 0 && sex !== "") {
+    if (sex === "male") {
+      pbw = 50 + 0.91 * (height - 152.4);
+    } else if (sex === "female") {
+      pbw = 45.5 + 0.91 * (height - 152.4);
+    }
+
+    if (pbw !== null && pbw > 0) {
+      addRow(
+        "Predicted body weight",
+        show(pbw) + " kg",
+        "Calculated from sex and height",
+        "Calculated",
+        "vent-info"
+      );
+    } else {
+      pbw = null;
+      addRow(
+        "Predicted body weight",
+        "—",
+        "Valid adult height and sex required",
+        "Check input",
+        "vent-warning"
+      );
+    }
   } else {
-    addRow("Driving pressure","—","Plateau pressure − total PEEP","Requires plateau pressure greater than PEEP","vent-warning");
-    addRow("Static compliance","—","VT ÷ driving pressure","Requires valid driving pressure","vent-warning");
+    addRow(
+      "Predicted body weight",
+      "—",
+      "Enter sex and height",
+      "Missing data",
+      "vent-warning"
+    );
   }
 
-  if(vtPerKg>8) alerts.push({type:"danger",message:"High tidal volume: above 8 mL/kg PBW. Reassess lung-protective ventilation."});
-  else if(vtPerKg<4) alerts.push({type:"warning",message:"Tidal volume below 4 mL/kg PBW. Review indication and patient response."});
-  if(plateau>=30) alerts.push({type:"danger",message:"Plateau pressure ≥30 cmH₂O: above the recommended ARDS target."});
-  if(pfRatio<=100) alerts.push({type:"danger",message:"Severe oxygenation impairment: P/F ratio ≤100. This does not independently diagnose ARDS."});
+  // 2. Tidal volume per kg PBW and individual target volume
+  if (vt !== null && vt > 0 && pbw !== null) {
+    const vtPerKg = vt / pbw;
+    const lowVT = pbw * 4;
+    const targetVT = pbw * 6;
+    const highVT = pbw * 8;
 
-  const review=[];
-  if(vtPerKg>8) review.push("Reassess high tidal volume.");
-  if(vtPerKg<4) review.push("Review very low tidal volume and clinical indication.");
-  if(plateau>=30) review.push("Reassess elevated plateau pressure.");
-  if(pfRatio<=100) review.push("Review severe oxygenation impairment.");
-  if(!review.length) review.push("No threshold-based alerts identified by this calculator.");
+    let interpretation = "Within 4–8 mL/kg PBW";
+    let status = "vent-good";
 
-  const ventilationStatus=vtPerKg>8?"Review: VT above 8 mL/kg PBW":vtPerKg<4?"Review: VT below 4 mL/kg PBW":"Within the 4–8 mL/kg PBW reference range";
-  const oxygenationStatus=pfRatio<=100?"Severe oxygenation impairment":pfRatio<=200?"Moderate oxygenation impairment":pfRatio<=300?"Mild oxygenation impairment":"P/F ratio above 300";
+    if (vtPerKg < 4) {
+      interpretation = "Below 4 mL/kg PBW";
+      status = "vent-warning";
+    } else if (vtPerKg > 8) {
+      interpretation = "Above 8 mL/kg PBW";
+      status = "vent-warning";
+    } else if (vtPerKg > 6) {
+      interpretation = "Within range; above 6 mL/kg reference";
+      status = "vent-info";
+    }
 
-  document.getElementById("ventAssessment").innerHTML=`
+    addRow(
+      "Set tidal volume",
+      show(vt, 0) + " mL (" + show(vtPerKg, 2) + " mL/kg PBW)",
+      "4–8 mL/kg PBW in ARDS; initial reference 6 mL/kg",
+      interpretation,
+      status
+    );
+
+    addRow(
+      "Patient-specific VT range",
+      "—",
+      show(lowVT, 0) + "–" + show(highVT, 0) +
+      " mL; 6 mL/kg = " + show(targetVT, 0) + " mL",
+      "Calculated from PBW",
+      "vent-info"
+    );
+  } else {
+    addRow(
+      "Set tidal volume",
+      "—",
+      "Requires valid VT, sex and height",
+      "Missing data",
+      "vent-warning"
+    );
+  }
+
+  // 3. P/F ratio and oxygenation category
+  let pfRatio = null;
+
+  if (
+    paO2 !== null && paO2 > 0 &&
+    fio2 !== null && fio2 > 0 && fio2 <= 100
+  ) {
+    pfRatio = paO2 / (fio2 / 100);
+
+    let category = "";
+    let interpretation = "";
+    let status = "vent-info";
+
+    if (pfRatio > 300) {
+      category = "Above 300";
+      interpretation = "Above ARDS oxygenation thresholds";
+      status = "vent-good";
+    } else if (pfRatio > 200) {
+      category = "Mild range";
+      interpretation = "Mild oxygenation impairment range";
+      status = "vent-info";
+    } else if (pfRatio > 100) {
+      category = "Moderate range";
+      interpretation = "Moderate oxygenation impairment range";
+      status = "vent-warning";
+    } else {
+      category = "Severe range";
+      interpretation = "Severe oxygenation impairment range";
+      status = "vent-warning";
+    }
+
+    if (peep === null || peep < 5) {
+      interpretation += "; Berlin category requires PEEP ≥5";
+      status = "vent-info";
+    }
+
+    addRow(
+      "P/F ratio",
+      show(pfRatio, 0),
+      "ARDS oxygenation ranges: mild 201–300; moderate 101–200; severe ≤100, with PEEP ≥5",
+      category + " — " + interpretation,
+      status
+    );
+  } else {
+    addRow(
+      "P/F ratio",
+      "—",
+      "PaO₂ ÷ FiO₂ fraction",
+      "Enter PaO₂ and FiO₂ (1–100%)",
+      "vent-warning"
+    );
+  }
+
+  // 4. Plateau pressure
+  if (plateau !== null && plateau >= 0) {
+    const status = plateau < 30 ? "vent-good" : "vent-warning";
+
+    addRow(
+      "Plateau pressure",
+      show(plateau) + " cmH₂O",
+      "<30 cmH₂O in ARDS",
+      plateau < 30 ? "Below ARDS threshold" : "At or above ARDS threshold",
+      status
+    );
+  } else {
+    addRow(
+      "Plateau pressure",
+      "—",
+      "<30 cmH₂O in ARDS",
+      "Enter plateau pressure",
+      "vent-warning"
+    );
+  }
+
+  // 5. PEEP
+  if (peep !== null && peep >= 0) {
+    addRow(
+      "Total PEEP",
+      show(peep) + " cmH₂O",
+      "Individualize according to disease and respiratory mechanics",
+      "Assess intrinsic PEEP and patient response",
+      "vent-info"
+    );
+  } else {
+    addRow(
+      "Total PEEP",
+      "—",
+      "Individualized",
+      "Enter total PEEP",
+      "vent-warning"
+    );
+  }
+
+  // 6. Driving pressure
+  let drivingPressure = null;
+
+  if (
+    plateau !== null && plateau >= 0 &&
+    peep !== null && peep >= 0 &&
+    plateau > peep
+  ) {
+    drivingPressure = plateau - peep;
+
+    addRow(
+      "Driving pressure",
+      show(drivingPressure) + " cmH₂O",
+      "Minimize where possible; no universally established target",
+      "Trend with compliance and clinical response",
+      "vent-info"
+    );
+  } else {
+    addRow(
+      "Driving pressure",
+      "—",
+      "Plateau pressure − total PEEP",
+      "Requires valid plateau pressure greater than PEEP",
+      "vent-warning"
+    );
+  }
+
+  // 7. Static compliance
+  if (
+    vt !== null && vt > 0 &&
+    drivingPressure !== null && drivingPressure > 0
+  ) {
+    const compliance = vt / drivingPressure;
+
+    addRow(
+      "Static compliance",
+      show(compliance) + " mL/cmH₂O",
+      "No single universal target; compare with prior measurements",
+      "Interpret with lung/chest-wall mechanics and trend",
+      "vent-info"
+    );
+  } else {
+    addRow(
+      "Static compliance",
+      "—",
+      "VT ÷ driving pressure",
+      "Requires valid VT and driving pressure",
+      "vent-warning"
+    );
+  }
+
+  // Clinical alerts
+  if (pbw !== null && vt !== null && pbw > 0) {
+    const vtPerKg = vt / pbw;
+
+    if (vtPerKg > 8) {
+      alerts.push({
+        type: "danger",
+        message: "High tidal volume: above 8 mL/kg PBW. Reassess lung-protective ventilation."
+      });
+    } else if (vtPerKg < 4) {
+      alerts.push({
+        type: "warning",
+        message: "Tidal volume below 4 mL/kg PBW. Review the clinical indication and patient response."
+      });
+    }
+  }
+
+  if (plateau >= 30) {
+    alerts.push({
+      type: "danger",
+      message: "Plateau pressure ≥30 cmH₂O: above the recommended ARDS target."
+    });
+  }
+
+  if (pfRatio !== null && pfRatio <= 100) {
+    alerts.push({
+      type: "danger",
+      message: "Severe oxygenation impairment: P/F ratio ≤100. This does not independently diagnose ARDS."
+    });
+  }
+
+  // Build alert display
+  const alertHTML = alerts.map(alert => `
+    <div class="vent-alert vent-alert-${alert.type}">
+      ⚠ ${alert.message}
+    </div>
+  `).join("");
+
+  // Generate ventilator daily assessment
+  const vtPerKgValue = pbw > 0 && vt > 0 ? vt / pbw : null;
+  const drivingValue =
+    plateau !== null && peep !== null && plateau > peep
+      ? plateau - peep
+      : null;
+
+  const complianceValue =
+    vt > 0 && drivingValue > 0
+      ? vt / drivingValue
+      : null;
+
+  let ventilationStatus = "Not assessed";
+
+  if (vtPerKgValue !== null) {
+    if (vtPerKgValue > 8) {
+      ventilationStatus = "Review: VT above 8 mL/kg PBW";
+    } else if (vtPerKgValue < 4) {
+      ventilationStatus = "Review: VT below 4 mL/kg PBW";
+    } else {
+      ventilationStatus = "Within the 4–8 mL/kg PBW reference range";
+    }
+  }
+
+  let oxygenationStatus = "Not assessed";
+
+  if (pfRatio !== null) {
+    if (pfRatio <= 100) {
+      oxygenationStatus = "Severe oxygenation impairment";
+    } else if (pfRatio <= 200) {
+      oxygenationStatus = "Moderate oxygenation impairment";
+    } else if (pfRatio <= 300) {
+      oxygenationStatus = "Mild oxygenation impairment";
+    } else {
+      oxygenationStatus = "P/F ratio above 300";
+    }
+  }
+
+  const reviewItems = [];
+
+  if (vtPerKgValue !== null && vtPerKgValue > 8)
+    reviewItems.push("Reassess high tidal volume.");
+
+  if (vtPerKgValue !== null && vtPerKgValue < 4)
+    reviewItems.push("Review very low tidal volume and clinical indication.");
+
+  if (plateau >= 30)
+    reviewItems.push("Reassess elevated plateau pressure.");
+
+  if (pfRatio !== null && pfRatio <= 100)
+    reviewItems.push("Review severe oxygenation impairment.");
+
+  if (reviewItems.length === 0)
+    reviewItems.push("No threshold-based alerts identified by this calculator.");
+
+  const assessmentHTML = `
     <div class="vent-assessment">
       <h3>Ventilator Daily Assessment</h3>
+
       <h4>1. Lung-protective ventilation</h4>
-      <p><b>PBW:</b> ${pbw.toFixed(1)} kg</p><p><b>VT/PBW:</b> ${vtPerKg.toFixed(2)} mL/kg</p><p><b>Assessment:</b> ${ventilationStatus}</p>
-      <h4>2. Oxygenation</h4><p><b>P/F ratio:</b> ${pfRatio.toFixed(0)}</p><p><b>Assessment:</b> ${oxygenationStatus}</p>
+      <p><strong>PBW:</strong> ${pbw.toFixed(1)} kg</p>
+      <p><strong>VT/PBW:</strong> ${vtPerKgValue !== null ? vtPerKgValue.toFixed(2) + " mL/kg" : "Not available"}</p>
+      <p><strong>Assessment:</strong> ${ventilationStatus}</p>
+
+      <h4>2. Oxygenation</h4>
+      <p><strong>P/F ratio:</strong> ${pfRatio !== null ? pfRatio.toFixed(0) : "Not available"}</p>
+      <p><strong>Assessment:</strong> ${oxygenationStatus}</p>
+
       <h4>3. Respiratory mechanics</h4>
-      <p><b>Plateau pressure:</b> ${plateau} cmH₂O</p><p><b>Total PEEP:</b> ${peep} cmH₂O</p>
-      <p><b>Driving pressure:</b> ${driving!==null?driving.toFixed(1)+" cmH₂O":"Not available"}</p>
-      <p><b>Static compliance:</b> ${compliance!==null?compliance.toFixed(1)+" mL/cmH₂O":"Not available"}</p>
-      <h4>4. Parameters requiring review</h4>${review.map(x=>"<p>• "+esc(x)+"</p>").join("")}
+      <p><strong>Plateau pressure:</strong> ${plateau} cmH₂O</p>
+      <p><strong>Total PEEP:</strong> ${peep} cmH₂O</p>
+      <p><strong>Driving pressure:</strong> ${drivingValue !== null ? drivingValue.toFixed(1) + " cmH₂O" : "Not available"}</p>
+      <p><strong>Static compliance:</strong> ${complianceValue !== null ? complianceValue.toFixed(1) + " mL/cmH₂O" : "Not available"}</p>
+
+      <h4>4. Parameters requiring review</h4>
+      ${reviewItems.map(item => `<p>• ${item}</p>`).join("")}
+
       <h4>5. ICU rounds report</h4>
-      <div class="vent-report">Ventilator assessment:
-VT ${vt} mL (${vtPerKg.toFixed(1)} mL/kg PBW).
-P/F ratio ${pfRatio.toFixed(0)}.
-Plateau pressure ${plateau} cmH₂O.
-Total PEEP ${peep} cmH₂O.
-Driving pressure ${driving!==null?driving.toFixed(1):"—"} cmH₂O.
-Static compliance ${compliance!==null?compliance.toFixed(1):"—"} mL/cmH₂O.</div>
-    </div>`;
-  document.getElementById("ventResult").innerHTML=
-    alerts.map(a=>`<div class="vent-alert vent-alert-${a.type}">⚠ ${esc(a.message)}</div>`).join("")+
-    `<table class="vent-table"><thead><tr><th>Parameter</th><th>Calculated</th><th>Reference / target</th><th>Interpretation</th></tr></thead><tbody>${rows.join("")}</tbody></table>`;
+      <div class="vent-report">
+        Ventilator assessment:
+        VT ${vt} mL (${vtPerKgValue !== null ? vtPerKgValue.toFixed(1) : "—"} mL/kg PBW).
+        P/F ratio ${pfRatio !== null ? pfRatio.toFixed(0) : "—"}.
+        Plateau pressure ${plateau} cmH₂O.
+        Total PEEP ${peep} cmH₂O.
+        Driving pressure ${drivingValue !== null ? drivingValue.toFixed(1) : "—"} cmH₂O.
+        Static compliance ${complianceValue !== null ? complianceValue.toFixed(1) : "—"} mL/cmH₂O.
+      </div>
+    </div>
+  `;
+
+  document.getElementById("ventAssessment").innerHTML = assessmentHTML;
+
+  document.getElementById("ventResult").innerHTML = `
+   ${alertHTML}
+    <table class="vent-table">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Calculated</th>
+          <th>Reference / target</th>
+          <th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join("")}
+      </tbody>
+    </table>
+  `;
 }
 
-/* ---------------- FLUID BALANCE ---------------- */
 
 function calculateFluid() {
-  const weight=Number(document.getElementById("weight").value);
-  const input=Number(document.getElementById("fluidIn").value);
-  const output=Number(document.getElementById("fluidOut").value);
-  const hours=Number(document.getElementById("duration").value);
-  if(!Number.isFinite(weight)||!Number.isFinite(input)||!Number.isFinite(output)||!Number.isFinite(hours)||weight<=0||input<0||output<0||hours<=0) {
-    return alert("Enter a valid positive weight and duration, and non-negative fluid values.");
+  const weight = Number(document.getElementById("weight").value);
+  const input = Number(document.getElementById("fluidIn").value);
+  const output = Number(document.getElementById("fluidOut").value);
+  const hours = Number(document.getElementById("duration").value);
+
+  if (
+    !Number.isFinite(weight) ||
+    !Number.isFinite(input) ||
+    !Number.isFinite(output) ||
+    !Number.isFinite(hours) ||
+    weight <= 0 || input < 0 || output < 0 || hours <= 0
+  ) {
+    alert("Enter a valid positive weight and duration, and non-negative fluid values.");
+    return;
   }
-  const balance=input-output,rate=output/(weight*hours);
-  document.getElementById("fluidResult").innerHTML=
-    "<h4>Calculation results</h4><p>Net fluid balance: <b>"+balance.toFixed(0)+" mL</b></p><p>Average output rate: <b>"+rate.toFixed(2)+" mL/kg/hour</b></p>";
+
+  const balance = input - output;
+  const outputRate = output / (weight * hours);
+
+  document.getElementById("fluidResult").innerHTML =
+    "<h4>Calculation results</h4>" +
+    "<p>Net fluid balance: <b>" + balance.toFixed(0) + " mL</b></p>" +
+    "<p>Average output rate: <b>" + outputRate.toFixed(2) +
+    " mL/kg/hour</b></p>";
 }
 
-/* ---------------- SBAR ---------------- */
-
 function makeSBAR() {
-  if(active===null||!data[active]) return alert("Open a patient record first.");
-  const p=data[active];
-  const summary=
-    "SITUATION\n"+(p.bed||"")+" — "+(p.diagnosis||"")+
-    "\n\nBACKGROUND\n"+(p.events||"")+
-    "\n\nASSESSMENT\n"+
-    "CNS: "+(p.cns||"")+
-    "\nRespiratory: "+(p.resp||"")+
-    "\nCardiovascular: "+(p.cv||"")+
-    "\nRenal: "+(p.renal||"")+
-    "\nInfection: "+(p.infection||"")+
-    "\nOther: "+(p.other||"")+
-    "\nLabs: "+(p.labs||"")+
-    "\n\nRECOMMENDATION / PLAN\n"+(p.plan||"")+
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
+    return;
+  }
+
+  const p = data[active];
+
+  const summary =
+    "SITUATION\n" +
+    (p.bed || "") + " — " + (p.diagnosis || "") +
+
+    "\n\nBACKGROUND\n" +
+    (p.events || "") +
+
+    "\n\nASSESSMENT\n" +
+    "CNS: " + (p.cns || "") +
+    "\nRespiratory: " + (p.resp || "") +
+    "\nCardiovascular: " + (p.cv || "") +
+    "\nRenal: " + (p.renal || "") +
+    "\nInfection: " + (p.infection || "") +
+    "\nOther: " + (p.other || "") +
+    "\nLabs: " + (p.labs || "") +
+
+    "\n\nRECOMMENDATION / PLAN\n" +
+    (p.plan || "") +
+
     "\n\nVerify all details before handover.";
 
-  /* Fixed: assign generated summary to the SBAR textarea. */
-  document.getElementById("sbar").value=summary;
+  
 }
 
 function copySBAR() {
-  const text=document.getElementById("sbar").value;
-  if(!text) return alert("Generate the SBAR summary first.");
-  if(navigator.clipboard&&navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(()=>alert("SBAR copied.")).catch(()=>alert("Copy not available on this device."));
-  } else alert("Copy is not available in this browser.");
-}
+  const text = document.getElementById("sbar").value;
 
-/* ---------------- EXPORT / DELETE ---------------- */
+  if (!text) {
+    alert("Generate the SBAR summary first.");
+    return;
+  }
 
-function download(obj,name) {
-  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob);
-  const link=document.createElement("a");
-  link.href=url;link.download=name;document.body.appendChild(link);link.click();link.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function exportData() {
-  if(active===null||!data[active]) return alert("Open a patient record first.");
-  download(data[active],"icu-bed-backup.json");
-}
-function exportAll() {
-  if(storageReadError) return alert("Cannot export unreadable browser data. Use your previously exported backup.");
-  download(data,"icu-rounds-backup.json");
-}
-function deletePatient() {
-  if(active===null||!data[active]) return;
-  if(confirm("Delete this patient record? This cannot be undone unless you have a backup.")) {
-    data.splice(active,1);active=null;document.getElementById("record").hidden=true;save();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => alert("SBAR copied."))
+      .catch(() => alert("Copy not available on this device."));
+  } else {
+    alert("Copy is not available in this browser.");
   }
 }
 
-/* ---------------- INITIALIZATION ---------------- */
+function download(obj, name) {
+  const blob = new Blob(
+    [JSON.stringify(obj, null, 2)],
+    { type: "application/json" }
+  );
 
-if (!storageReadError) {
-  data.forEach(p => {
-    if (p && typeof p === "object") ensureInvestigations(p);
-  });
-  persistWithoutRender();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+function exportData() {
+  if (active === null || !data[active]) {
+    alert("Open a patient record first.");
+    return;
+  }
+
+  download(data[active], "icu-bed-backup.json");
+}
+
+function exportAll() {
+  download(data, "icu-rounds-backup.json");
+}
+
+function deletePatient() {
+  if (active === null || !data[active]) return;
+
+  if (confirm("Delete this patient record? This cannot be undone unless you have a backup.")) {
+    data.splice(active, 1);
+    active = null;
+    document.getElementById("record").hidden = true;
+    save();
+  }
+}
+
 render();
-if (active !== null) renderRangeSummary();
 </script>
 
 <script>
@@ -1051,5 +1844,6 @@ if ("serviceWorker" in navigator) {
   });
 }
 </script>
+
 </body>
 </html>
