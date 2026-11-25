@@ -1408,547 +1408,6 @@ function addCustomInvestigation(type) {
 
 function calculateVentilator() {
   const getValue = id => {
-    const raw = document.getElementById(id).value.trim();
-    if (raw === "") return null;
-
-    const value = Number(raw);
-    return Number.isFinite(value) ? value : null;
-  };
-
-  const sex = document.getElementById("ventSex").value;
-  const height = getValue("heightCm");
-  const vt = getValue("setVT");
-  const paO2 = getValue("paO2");
-  const fio2 = getValue("fio2Percent");
-  const plateau = getValue("plateauPressure");
-  const peep = getValue("totalPeep");
-
-  const rows = [];
-  const alerts = [];
-  const errors = [];
-
-  // Validate required inputs
-  if (!sex) errors.push("Select patient sex.");
-
-  if (height === null || height <= 0 || height > 250)
-    errors.push("Enter a valid height in cm.");
-
-  if (vt === null || vt <= 0)
-    errors.push("Enter a valid tidal volume in mL.");
-
-  if (paO2 === null || paO2 <= 0)
-    errors.push("Enter a valid PaO₂ in mmHg.");
-
-  if (fio2 === null || fio2 < 21 || fio2 > 100)
-    errors.push("Enter FiO₂ as a percentage between 21 and 100.");
-
-  if (plateau === null || plateau < 0)
-    errors.push("Enter a valid plateau pressure.");
-
-  if (peep === null || peep < 0)
-    errors.push("Enter a valid total PEEP.");
-
-  if (errors.length > 0) {    document.getElementById("ventAssessment").innerHTML = "";
-    document.getElementById("ventResult").innerHTML = `
-      <div class="vent-validation">
-        <strong>Please correct these inputs:</strong>
-        <ul>${errors.map(error => `<li>${error}</li>`).join("")}</ul>
-      </div>
-    `;
-    return;
-  }
-
-  function addRow(parameter, measured, reference, interpretation, status) {
-    rows.push(`
-      <tr>
-        <td>${parameter}</td>
-        <td>${measured}</td>
-        <td>${reference}</td>
-        <td class="vent-status ${status}">${interpretation}</td>
-      </tr>
-    `);
-  }
-
-  const show = (value, digits = 1) =>
-    Number.isFinite(value) ? value.toFixed(digits) : "—";
-
-  // 1. Predicted body weight
-  let pbw = null;
-
-  if (height !== null && height > 0 && sex !== "") {
-    if (sex === "male") {
-      pbw = 50 + 0.91 * (height - 152.4);
-    } else if (sex === "female") {
-      pbw = 45.5 + 0.91 * (height - 152.4);
-    }
-
-    if (pbw !== null && pbw > 0) {
-      addRow(
-        "Predicted body weight",
-        show(pbw) + " kg",
-        "Calculated from sex and height",
-        "Calculated",
-        "vent-info"
-      );
-    } else {
-      pbw = null;
-      addRow(
-        "Predicted body weight",
-        "—",
-        "Valid adult height and sex required",
-        "Check input",
-        "vent-warning"
-      );
-    }
-  } else {
-    addRow(
-      "Predicted body weight",
-      "—",
-      "Enter sex and height",
-      "Missing data",
-      "vent-warning"
-    );
-  }
-
-  // 2. Tidal volume per kg PBW and individual target volume
-  if (vt !== null && vt > 0 && pbw !== null) {
-    const vtPerKg = vt / pbw;
-    const lowVT = pbw * 4;
-    const targetVT = pbw * 6;
-    const highVT = pbw * 8;
-
-    let interpretation = "Within 4–8 mL/kg PBW";
-    let status = "vent-good";
-
-    if (vtPerKg < 4) {
-      interpretation = "Below 4 mL/kg PBW";
-      status = "vent-warning";
-    } else if (vtPerKg > 8) {
-      interpretation = "Above 8 mL/kg PBW";
-      status = "vent-warning";
-    } else if (vtPerKg > 6) {
-      interpretation = "Within range; above 6 mL/kg reference";
-      status = "vent-info";
-    }
-
-    addRow(
-      "Set tidal volume",
-      show(vt, 0) + " mL (" + show(vtPerKg, 2) + " mL/kg PBW)",
-      "4–8 mL/kg PBW in ARDS; initial reference 6 mL/kg",
-      interpretation,
-      status
-    );
-
-    addRow(
-      "Patient-specific VT range",
-      "—",
-      show(lowVT, 0) + "–" + show(highVT, 0) +
-      " mL; 6 mL/kg = " + show(targetVT, 0) + " mL",
-      "Calculated from PBW",
-      "vent-info"
-    );
-  } else {
-    addRow(
-      "Set tidal volume",
-      "—",
-      "Requires valid VT, sex and height",
-      "Missing data",
-      "vent-warning"
-    );
-  }
-
-  // 3. P/F ratio and oxygenation category
-  let pfRatio = null;
-
-  if (
-    paO2 !== null && paO2 > 0 &&
-    fio2 !== null && fio2 > 0 && fio2 <= 100
-  ) {
-    pfRatio = paO2 / (fio2 / 100);
-
-    let category = "";
-    let interpretation = "";
-    let status = "vent-info";
-
-    if (pfRatio > 300) {
-      category = "Above 300";
-      interpretation = "Above ARDS oxygenation thresholds";
-      status = "vent-good";
-    } else if (pfRatio > 200) {
-      category = "Mild range";
-      interpretation = "Mild oxygenation impairment range";
-      status = "vent-info";
-    } else if (pfRatio > 100) {
-      category = "Moderate range";
-      interpretation = "Moderate oxygenation impairment range";
-      status = "vent-warning";
-    } else {
-      category = "Severe range";
-      interpretation = "Severe oxygenation impairment range";
-      status = "vent-warning";
-    }
-
-    if (peep === null || peep < 5) {
-      interpretation += "; Berlin category requires PEEP ≥5";
-      status = "vent-info";
-    }
-
-    addRow(
-      "P/F ratio",
-      show(pfRatio, 0),
-      "ARDS oxygenation ranges: mild 201–300; moderate 101–200; severe ≤100, with PEEP ≥5",
-      category + " — " + interpretation,
-      status
-    );
-  } else {
-
-
-function calculateVentilator() {
-  const getValue = id => {
-    const element = document.getElementById(id);
-    if (!element || element.value.trim() === "") return null;
-
-    const value = Number(element.value);
-    return Number.isFinite(value) ? value : null;
-  };
-
-  const sex = document.getElementById("ventSex").value.toLowerCase();
-  const height = getValue("heightCm");
-  const vt = getValue("setVT");
-  const fio2 = getValue("fio2Percent");
-  const pao2 = getValue("paO2");
-  const plateau = getValue("plateauPressure");
-  const totalPeep = getValue("totalPeep");
-  const setPeep = getValue("setPEEP");
-
-  const result = document.getElementById("ventResult");
-
-  if (!result) return;
-
-  const rows = [];
-
-  function addRow(parameter, calculated, target, interpretation, status = "info") {
-    rows.push(`
-      <tr>
-        <td>${parameter}</td>
-        <td>${calculated}</td>
-        <td>${target}</td>
-        <td class="vent-status vent-${status}">${interpretation}</td>
-      </tr>
-    `);
-  }
-
-  function fmt(value, decimals = 1) {
-    return Number.isFinite(value) ? value.toFixed(decimals) : "—";
-  }
-
-  // 1. Predicted body weight
-  let pbw = null;
-
-  if (height !== null && height > 0 && (sex === "male" || sex === "female")) {
-    pbw = sex === "male"
-      ? 50 + 0.91 * (height - 152.4)
-      : 45.5 + 0.91 * (height - 152.4);
-
-    if (pbw > 0) {
-      addRow(
-        "Predicted body weight",
-        fmt(pbw) + " kg",
-        "Calculated from sex and height",
-        "Calculated",
-        "info"
-      );
-    } else {
-      pbw = null;
-      addRow(
-        "Predicted body weight",
-        "—",
-        "Check height",
-        "Invalid height for calculation",
-        "warning"
-      );
-    }
-  } else {
-    addRow(
-      "Predicted body weight",
-      "—",
-      "Enter sex and height",
-      "Missing information",
-      "info"
-    );
-  }
-
-  // 2. Tidal volume / PBW
-  if (vt !== null && vt > 0 && pbw !== null) {
-    const vtPerKg = vt / pbw;
-
-    let interpretation = "Within 4–8 mL/kg PBW range";
-    let status = "good";
-
-    if (vtPerKg < 4) {
-      interpretation = "Below 4 mL/kg PBW";
-      status = "warning";
-    } else if (vtPerKg > 8) {
-      interpretation = "Above 8 mL/kg PBW";
-      status = "warning";
-    }
-
-    addRow(
-      "VT / PBW",
-      fmt(vtPerKg) + " mL/kg",
-      "4–8 mL/kg PBW",
-      interpretation,
-      status
-    );
-  } else {
-    addRow(
-      "VT / PBW",
-      "—",
-      "4–8 mL/kg PBW",
-      "Enter VT, sex and height",
-      "info"
-    );
-  }
-
-  // 3. P/F ratio
-  if (
-    pao2 !== null && pao2 > 0 &&
-    fio2 !== null && fio2 >= 21 && fio2 <= 100
-  ) {
-    const pf = pao2 / (fio2 / 100);
-
-    addRow(
-      "P/F ratio",
-      fmt(pf, 0),
-      "Interpret with clinical context",
-      "Oxygenation index; not an ARDS diagnosis",
-      "info"
-    );
-  } else {
-    addRow(
-      "P/F ratio",
-      "—",
-      "PaO₂ and FiO₂ required",
-      "Enter valid oxygenation data",
-      "info"
-    );
-  }
-
-  // 4. Plateau pressure
-  if (plateau !== null && plateau > 0) {
-    const status = plateau <= 30 ? "good" : "warning";
-
-    addRow(
-      "Plateau pressure",
-      fmt(plateau) + " cmH₂O",
-      "Generally ≤30 cmH₂O in lung-protective ventilation",
-      plateau <= 30
-        ? "Within commonly used target"
-        : "Above commonly used target",
-      status
-    );
-  } else {
-    addRow(
-      "Plateau pressure",
-      "—",
-      "Measure when applicable",
-      "Not entered",
-      "info"
-    );
-  }
-
-  // 5. Driving pressure
-  if (
-    plateau !== null && plateau > 0 &&
-    totalPeep !== null && totalPeep >= 0
-  ) {
-    const driving = plateau - totalPeep;
-
-    if (driving > 0) {
-      let interpretation = "Assess and trend with clinical context";
-      let status = "info";
-
-      if (driving > 15) {
-        interpretation = "Above commonly discussed 15 cmH₂O threshold";
-        status = "warning";
-      } else {
-        interpretation = "At or below 15 cmH₂O; interpret clinically";
-        status = "good";
-      }
-
-      addRow(
-        "Driving pressure",
-        fmt(driving) + " cmH₂O",
-        "Trend; 15 cmH₂O is not a universal cutoff",
-        interpretation,
-        status
-      );
-    } else {
-      addRow(
-        "Driving pressure",
-        "—",
-        "Plateau pressure must exceed total PEEP",
-        "Check measurements",
-        "warning"
-      );
-    }
-  } else {
-    addRow(
-      "Driving pressure",
-      "—",
-      "Plateau pressure − total PEEP",
-      "Enter both values",
-      "info"
-    );
-  }
-
-  // 6. Static compliance
-  if (
-    vt !== null && vt > 0 &&
-    plateau !== null && plateau > 0 &&
-    totalPeep !== null && totalPeep >= 0
-  ) {
-    const driving = plateau - totalPeep;
-
-    if (driving > 0) {
-      const compliance = vt / driving;
-
-      addRow(
-        "Static compliance",
-        fmt(compliance) + " mL/cmH₂O",
-        "No universal normal target in critical illness",
-        "Trend over time",
-        "info"
-      );
-    } else {
-      addRow(
-        "Static compliance",
-        "—",
-        "Requires positive driving pressure",
-        "Check measurements",
-        "warning"
-      );
-    }
-  } else {
-    addRow(
-      "Static compliance",
-      "—",
-      "VT ÷ driving pressure",
-      "Enter VT, plateau and total PEEP",
-      "info"
-    );
-  }
-
-  // 7. Intrinsic PEEP estimate
-  if (
-    totalPeep !== null && totalPeep >= 0 &&
-    setPeep !== null && setPeep >= 0
-  ) {
-    const autoPeep = totalPeep - setPeep;
-
-    if (autoPeep >= 0) {
-      addRow(
-        "Intrinsic PEEP estimate",
-        fmt(autoPeep) + " cmH₂O",
-        "Assess clinically",
-        "Total PEEP − set PEEP; verify measurement",
-        "info"
-      );
-    } else {
-      addRow(
-        "Intrinsic PEEP estimate",
-        "—",
-        "Total PEEP should be ≥ set PEEP",
-        "Check measurements",
-        "warning"
-      );
-    }
-  } else {
-    addRow(
-      "Intrinsic PEEP estimate",
-      "—",
-      "Total PEEP − set PEEP",
-      "Enter both PEEP values",
-      "info"
-    );
-  }
-
-  result.innerHTML = `
-    <table class="vent-table">
-      <thead>
-        <tr>
-          <th>Parameter</th>
-          <th>Calculated</th>
-          <th>Reference / target</th>
-          <th>Interpretation</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.join("")}
-      </tbody>
-    </table>
-  `;
-}
-
-  // Clinical alerts
-  if (pbw !== null && vt !== null && pbw > 0) {
-    const vtPerKg = vt / pbw;
-
-    if (vtPerKg > 8) {
-      alerts.push({
-        type: "danger",
-        message: "High tidal volume: above 8 mL/kg PBW. Reassess lung-protective ventilation."
-      });
-    } else if (vtPerKg < 4) {
-      alerts.push({
-        type: "warning",
-        message: "Tidal volume below 4 mL/kg PBW. Review the clinical indication and patient response."
-      });
-    }
-  }
-
-  if (plateau >= 30) {
-    alerts.push({
-      type: "danger",
-      message: "Plateau pressure ≥30 cmH₂O: above the recommended ARDS target."
-    });
-  }
-
-  if (pfRatio !== null && pfRatio <= 100) {
-    alerts.push({
-      type: "danger",
-      message: "Severe oxygenation impairment: P/F ratio ≤100. This does not independently diagnose ARDS."
-    });
-  }
-
-  // Build alert display
-  const alertHTML = alerts.map(alert => `
-    <div class="vent-alert vent-alert-${alert.type}">
-      ⚠ ${alert.message}
-    </div>
-  `).join("");
-
-  // Generate ventilator daily assessment
-  const vtPerKgValue = pbw > 0 && vt > 0 ? vt / pbw : null;
-  const drivingValue =
-    plateau !== null && peep !== null && plateau > peep
-      ? plateau - peep
-      : null;
-
-  const complianceValue =
-    vt > 0 && drivingValue > 0
-      ? vt / drivingValue
-      : null;
-
-  let ventilationStatus = "Not assessed";
-
-  if (vtPerKgValue !== null) {
-    if (vtPerKgValue > 8) {
-      ventilationStatus = "Review: VT above 8 mL/kg PBW";
-    } else if (vtPerKgValue < 4) {
-
-function calculateVentilator() {
-  const getValue = id => {
     const el = document.getElementById(id);
     if (!el || el.value.trim() === "") return null;
     const n = Number(el.value);
@@ -1963,6 +1422,7 @@ function calculateVentilator() {
 
   const sex = getText("ventSex").toLowerCase();
   const mode = getText("ventMode");
+  const ieRatio = getText("ieRatio");
   const rate = getValue("ventRate");
   const height = getValue("heightCm");
   const vt = getValue("setVT");
@@ -1991,11 +1451,13 @@ function calculateVentilator() {
     `);
   }
 
-  // Ventilator settings summary
+  // Ventilator settings
   addRow("Ventilator mode", mode || "—", "As clinically indicated", "Entered setting");
   addRow("Set respiratory rate", rate !== null ? rate + " /min" : "—", "Individualized", "Entered setting");
-  addRow("Pressure support", ps !== null ? ps + " cmH₂O" : "—", "If applicable", "Entered setting");
-  addRow("Peak pressure", peak !== null ? peak + " cmH₂O" : "—", "Interpret with airway resistance and mechanics", "Entered measurement");
+  addRow("Set PEEP", setPeep !== null ? fmt(setPeep) + " cmH₂O" : "—", "Entered setting", "Not independently assessed");
+  addRow("Pressure support", ps !== null ? fmt(ps) + " cmH₂O" : "—", "If applicable", "Entered setting");
+  addRow("Peak pressure", peak !== null ? fmt(peak) + " cmH₂O" : "—", "Interpret with airway resistance and mechanics", "Entered measurement");
+  addRow("I:E ratio", ieRatio || "—", "Individualized", "Entered setting");
 
   // Predicted body weight
   let pbw = null;
@@ -2031,7 +1493,7 @@ function calculateVentilator() {
     );
   }
 
-  // Tidal volume per PBW
+  // Tidal volume / PBW
   let vtPerKg = null;
 
   if (vt !== null && vt > 0 && pbw !== null) {
@@ -2046,6 +1508,9 @@ function calculateVentilator() {
     } else if (vtPerKg > 8) {
       status = "warning";
       interpretation = "Above 8 mL/kg PBW";
+    } else if (vtPerKg > 6) {
+      status = "info";
+      interpretation = "Within range; above 6 mL/kg reference";
     }
 
     addRow(
@@ -2060,7 +1525,7 @@ function calculateVentilator() {
       "PBW-based VT range",
       "—",
       fmt(pbw * 4, 0) + "–" + fmt(pbw * 8, 0) + " mL",
-      "Calculated 4–8 mL/kg range",
+      "4–8 mL/kg; 6 mL/kg = " + fmt(pbw * 6, 0) + " mL",
       "info"
     );
   } else {
@@ -2150,8 +1615,8 @@ function calculateVentilator() {
       addRow(
         "Driving pressure",
         fmt(driving) + " cmH₂O",
-        "Trend; 15 cmH₂O is a commonly discussed threshold, not a universal cutoff",
-        driving > 15 ? "Above 15; review in clinical context" : "At or below 15",
+        "Trend; 15 cmH₂O is a discussed threshold, not a universal cutoff",
+        driving > 15 ? "Above 15; review clinically" : "At or below 15",
         driving > 15 ? "warning" : "info"
       );
     } else {
@@ -2229,7 +1694,7 @@ function calculateVentilator() {
     );
   }
 
-  // Threshold-based alerts
+  // Review prompts
   if (vtPerKg !== null && vtPerKg > 8) {
     alerts.push("VT exceeds 8 mL/kg PBW.");
   }
@@ -2250,9 +1715,10 @@ function calculateVentilator() {
     ? `<div class="vent-alert vent-alert-warning">
         <strong>Parameters to review:</strong>
         <ul>${alerts.map(a => `<li>${a}</li>`).join("")}</ul>
+        These are review prompts, not automatic treatment instructions.
       </div>`
     : `<div class="vent-alert vent-alert-success">
-        No threshold-based alerts identified by this calculator.
+        No threshold-based alerts identified.
         This does not establish that ventilation is safe or optimal.
       </div>`;
 
@@ -2271,9 +1737,14 @@ function calculateVentilator() {
         <tbody>${rows.join("")}</tbody>
       </table>
     </div>
+    <p class="vent-disclaimer">
+      These calculations support clinical review only. P/F ranges do not
+      independently diagnose ARDS. Confirm plateau pressure and total PEEP
+      using appropriate measurement conditions. Intrinsic PEEP estimation
+      requires valid measurements and clinical interpretation.
+    </p>
   `;
 }
-
 
 
 function calculateFluid() {
