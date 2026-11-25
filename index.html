@@ -2281,8 +2281,8 @@ function renderCardioVitals(v) {
 
         <div class="cardio-field">
           <label>Pulse Pressure (Automatically calculated)</label>
-          <input class="cardio-calculated" readonly
-            value="${calc.pulsePressure === null ? "" : calc.pulsePressure.toFixed(1) + " mmHg"}">
+          <input id="cardioPPValue" class="cardio-calculated" readonly
+  value="${calc.pulsePressure === null ? "" : calc.pulsePressure.toFixed(1) + " mmHg"}">
         </div>
 
         ${cardioInput(
@@ -2763,6 +2763,7 @@ function renderCardio() {
    SAVE CARDIOVASCULAR INPUTS
 ========================================= */
 
+
 function saveCardioInput(element) {
   if (active === null || !data[active]) return;
 
@@ -2794,20 +2795,27 @@ function saveCardioInput(element) {
   saveCardioData();
 
   if (section === "vitals") {
-  refreshCardioCalculations();
-                          }
+    refreshCardioCalculations();
+  }
+}
 
+/* Register cardiovascular input listeners OUTSIDE the function */
 document.addEventListener("input", function(event) {
-  if (event.target.matches("[data-cardio-section], [data-cardio-list]")) {
+  if (event.target.matches(
+    "[data-cardio-section], [data-cardio-list]"
+  )) {
     saveCardioInput(event.target);
   }
 });
 
 document.addEventListener("change", function(event) {
-  if (event.target.matches("[data-cardio-section], [data-cardio-list]")) {
+  if (event.target.matches(
+    "[data-cardio-section], [data-cardio-list]"
+  )) {
     saveCardioInput(event.target);
   }
 });
+
 
 /* =========================================
    ADD / REMOVE ECG, BIOMARKERS AND DRUGS
