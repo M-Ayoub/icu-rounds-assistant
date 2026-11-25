@@ -586,6 +586,217 @@ button:active { opacity: .8; }
     grid-template-columns: 1fr;
   }
 }
+  /* ==============================
+   CARDIOVASCULAR MODULE
+============================== */
+
+.cardio-card {
+  background: #FCEDEA;
+}
+
+#cardioModule {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  color: #17212b;
+}
+
+.cardio-section {
+  background: #ffffff;
+  border: 1px solid #e1e8ed;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.cardio-section h4 {
+  color: #103954;
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.cardio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cardio-field {
+  min-width: 0;
+}
+
+.cardio-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #34536a;
+  margin-bottom: 5px;
+}
+
+.cardio-field input,
+.cardio-field select,
+.cardio-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid #cbd8e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #17212b;
+  font-size: 13px;
+}
+
+.cardio-field textarea {
+  min-height: 65px;
+  resize: vertical;
+}
+
+.cardio-calculated {
+  background: #eaf3f8 !important;
+  color: #103954 !important;
+  font-weight: 700;
+}
+
+.cardio-full {
+  grid-column: 1 / -1;
+}
+
+.cardio-subtitle {
+  color: #526b7d;
+  font-size: 12px;
+  margin: 0 0 10px;
+}
+
+.cardio-alerts {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.cardio-alert {
+  background: #fff0ef;
+  color: #a12622;
+  border-left: 4px solid #c62828;
+  border-radius: 6px;
+  padding: 9px;
+  font-size: 12px;
+}
+
+.cardio-ok {
+  background: #eaf5ee;
+  color: #187448;
+  border-left: 4px solid #187448;
+  border-radius: 6px;
+  padding: 9px;
+  font-size: 12px;
+}
+
+.cardio-info {
+  background: #edf5fa;
+  color: #315f91;
+  border-left: 4px solid #315f91;
+  border-radius: 6px;
+  padding: 9px;
+  font-size: 12px;
+}
+
+.cardio-plus {
+  background: #103954;
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 9px 13px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 5px 0 10px;
+}
+
+.cardio-remove {
+  background: #fff0ef;
+  color: #a12622;
+  border: 1px solid #efc5c2;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cardio-entry {
+  background: #f7fafc;
+  border: 1px solid #dce6ed;
+  border-radius: 9px;
+  padding: 11px;
+  margin-bottom: 10px;
+}
+
+.cardio-entry-title {
+  color: #103954;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.cardio-drug {
+  background: #ADE3FF;
+  color: #103954;
+  border: 1px solid #8bcdec;
+  border-radius: 9px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.cardio-drug .cardio-entry-title {
+  color: #103954;
+}
+
+.cardio-drug .cardio-field label {
+  color: #103954;
+}
+
+.cardio-drug .cardio-field input,
+.cardio-drug .cardio-field select {
+  background: #ffffff;
+  color: #103954;
+  border-color: #80bfdd;
+}
+
+.cardio-drug .cardio-remove {
+  background: #ffffff;
+}
+
+.cardio-note {
+  color: #647b8c;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 9px;
+}
+
+.cardio-notes {
+  margin-top: 14px;
+}
+
+.cardio-notes label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #103954;
+}
+
+.cardio-notes textarea {
+  width: 100%;
+  min-height: 90px;
+}
+
+@media (max-width: 420px) {
+  .cardio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardio-full {
+    grid-column: auto;
+  }
+  }
 </style>
 </head>
 
@@ -818,17 +1029,17 @@ button:active { opacity: .8; }
 </details>
 
 
-  <details class="clinical-card">
-    <summary>
-      <span class="card-icon card-cardiac">❤️</span>
-      <span>Cardiovascular assessment</span>
-    </summary>
-    <div class="card-content">
-      <p class="card-subtitle">HEMODYNAMIC STATUS</p>
-      <label for="cv">Cardiovascular</label>
-      <textarea id="cv" placeholder="HR, BP, MAP, perfusion, vasopressors, echo..."></textarea>
-    </div>
-  </details>
+  <section class="clinical-card card-cardiac cardio-card">
+  <h3>❤️ Cardiovascular Assessment</h3>
+
+  <div id="cardioModule"></div>
+
+  <div class="cardio-notes">
+    <label for="cv">Additional Cardiovascular Notes</label>
+    <textarea id="cv"
+      placeholder="Additional findings, clinical assessment and plan..."></textarea>
+  </div>
+  </section>
 
   <details class="clinical-card">
     <summary>
@@ -1034,6 +1245,7 @@ function openPatient(i) {
   const p = data[i];
 ensureInvestigations(p);
 renderInvestigations();
+  renderCardio();
   document.getElementById("record").hidden = false;
   document.getElementById("heading").textContent = p.bed || "Patient record";
 
@@ -1826,7 +2038,920 @@ function addCustomInvestigation(type) {
   }
 }
 
+/* =========================================
+   CARDIOVASCULAR ASSESSMENT MODULE
+   Uses existing:
+   data, active, KEY
+========================================= */
 
+function cardioToday() {
+  const d = new Date();
+  const offset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offset)
+    .toISOString().slice(0, 10);
+}
+
+function escapeCardio(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function ensureCardio(patient) {
+  if (!patient.cardio || typeof patient.cardio !== "object") {
+    patient.cardio = {};
+  }
+
+  const c = patient.cardio;
+
+  if (!c.vitals || typeof c.vitals !== "object") {
+    c.vitals = {};
+  }
+
+  if (!Array.isArray(c.ecg)) c.ecg = [];
+  if (!Array.isArray(c.biomarkers)) c.biomarkers = [];
+  if (!Array.isArray(c.vasoactive)) c.vasoactive = [];
+
+  if (!c.echo || typeof c.echo !== "object") {
+    c.echo = {
+      enabled: false
+    };
+  }
+
+  if (c.vitals.targetMap === undefined) {
+    c.vitals.targetMap = "65";
+  }
+}
+
+function saveCardioData() {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (error) {
+    alert("Could not save cardiovascular data. Check available device storage.");
+  }
+}
+
+function cardioValue(value) {
+  return escapeCardio(value ?? "");
+}
+
+function cardioInput(label, field, value, type = "text", unit = "") {
+  return `
+    <div class="cardio-field">
+      <label>${label}${unit ? " (" + unit + ")" : ""}</label>
+      <input type="${type}"
+        value="${cardioValue(value)}"
+        data-cardio-section="vitals"
+        data-cardio-field="${field}">
+    </div>
+  `;
+}
+
+function cardioSelect(label, field, value, options) {
+  return `
+    <div class="cardio-field">
+      <label>${label}</label>
+      <select data-cardio-section="vitals"
+        data-cardio-field="${field}">
+        ${options.map(option => `
+          <option value="${escapeCardio(option)}"
+            ${value === option ? "selected" : ""}>
+            ${escapeCardio(option)}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+  `;
+}
+
+function cardioArrayInput(list, index, field, label, value,
+                          type = "text", unit = "") {
+  return `
+    <div class="cardio-field">
+      <label>${label}${unit ? " (" + unit + ")" : ""}</label>
+      <input type="${type}"
+        value="${cardioValue(value)}"
+        data-cardio-list="${list}"
+        data-cardio-index="${index}"
+        data-cardio-field="${field}">
+    </div>
+  `;
+}
+
+function cardioArraySelect(list, index, field, label, value, options) {
+  return `
+    <div class="cardio-field">
+      <label>${label}</label>
+      <select data-cardio-list="${list}"
+        data-cardio-index="${index}"
+        data-cardio-field="${field}">
+        ${options.map(option => `
+          <option value="${escapeCardio(option)}"
+            ${value === option ? "selected" : ""}>
+            ${escapeCardio(option)}
+          </option>
+        `).join("")}
+      </select>
+    </div>
+  `;
+}
+
+/* =========================================
+   VITAL SIGNS CALCULATIONS AND ALERTS
+========================================= */
+
+function calculateCardioValues(v) {
+  const sbp = parseFloat(v.sbp);
+  const dbp = parseFloat(v.dbp);
+  const hr = parseFloat(v.hr);
+  const target = parseFloat(v.targetMap || 65);
+
+  const validBP =
+    Number.isFinite(sbp) &&
+    Number.isFinite(dbp) &&
+    sbp > 0 &&
+    dbp > 0 &&
+    sbp >= dbp;
+
+  const map = validBP ? (sbp + 2 * dbp) / 3 : null;
+
+  const shockIndex =
+    Number.isFinite(hr) && hr > 0 &&
+    Number.isFinite(sbp) && sbp > 0
+      ? hr / sbp
+      : null;
+
+  const pulsePressure = validBP ? sbp - dbp : null;
+
+  const alerts = [];
+
+  if (map !== null && Number.isFinite(target) && map < target) {
+    alerts.push(
+      `MAP ${map.toFixed(1)} mmHg is below the entered target of ${target} mmHg.`
+    );
+  }
+
+  if (Number.isFinite(hr)) {
+    if (hr < 50) {
+      alerts.push("Bradycardia: HR below 50 bpm. Review clinically.");
+    } else if (hr > 120) {
+      alerts.push("Tachycardia: HR above 120 bpm. Review clinically.");
+    }
+  }
+
+  if (shockIndex !== null && shockIndex >= 0.9) {
+    alerts.push(
+      `Shock index ${shockIndex.toFixed(2)} is elevated (≥0.9). Review perfusion and clinical context.`
+    );
+  }
+
+  if (alerts.length === 0) {
+    alerts.push("No alert triggered by the entered thresholds.");
+  }
+
+  return {
+    map,
+    shockIndex,
+    pulsePressure,
+    alerts
+  };
+}
+
+/* =========================================
+   RENDER VITAL SIGNS
+========================================= */
+
+function renderCardioVitals(v) {
+  const calc = calculateCardioValues(v);
+
+  return `
+    <div class="cardio-section">
+      <h4>🩺 Vital Signs & Hemodynamics</h4>
+
+      <div class="cardio-grid">
+
+        <div class="cardio-field cardio-full">
+          <label>Blood Pressure (mmHg)</label>
+          <div class="cardio-grid">
+            <div class="cardio-field">
+              <label>SBP</label>
+              <input type="number" min="0" step="1"
+                value="${cardioValue(v.sbp)}"
+                placeholder="Systolic"
+                data-cardio-section="vitals"
+                data-cardio-field="sbp">
+            </div>
+            <div class="cardio-field">
+              <label>DBP</label>
+              <input type="number" min="0" step="1"
+                value="${cardioValue(v.dbp)}"
+                placeholder="Diastolic"
+                data-cardio-section="vitals"
+                data-cardio-field="dbp">
+            </div>
+          </div>
+        </div>
+
+        ${cardioSelect(
+          "Rhythm",
+          "rhythm",
+          v.rhythm || "",
+          ["", "Sinus rhythm", "Atrial fibrillation",
+           "Atrial flutter", "SVT", "VT", "Paced rhythm", "Other"]
+        )}
+
+        ${cardioInput("Heart Rate", "hr", v.hr, "number", "bpm")}
+
+        ${cardioInput("CVP", "cvp", v.cvp, "number", "mmHg")}
+
+        <div class="cardio-field">
+          <label>MAP (Automatically calculated)</label>
+          <input id="cardioMAPValue" class="cardio-calculated" readonly
+  value="${calc.map === null ? "" : calc.map.toFixed(1) + " mmHg"}">
+        </div>
+
+        <div class="cardio-field">
+          <label>Shock Index (Automatically calculated)</label>
+          <input id="cardioShockValue" class="cardio-calculated" readonly
+  value="${calc.shockIndex === null ? "" : calc.shockIndex.toFixed(2)}">
+        </div>
+
+        <div class="cardio-field">
+          <label>Pulse Pressure (Automatically calculated)</label>
+          <input class="cardio-calculated" readonly
+            value="${calc.pulsePressure === null ? "" : calc.pulsePressure.toFixed(1) + " mmHg"}">
+        </div>
+
+        ${cardioInput(
+          "Individual MAP Target",
+          "targetMap",
+          v.targetMap || "65",
+          "number",
+          "mmHg"
+        )}
+
+      </div>
+
+      <div id="cardioAlerts" class="cardio-alerts">
+        <strong style="font-size:13px;color:#103954">
+          Automatic Review Alerts
+        </strong>
+
+        ${calc.alerts.map(message => `
+          <div class="${
+            message.startsWith("No alert")
+              ? "cardio-ok"
+              : "cardio-alert"
+          }">
+            ${escapeCardio(message)}
+          </div>
+        `).join("")}
+      </div>
+
+      <p class="cardio-note">
+        MAP = (SBP + 2 × DBP) / 3.
+        Shock index = HR / SBP.
+        Alerts are screening prompts, not diagnoses.
+        MAP target must be individualized to the patient.
+      </p>
+    </div>
+  `;
+}
+function refreshCardioCalculations() {
+  if (active === null || !data[active]) return;
+
+  const v = data[active].cardio.vitals;
+  const calc = calculateCardioValues(v);
+
+  const map = document.getElementById("cardioMAPValue");
+  const shock = document.getElementById("cardioShockValue");
+  const pp = document.getElementById("cardioPPValue");
+  const alerts = document.getElementById("cardioAlerts");
+
+  if (map) {
+    map.value = calc.map === null
+      ? ""
+      : calc.map.toFixed(1) + " mmHg";
+  }
+
+  if (shock) {
+    shock.value = calc.shockIndex === null
+      ? ""
+      : calc.shockIndex.toFixed(2);
+  }
+
+  if (pp) {
+    pp.value = calc.pulsePressure === null
+      ? ""
+      : calc.pulsePressure.toFixed(1) + " mmHg";
+  }
+
+  if (alerts) {
+    alerts.innerHTML = `
+      <strong style="font-size:13px;color:#103954">
+        Automatic Review Alerts
+      </strong>
+
+      ${calc.alerts.map(message => `
+        <div class="${
+          message.startsWith("No alert")
+            ? "cardio-ok"
+            : "cardio-alert"
+        }">
+          ${escapeCardio(message)}
+        </div>
+      `).join("")}
+    `;
+  }
+}
+/* =========================================
+   ECG
+========================================= */
+
+function renderCardioECG(list) {
+  return `
+    <div class="cardio-section">
+      <h4>🫀 ECG</h4>
+
+      <button type="button" class="cardio-plus"
+        data-cardio-action="add-ecg">
+        + Add ECG
+      </button>
+
+      ${list.map((item, i) => `
+        <div class="cardio-entry">
+          <div class="cardio-entry-title">
+            ECG ${i + 1}
+          </div>
+
+          <div class="cardio-grid">
+            ${cardioArrayInput("ecg", i, "date",
+              "Date", item.date, "date")}
+
+            ${cardioArrayInput("ecg", i, "time",
+              "Time", item.time, "time")}
+
+            ${cardioArrayInput("ecg", i, "rate",
+              "Heart Rate", item.rate, "number", "bpm")}
+
+            ${cardioArrayInput("ecg", i, "pr",
+              "PR Interval", item.pr, "number", "ms")}
+
+            ${cardioArrayInput("ecg", i, "qrs",
+              "QRS Duration", item.qrs, "number", "ms")}
+
+            ${cardioArrayInput("ecg", i, "qtc",
+              "QTc", item.qtc, "number", "ms")}
+
+            <div class="cardio-field cardio-full">
+              <label>ST Segment / T-wave Changes</label>
+              <textarea data-cardio-list="ecg"
+                data-cardio-index="${i}"
+                data-cardio-field="stt">${cardioValue(item.stt)}</textarea>
+            </div>
+
+            <div class="cardio-field cardio-full">
+              <label>ECG Interpretation</label>
+              <textarea data-cardio-list="ecg"
+                data-cardio-index="${i}"
+                data-cardio-field="interpretation">${cardioValue(item.interpretation)}</textarea>
+            </div>
+          </div>
+
+          <button type="button" class="cardio-remove"
+            data-cardio-action="remove-ecg"
+            data-cardio-index="${i}">
+            Remove ECG
+          </button>
+        </div>
+      `).join("")}
+
+      <p class="cardio-note">
+        Record the actual ECG findings and clinician interpretation.
+      </p>
+    </div>
+  `;
+}
+
+/* =========================================
+   CARDIAC BIOMARKERS
+========================================= */
+
+function renderCardioBiomarkers(list) {
+  return `
+    <div class="cardio-section">
+      <h4>🧪 Cardiac Enzymes & Biomarkers</h4>
+
+      <button type="button" class="cardio-plus"
+        data-cardio-action="add-biomarker">
+        + Add Cardiac Biomarker
+      </button>
+
+      ${list.map((item, i) => `
+        <div class="cardio-entry">
+          <div class="cardio-entry-title">
+            Cardiac Biomarker ${i + 1}
+          </div>
+
+          <div class="cardio-grid">
+
+            ${cardioArraySelect(
+              "biomarkers", i, "test",
+              "Test",
+              item.test || "",
+              ["", "High-sensitivity Troponin I",
+               "High-sensitivity Troponin T",
+               "Troponin I", "Troponin T",
+               "CK-MB", "BNP", "NT-proBNP", "Other"]
+            )}
+
+            ${cardioArrayInput("biomarkers", i, "date",
+              "Date", item.date, "date")}
+
+            ${cardioArrayInput("biomarkers", i, "time",
+              "Time", item.time, "time")}
+
+            ${cardioArrayInput("biomarkers", i, "result",
+              "Result", item.result, "number")}
+
+            ${cardioArrayInput("biomarkers", i, "unit",
+              "Unit", item.unit)}
+
+            ${cardioArrayInput("biomarkers", i, "reference",
+              "Reference Range", item.reference)}
+
+            ${cardioArraySelect(
+              "biomarkers", i, "trend",
+              "Trend",
+              item.trend || "",
+              ["", "Increasing", "Stable", "Decreasing"]
+            )}
+
+          </div>
+
+          <button type="button" class="cardio-remove"
+            data-cardio-action="remove-biomarker"
+            data-cardio-index="${i}">
+            Remove Result
+          </button>
+        </div>
+      `).join("")}
+
+      <p class="cardio-note">
+        BNP and NT-proBNP are cardiac biomarkers, not cardiac enzymes.
+        Interpret all results using the assay-specific reference range
+        and clinical context.
+      </p>
+    </div>
+  `;
+}
+
+/* =========================================
+   VASOPRESSORS AND INOTROPES
+========================================= */
+
+const cardioDrugOptions = [
+  "Norepinephrine (Noradrenaline)",
+  "Epinephrine (Adrenaline)",
+  "Vasopressin",
+  "Dobutamine",
+  "Dopamine",
+  "Phenylephrine",
+  "Milrinone",
+  "Other"
+];
+
+function renderCardioVasoactive(list) {
+  return `
+    <div class="cardio-section">
+      <h4>💉 Vasopressors & Inotropes</h4>
+
+      <div class="cardio-grid">
+        <div class="cardio-field cardio-full">
+          <label>Select Vasoactive Drug</label>
+          <select id="cardioDrugSelect">
+            <option value="">Select drug...</option>
+            ${cardioDrugOptions.map(drug => `
+              <option value="${escapeCardio(drug)}">
+                ${escapeCardio(drug)}
+              </option>
+            `).join("")}
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="cardio-plus"
+        data-cardio-action="add-drug">
+        + Add Drug
+      </button>
+
+      ${list.map((item, i) => `
+        <div class="cardio-drug">
+
+          <div class="cardio-entry-title">
+            ${escapeCardio(item.drug || "Vasoactive Drug")}
+          </div>
+
+          <div class="cardio-grid">
+
+            ${cardioArrayInput(
+              "vasoactive", i, "dose",
+              "Dose", item.dose, "number"
+            )}
+
+            ${cardioArraySelect(
+              "vasoactive", i, "unit",
+              "Unit", item.unit || "",
+              ["", "mcg/kg/min", "mcg/min",
+               "mg/hr", "mcg/hr", "units/min",
+               "units/hr", "mg/kg/hr", "Other"]
+            )}
+
+            ${cardioArraySelect(
+              "vasoactive", i, "trend",
+              "Dose Trend", item.trend || "",
+              ["", "Increasing", "Stable", "Decreasing", "Stopped"]
+            )}
+
+            ${cardioArrayInput(
+              "vasoactive", i, "targetMap",
+              "Target MAP", item.targetMap, "number", "mmHg"
+            )}
+
+            ${cardioArrayInput(
+              "vasoactive", i, "lastAdjustment",
+              "Last Dose Adjustment", item.lastAdjustment, "datetime-local"
+            )}
+
+            <div class="cardio-field cardio-full">
+              <label>Clinical Response / Reason for Use</label>
+              <textarea data-cardio-list="vasoactive"
+                data-cardio-index="${i}"
+                data-cardio-field="response">${cardioValue(item.response)}</textarea>
+            </div>
+
+          </div>
+
+          <button type="button" class="cardio-remove"
+            data-cardio-action="remove-drug"
+            data-cardio-index="${i}">
+            Remove Drug
+          </button>
+        </div>
+      `).join("")}
+
+      <p class="cardio-note">
+        Record the actual prescribed dose and correct unit.
+        Verify dose calculations and infusion settings independently.
+      </p>
+    </div>
+  `;
+}
+
+/* =========================================
+   ECHOCARDIOGRAPHY
+========================================= */
+
+function renderCardioEcho(echo) {
+  if (!echo.enabled) {
+    return `
+      <div class="cardio-section">
+        <h4>🫀 Echocardiography</h4>
+
+        <button type="button" class="cardio-plus"
+          data-cardio-action="add-echo">
+          + Add Echo
+        </button>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="cardio-section">
+      <h4>🫀 Echocardiography</h4>
+
+      <button type="button" class="cardio-plus"
+        data-cardio-action="hide-echo">
+        Hide Echo
+      </button>
+
+      <div class="cardio-grid">
+
+        ${cardioArrayInput(
+          "echo", 0, "date",
+          "Examination Date", echo.date, "date"
+        )}
+
+        ${cardioArrayInput(
+          "echo", 0, "time",
+          "Examination Time", echo.time, "time"
+        )}
+
+        ${cardioArrayInput(
+          "echo", 0, "ef",
+          "LVEF", echo.ef, "number", "%"
+        )}
+
+        ${cardioArrayInput(
+          "echo", 0, "vti",
+          "LVOT VTI", echo.vti, "number", "cm"
+        )}
+
+        ${cardioArrayInput(
+          "echo", 0, "ivcDiameter",
+          "IVC Diameter", echo.ivcDiameter, "number", "mm"
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "lvFunction",
+          "LV Systolic Function",
+          echo.lvFunction || "",
+          ["", "Normal", "Mildly reduced",
+           "Moderately reduced", "Severely reduced"]
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "rvFunction",
+          "RV Function",
+          echo.rvFunction || "",
+          ["", "Normal", "Mildly impaired",
+           "Moderately impaired", "Severely impaired"]
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "lvSize",
+          "LV Size",
+          echo.lvSize || "",
+          ["", "Normal", "Dilated", "Small"]
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "rvSize",
+          "RV Size",
+          echo.rvSize || "",
+          ["", "Normal", "Dilated"]
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "pericardial",
+          "Pericardial Effusion",
+          echo.pericardial || "",
+          ["", "Absent", "Present", "Not assessed"]
+        )}
+
+        ${cardioArraySelect(
+          "echo", 0, "ivcVariation",
+          "IVC Respiratory Variation",
+          echo.ivcVariation || "",
+          ["", "Collapsible", "Plethoric",
+           "Minimal variation", "Not assessed"]
+        )}
+
+        <div class="cardio-field cardio-full">
+          <label>Valvular Assessment</label>
+          <textarea data-cardio-list="echo"
+            data-cardio-index="0"
+            data-cardio-field="valves">${cardioValue(echo.valves)}</textarea>
+        </div>
+
+        <div class="cardio-field cardio-full">
+          <label>Overall Echo Impression</label>
+          <textarea data-cardio-list="echo"
+            data-cardio-index="0"
+            data-cardio-field="impression">${cardioValue(echo.impression)}</textarea>
+        </div>
+
+      </div>
+
+      <p class="cardio-note">
+        Record measurements using the appropriate imaging method.
+        IVC size and variation alone should not be used to determine
+        fluid responsiveness.
+      </p>
+    </div>
+  `;
+}
+
+/* =========================================
+   MAIN CARDIOVASCULAR RENDER
+========================================= */
+
+function renderCardio() {
+  if (active === null || !data[active]) return;
+
+  const patient = data[active];
+  ensureCardio(patient);
+
+  const c = patient.cardio;
+  const container = document.getElementById("cardioModule");
+
+  if (!container) return;
+
+  container.innerHTML = `
+    ${renderCardioVitals(c.vitals)}
+    ${renderCardioECG(c.ecg)}
+    ${renderCardioBiomarkers(c.biomarkers)}
+    ${renderCardioVasoactive(c.vasoactive)}
+    ${renderCardioEcho(c.echo)}
+  `;
+}
+
+/* =========================================
+   SAVE CARDIOVASCULAR INPUTS
+========================================= */
+
+function saveCardioInput(element) {
+  if (active === null || !data[active]) return;
+
+  ensureCardio(data[active]);
+
+  const c = data[active].cardio;
+  const section = element.dataset.cardioSection;
+  const list = element.dataset.cardioList;
+  const field = element.dataset.cardioField;
+
+  if (!field) return;
+
+  if (section) {
+    if (!c[section]) c[section] = {};
+    c[section][field] = element.value;
+  }
+
+  if (list === "echo") {
+    c.echo[field] = element.value;
+  } else if (list) {
+    const index = Number(element.dataset.cardioIndex);
+
+    if (!Number.isInteger(index) || !c[list] ||
+        !c[list][index]) return;
+
+    c[list][index][field] = element.value;
+  }
+
+  saveCardioData();
+
+  if (section === "vitals") {
+  refreshCardioCalculations();
+                          }
+
+document.addEventListener("input", function(event) {
+  if (event.target.matches("[data-cardio-section], [data-cardio-list]")) {
+    saveCardioInput(event.target);
+  }
+});
+
+document.addEventListener("change", function(event) {
+  if (event.target.matches("[data-cardio-section], [data-cardio-list]")) {
+    saveCardioInput(event.target);
+  }
+});
+
+/* =========================================
+   ADD / REMOVE ECG, BIOMARKERS AND DRUGS
+========================================= */
+
+function cardioAddECG() {
+  const c = data[active].cardio;
+
+  c.ecg.push({
+    date: cardioToday(),
+    time: "",
+    rate: "",
+    pr: "",
+    qrs: "",
+    qtc: "",
+    stt: "",
+    interpretation: ""
+  });
+
+  saveCardioData();
+  renderCardio();
+}
+
+function cardioAddBiomarker() {
+  const c = data[active].cardio;
+
+  c.biomarkers.push({
+    test: "",
+    date: cardioToday(),
+    time: "",
+    result: "",
+    unit: "",
+    reference: "",
+    trend: ""
+  });
+
+  saveCardioData();
+  renderCardio();
+}
+
+function cardioAddDrug() {
+  const select = document.getElementById("cardioDrugSelect");
+  const drug = select?.value;
+
+  if (!drug) {
+    alert("Please select a vasoactive drug first.");
+    return;
+  }
+
+  const c = data[active].cardio;
+
+  if (c.vasoactive.some(item => item.drug === drug)) {
+    alert("This drug has already been added.");
+    return;
+  }
+
+  c.vasoactive.push({
+    drug,
+    dose: "",
+    unit: "",
+    trend: "Stable",
+    targetMap: c.vitals.targetMap || "65",
+    lastAdjustment: "",
+    response: ""
+  });
+
+  saveCardioData();
+  renderCardio();
+}
+
+function cardioRemoveItem(list, index) {
+  const c = data[active].cardio;
+
+  if (!Array.isArray(c[list])) return;
+
+  c[list].splice(index, 1);
+
+  saveCardioData();
+  renderCardio();
+}
+
+/* =========================================
+   ECHO TOGGLE
+========================================= */
+
+function cardioShowEcho() {
+  data[active].cardio.echo.enabled = true;
+  saveCardioData();
+  renderCardio();
+}
+
+function cardioHideEcho() {
+  data[active].cardio.echo.enabled = false;
+  saveCardioData();
+  renderCardio();
+}
+
+/* =========================================
+   CARDIOVASCULAR BUTTON EVENTS
+========================================= */
+
+document.addEventListener("click", function(event) {
+  const button = event.target.closest("[data-cardio-action]");
+  if (!button) return;
+
+  if (active === null || !data[active]) return;
+
+  ensureCardio(data[active]);
+
+  const action = button.dataset.cardioAction;
+  const index = Number(button.dataset.cardioIndex);
+
+  if (action === "add-ecg") {
+    cardioAddECG();
+  }
+
+  if (action === "add-biomarker") {
+    cardioAddBiomarker();
+  }
+
+  if (action === "add-drug") {
+    cardioAddDrug();
+  }
+
+  if (action === "remove-ecg") {
+    cardioRemoveItem("ecg", index);
+  }
+
+  if (action === "remove-biomarker") {
+    cardioRemoveItem("biomarkers", index);
+  }
+
+  if (action === "remove-drug") {
+    cardioRemoveItem("vasoactive", index);
+  }
+
+  if (action === "add-echo") {
+    cardioShowEcho();
+  }
+
+  if (action === "hide-echo") {
+    cardioHideEcho();
+  }
+});
 function calculateVentilator() {
   const getValue = id => {
     const el = document.getElementById(id);
