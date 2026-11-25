@@ -463,6 +463,71 @@ button:active { opacity: .8; }
   margin: 5px 0 12px;
 }
 
+.vent-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.vent-result {
+  margin-top: 14px;
+  overflow-x: auto;
+}
+
+.vent-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 440px;
+}
+
+.vent-table th,
+.vent-table td {
+  padding: 9px 7px;
+  border: 1px solid #dce5eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.vent-table th {
+  background: #123047;
+  color: white;
+}
+
+.vent-table tr:nth-child(even) {
+  background: #f2f5f7;
+}
+
+.vent-status {
+  font-weight: bold;
+}
+
+.vent-good {
+  color: #18733b;
+}
+
+.vent-warning {
+  color: #b45309;
+}
+
+.vent-info {
+  color: #245c82;
+}
+
+.card-note {
+  background: #eef5f8;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 420px) {
+  .vent-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>
 </head>
 
@@ -574,65 +639,117 @@ button:active { opacity: .8; }
 <details class="clinical-card">
   <summary>
     <span class="card-icon card-respiratory">🫁</span>
-    <span>Ventilator monitoring and calculators</span>
+    <span>Ventilator Monitoring</span>
   </summary>
 
   <div class="card-content">
-    <p class="card-subtitle">VENTILATOR PARAMETERS</p>
 
-    <label for="ventSex">Sex used for PBW calculation</label>
-    <select id="ventSex">
-      <option value="">Select</option>
+    <p class="card-subtitle">VENTILATOR SETTINGS</p>
+
+    <label for="ventMode">Ventilator mode</label>
+    <select id="ventMode" onchange="calculateVentilator()">
+      <option value="">Select mode</option>
+      <option value="VC">Volume Control (VC)</option>
+      <option value="PC">Pressure Control (PC)</option>
+      <option value="SIMV-VC">SIMV-VC</option>
+      <option value="SIMV-PC">SIMV-PC</option>
+      <option value="PSV">Pressure Support (PSV)</option>
+      <option value="CPAP">CPAP</option>
+      <option value="APRV">APRV</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label for="ventSex">Sex for PBW calculation</label>
+    <select id="ventSex" onchange="calculateVentilator()">
+      <option value="">Select sex</option>
       <option value="male">Male</option>
       <option value="female">Female</option>
     </select>
 
     <label for="heightCm">Height (cm)</label>
-    <input id="heightCm" type="number" min="1" step="0.1"
-           placeholder="Example: 170">
+    <input id="heightCm" type="number" min="1"
+      placeholder="Height in cm" oninput="calculateVentilator()">
 
-    <label for="setVT">Tidal volume (mL)</label>
-    <input id="setVT" type="number" min="1" step="1"
-           placeholder="Example: 420">
+    <div class="vent-grid">
+      <div>
+        <label for="ventRate">Set RR (breaths/min)</label>
+        <input id="ventRate" type="number" min="0"
+          placeholder="e.g. 16" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="setVT">Set VT (mL)</label>
+        <input id="setVT" type="number" min="0"
+          placeholder="e.g. 420" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="fio2Percent">FiO₂ (%)</label>
+        <input id="fio2Percent" type="number" min="21" max="100"
+          placeholder="e.g. 40" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="setPEEP">Set PEEP (cmH₂O)</label>
+        <input id="setPEEP" type="number" min="0"
+          placeholder="e.g. 8" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="pressureSupport">Pressure support (cmH₂O)</label>
+        <input id="pressureSupport" type="number" min="0"
+          placeholder="If applicable" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="peakPressure">Peak pressure (cmH₂O)</label>
+        <input id="peakPressure" type="number" min="0"
+          placeholder="e.g. 25" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="plateauPressure">Plateau pressure (cmH₂O)</label>
+        <input id="plateauPressure" type="number" min="0"
+          placeholder="e.g. 24" oninput="calculateVentilator()">
+      </div>
+
+      <div>
+        <label for="totalPeep">Total PEEP (cmH₂O)</label>
+        <input id="totalPeep" type="number" min="0"
+          placeholder="e.g. 10" oninput="calculateVentilator()">
+      </div>
+    </div>
+
+    <label for="ieRatio">I:E ratio</label>
+    <input id="ieRatio" type="text"
+      placeholder="e.g. 1:2">
+
+    <p class="card-subtitle">OXYGENATION DATA</p>
 
     <label for="paO2">PaO₂ (mmHg)</label>
-    <input id="paO2" type="number" min="0" step="0.1"
-           placeholder="Example: 80">
+    <input id="paO2" type="number" min="0"
+      placeholder="Enter ABG PaO₂" oninput="calculateVentilator()">
 
-    <label for="fio2Percent">FiO₂ (%)</label>
-    <input id="fio2Percent" type="number" min="1" max="100"
-           step="1" placeholder="Example: 40">
+    <p class="card-subtitle">AUTOMATICALLY CALCULATED PARAMETERS</p>
 
-    <label for="plateauPressure">Plateau pressure (cmH₂O)</label>
-    <input id="plateauPressure" type="number" min="0" step="0.1"
-           placeholder="Example: 25">
+    <button type="button" onclick="calculateVentilator()">
+      Calculate ventilator parameters
+    </button>
 
-    <label for="totalPeep">Total PEEP (cmH₂O)</label>
-    <input id="totalPeep" type="number" min="0" step="0.1"
-           placeholder="Example: 10">
+    <div id="ventResult" class="vent-result">
+      Enter the patient and ventilator data to calculate parameters.
+    </div>
 
-    <button onclick="calculateVentilator()">Calculate ventilator parameters</button>
-
-    
-<div id="ventResult" class="vent-table-wrap" aria-live="polite">
-  <p>Enter the ventilator and patient measurements, then calculate.</p>
-</div>
-    <div id="ventAssessment"></div>
-<div class="vent-disclaimer">
-  Reference values are clinical guides, not automatic ventilator
-  prescriptions. Always interpret them alongside the patient's
-  diagnosis, mechanics, gas exchange and clinical condition.
-</div>
-
-
+    <p class="card-subtitle">CLINICAL REMINDER</p>
     <p class="card-note">
-      Use measured height where possible. For driving pressure,
-      use total PEEP, including intrinsic PEEP when present.
-      Static compliance calculation assumes a valid plateau
-      pressure measurement during passive conditions.
+      Interpret ventilator parameters alongside patient condition,
+      respiratory mechanics, ABG, hemodynamics and the underlying disease.
+      Calculated values do not independently prescribe ventilator changes.
     </p>
+
   </div>
 </details>
+
 
   <details class="clinical-card">
     <summary>
@@ -790,7 +907,12 @@ const fields = [
   "resp", "cv", "renal", "infection", "other",
   "labs", "weight", "fluidIn", "fluidOut", "duration",
   "plan", "ventSex", "heightCm", "setVT", "paO2",
-  "fio2Percent", "plateauPressure", "totalPeep"
+  "fio2Percent", "plateauPressure", "totalPeep", "ventMode",
+"ventRate",
+"setPEEP",
+"pressureSupport",
+"peakPressure",
+"ieRatio"
 ];
 
 function save() {
@@ -1479,105 +1601,294 @@ function calculateVentilator() {
       status
     );
   } else {
+
+
+function calculateVentilator() {
+  const getValue = id => {
+    const element = document.getElementById(id);
+    if (!element || element.value.trim() === "") return null;
+
+    const value = Number(element.value);
+    return Number.isFinite(value) ? value : null;
+  };
+
+  const sex = document.getElementById("ventSex").value.toLowerCase();
+  const height = getValue("heightCm");
+  const vt = getValue("setVT");
+  const fio2 = getValue("fio2Percent");
+  const pao2 = getValue("paO2");
+  const plateau = getValue("plateauPressure");
+  const totalPeep = getValue("totalPeep");
+  const setPeep = getValue("setPEEP");
+
+  const result = document.getElementById("ventResult");
+
+  if (!result) return;
+
+  const rows = [];
+
+  function addRow(parameter, calculated, target, interpretation, status = "info") {
+    rows.push(`
+      <tr>
+        <td>${parameter}</td>
+        <td>${calculated}</td>
+        <td>${target}</td>
+        <td class="vent-status vent-${status}">${interpretation}</td>
+      </tr>
+    `);
+  }
+
+  function fmt(value, decimals = 1) {
+    return Number.isFinite(value) ? value.toFixed(decimals) : "—";
+  }
+
+  // 1. Predicted body weight
+  let pbw = null;
+
+  if (height !== null && height > 0 && (sex === "male" || sex === "female")) {
+    pbw = sex === "male"
+      ? 50 + 0.91 * (height - 152.4)
+      : 45.5 + 0.91 * (height - 152.4);
+
+    if (pbw > 0) {
+      addRow(
+        "Predicted body weight",
+        fmt(pbw) + " kg",
+        "Calculated from sex and height",
+        "Calculated",
+        "info"
+      );
+    } else {
+      pbw = null;
+      addRow(
+        "Predicted body weight",
+        "—",
+        "Check height",
+        "Invalid height for calculation",
+        "warning"
+      );
+    }
+  } else {
+    addRow(
+      "Predicted body weight",
+      "—",
+      "Enter sex and height",
+      "Missing information",
+      "info"
+    );
+  }
+
+  // 2. Tidal volume / PBW
+  if (vt !== null && vt > 0 && pbw !== null) {
+    const vtPerKg = vt / pbw;
+
+    let interpretation = "Within 4–8 mL/kg PBW range";
+    let status = "good";
+
+    if (vtPerKg < 4) {
+      interpretation = "Below 4 mL/kg PBW";
+      status = "warning";
+    } else if (vtPerKg > 8) {
+      interpretation = "Above 8 mL/kg PBW";
+      status = "warning";
+    }
+
+    addRow(
+      "VT / PBW",
+      fmt(vtPerKg) + " mL/kg",
+      "4–8 mL/kg PBW",
+      interpretation,
+      status
+    );
+  } else {
+    addRow(
+      "VT / PBW",
+      "—",
+      "4–8 mL/kg PBW",
+      "Enter VT, sex and height",
+      "info"
+    );
+  }
+
+  // 3. P/F ratio
+  if (
+    pao2 !== null && pao2 > 0 &&
+    fio2 !== null && fio2 >= 21 && fio2 <= 100
+  ) {
+    const pf = pao2 / (fio2 / 100);
+
+    addRow(
+      "P/F ratio",
+      fmt(pf, 0),
+      "Interpret with clinical context",
+      "Oxygenation index; not an ARDS diagnosis",
+      "info"
+    );
+  } else {
     addRow(
       "P/F ratio",
       "—",
-      "PaO₂ ÷ FiO₂ fraction",
-      "Enter PaO₂ and FiO₂ (1–100%)",
-      "vent-warning"
+      "PaO₂ and FiO₂ required",
+      "Enter valid oxygenation data",
+      "info"
     );
   }
 
   // 4. Plateau pressure
-  if (plateau !== null && plateau >= 0) {
-    const status = plateau < 30 ? "vent-good" : "vent-warning";
+  if (plateau !== null && plateau > 0) {
+    const status = plateau <= 30 ? "good" : "warning";
 
     addRow(
       "Plateau pressure",
-      show(plateau) + " cmH₂O",
-      "<30 cmH₂O in ARDS",
-      plateau < 30 ? "Below ARDS threshold" : "At or above ARDS threshold",
+      fmt(plateau) + " cmH₂O",
+      "Generally ≤30 cmH₂O in lung-protective ventilation",
+      plateau <= 30
+        ? "Within commonly used target"
+        : "Above commonly used target",
       status
     );
   } else {
     addRow(
       "Plateau pressure",
       "—",
-      "<30 cmH₂O in ARDS",
-      "Enter plateau pressure",
-      "vent-warning"
+      "Measure when applicable",
+      "Not entered",
+      "info"
     );
   }
 
-  // 5. PEEP
-  if (peep !== null && peep >= 0) {
-    addRow(
-      "Total PEEP",
-      show(peep) + " cmH₂O",
-      "Individualize according to disease and respiratory mechanics",
-      "Assess intrinsic PEEP and patient response",
-      "vent-info"
-    );
-  } else {
-    addRow(
-      "Total PEEP",
-      "—",
-      "Individualized",
-      "Enter total PEEP",
-      "vent-warning"
-    );
-  }
-
-  // 6. Driving pressure
-  let drivingPressure = null;
-
+  // 5. Driving pressure
   if (
-    plateau !== null && plateau >= 0 &&
-    peep !== null && peep >= 0 &&
-    plateau > peep
+    plateau !== null && plateau > 0 &&
+    totalPeep !== null && totalPeep >= 0
   ) {
-    drivingPressure = plateau - peep;
+    const driving = plateau - totalPeep;
 
-    addRow(
-      "Driving pressure",
-      show(drivingPressure) + " cmH₂O",
-      "Minimize where possible; no universally established target",
-      "Trend with compliance and clinical response",
-      "vent-info"
-    );
+    if (driving > 0) {
+      let interpretation = "Assess and trend with clinical context";
+      let status = "info";
+
+      if (driving > 15) {
+        interpretation = "Above commonly discussed 15 cmH₂O threshold";
+        status = "warning";
+      } else {
+        interpretation = "At or below 15 cmH₂O; interpret clinically";
+        status = "good";
+      }
+
+      addRow(
+        "Driving pressure",
+        fmt(driving) + " cmH₂O",
+        "Trend; 15 cmH₂O is not a universal cutoff",
+        interpretation,
+        status
+      );
+    } else {
+      addRow(
+        "Driving pressure",
+        "—",
+        "Plateau pressure must exceed total PEEP",
+        "Check measurements",
+        "warning"
+      );
+    }
   } else {
     addRow(
       "Driving pressure",
       "—",
       "Plateau pressure − total PEEP",
-      "Requires valid plateau pressure greater than PEEP",
-      "vent-warning"
+      "Enter both values",
+      "info"
     );
   }
 
-  // 7. Static compliance
+  // 6. Static compliance
   if (
     vt !== null && vt > 0 &&
-    drivingPressure !== null && drivingPressure > 0
+    plateau !== null && plateau > 0 &&
+    totalPeep !== null && totalPeep >= 0
   ) {
-    const compliance = vt / drivingPressure;
+    const driving = plateau - totalPeep;
 
-    addRow(
-      "Static compliance",
-      show(compliance) + " mL/cmH₂O",
-      "No single universal target; compare with prior measurements",
-      "Interpret with lung/chest-wall mechanics and trend",
-      "vent-info"
-    );
+    if (driving > 0) {
+      const compliance = vt / driving;
+
+      addRow(
+        "Static compliance",
+        fmt(compliance) + " mL/cmH₂O",
+        "No universal normal target in critical illness",
+        "Trend over time",
+        "info"
+      );
+    } else {
+      addRow(
+        "Static compliance",
+        "—",
+        "Requires positive driving pressure",
+        "Check measurements",
+        "warning"
+      );
+    }
   } else {
     addRow(
       "Static compliance",
       "—",
       "VT ÷ driving pressure",
-      "Requires valid VT and driving pressure",
-      "vent-warning"
+      "Enter VT, plateau and total PEEP",
+      "info"
     );
   }
+
+  // 7. Intrinsic PEEP estimate
+  if (
+    totalPeep !== null && totalPeep >= 0 &&
+    setPeep !== null && setPeep >= 0
+  ) {
+    const autoPeep = totalPeep - setPeep;
+
+    if (autoPeep >= 0) {
+      addRow(
+        "Intrinsic PEEP estimate",
+        fmt(autoPeep) + " cmH₂O",
+        "Assess clinically",
+        "Total PEEP − set PEEP; verify measurement",
+        "info"
+      );
+    } else {
+      addRow(
+        "Intrinsic PEEP estimate",
+        "—",
+        "Total PEEP should be ≥ set PEEP",
+        "Check measurements",
+        "warning"
+      );
+    }
+  } else {
+    addRow(
+      "Intrinsic PEEP estimate",
+      "—",
+      "Total PEEP − set PEEP",
+      "Enter both PEEP values",
+      "info"
+    );
+  }
+
+  result.innerHTML = `
+    <table class="vent-table">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Calculated</th>
+          <th>Reference / target</th>
+          <th>Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join("")}
+      </tbody>
+    </table>
+  `;
+}
 
   // Clinical alerts
   if (pbw !== null && vt !== null && pbw > 0) {
