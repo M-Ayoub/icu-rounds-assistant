@@ -527,7 +527,65 @@ button:active { opacity: .8; }
     grid-template-columns: 1fr;
   }
 }
+.abg-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
 
+.abg-field label {
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.abg-field input {
+  margin-bottom: 5px;
+}
+
+.abg-output {
+  background: #f2f6f9;
+  border: 1px solid #dce5ed;
+  border-radius: 9px;
+  padding: 13px;
+  margin-top: 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.abg-output h4 {
+  color: #123047;
+  margin: 10px 0 5px;
+}
+
+.abg-result {
+  padding: 9px;
+  margin: 7px 0;
+  border-radius: 7px;
+  background: white;
+  border-left: 4px solid #315f91;
+}
+
+.abg-alert {
+  border-left-color: #c62828;
+  background: #fff0ef;
+}
+
+.abg-good {
+  border-left-color: #187448;
+  background: #eaf5ee;
+}
+
+.abg-muted {
+  color: #718096;
+  font-size: 12px;
+}
+
+@media (max-width: 420px) {
+  .abg-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
 </head>
 
@@ -606,7 +664,15 @@ button:active { opacity: .8; }
             onclick="addCustomInvestigation('laboratory')">
       + Add laboratory test
     </button>
+<h4 class="investigation-heading">Arterial Blood Gas (ABG)</h4>
 
+<div id="abgSection"></div>
+
+<p class="investigation-note">
+  Enter values from the same ABG sample. Use PaCO₂ in mmHg,
+  HCO₃⁻ in mmol/L, and FiO₂ as a percentage.
+  Interpretation is an aid and requires clinical correlation.
+</p>
     <h4 class="investigation-heading">Radiology</h4>
 
     <div id="radiologyRows"></div>
@@ -1171,6 +1237,359 @@ function ensureInvestigations(patient) {
   }
 }
 
+/* =========================================
+   ABG INTERPRETATION
+   Saved separately for each patient
+========================================= */
+
+const abgFields = [
+  ["pH", "pH", "7.40", "0.01"],
+  ["PaCO2", "PaCO₂ (mmHg)", "40", "0.1"],
+  ["HCO3", "HCO₃⁻ (mmol/L)", "24", "0.1"],
+  ["PaO2", "PaO₂ (mmHg)", "90", "0.1"],
+  ["FiO2", "FiO₂ (%)", "21", "1"],
+  ["Na", "Na⁺ (mmol/L)", "140", "0.1"],
+  ["Cl", "Cl⁻ (mmol/L)", "104", "0.1"],
+  ["Albumin", "Albumin (g/dL)", "4", "0.1"],
+  ["Lactate", "Lactate (mmol/L)", "1", "0.1"]
+];
+
+function ensureABG(patient) {
+  if (!patient.investigations ||
+      typeof patient.investigations !== "object") {
+    patient.investigations = {};
+  }
+
+  if (!patient.investigations.abg ||
+      typeof patient.investigations.abg !== "object") {
+    patient.investigations.abg = {};
+  }
+}
+
+function renderABG() {
+  if (active === null || !data[active]) return;
+
+  const patient = data[active];
+  ensureABG(patient);
+
+  const container = document.getElementById("abgSection");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="abg-grid">
+      ${abgFields.map(([id, label, placeholder, step]) => `
+        <div class="abg-field">
+          <label for="abg_${id}">${label}</label>
+          <input
+            id="abg_${id}"
+            type="number"
+            step="${step}"
+            placeholder="${placeholder}"
+            value="${escapeInvestigationText(
+              patient.investigations.abg[id] ?? ""
+            )}"
+            data-abg-field="${id}">
+        </div>
+      `).join("")}
+    </div>
+
+    <button type="button" onclick="calculateABG()">
+      Interpret ABG
+    </button>
+
+    <div id="abgResult" class="abg-output" aria-live="polite">
+      Enter ABG values and select Interpret ABG.
+    </div>
+  `;
+}
+
+function saveABGField(event) {
+  const element = event.target;
+  const field = element.dataset.abgField;
+
+  if (!field || active === null || !data[active]) return;
+
+  ensureABG(data[active]);
+
+  data[active].investigations.abg[field] = element.value;
+
+  try {
+    localStorage.setItem(KEY, JSON.stringify(data));
+  } catch (error) {
+    alert("Could not save ABG data. Check available device storage.");
+  }
+}
+
+document.addEventListener("input", saveABGField);
+document.addEventListener("change", saveABGField);
+
+function calculateABG() {
+  if (active === null || !data[active]) return;
+
+  const get = id => {
+    const element = document.getElementById("abg_" + id);
+    if (!element || element.value.trim() === "") return null;
+
+    const value = Number(element.value);
+    return Number.isFinite(value) ? value : null;
+  };
+
+  const pH = get("pH");
+  const co2 = get("PaCO2");
+  const hco3 = get("HCO3");
+  const pao2 = get("PaO2");
+  const fio2 = get("FiO2");
+  const na = get("Na");
+  const cl = get("Cl");
+  const albumin = get("Albumin");
+  const lactate = get("Lactate");
+
+  const output = document.getElementById("abgResult");
+
+  const fmt = (value, digits = 1) =>
+    Number.isFinite(value) ? value.toFixed(digits) : "—";
+
+  const addResult = (title, value, alert = false) => `
+    <div class="abg-result ${alert ? "abg-alert" : ""}">
+      <strong>${title}:</strong> ${value}
+    </div>
+  `;
+
+  const messages = [];
+
+  if (
+    pH === null || co2 === null || hco3 === null ||
+    pH < 6.8 || pH > 7.8 || co2 <= 0 || hco3 <= 0
+  ) {
+    output.innerHTML =
+      "<strong>Enter valid pH, PaCO₂ and HCO₃⁻ values.</strong>";
+    return;
+  }
+
+  if (pH < 7.35) {
+    messages.push(addResult(
+      "pH assessment",
+      "Acidemia",
+      true
+    ));
+  } else if (pH > 7.45) {
+    messages.push(addResult(
+      "pH assessment",
+      "Alkalemia",
+      true
+    ));
+  } else {
+    messages.push(addResult(
+      "pH assessment",
+      "Within normal range (7.35–7.45)"
+    ));
+  }
+
+  let primary = "";
+  let compensation = "";
+  let mixed = false;
+
+  if (pH < 7.35) {
+    if (hco3 < 22 && co2 > 45) {
+      primary = "Mixed metabolic and respiratory acidosis";
+      mixed = true;
+    } else if (hco3 < 22) {
+      primary = "Metabolic acidosis";
+    } else if (co2 > 45) {
+      primary = "Respiratory acidosis";
+    } else {
+      primary = "Acidemia without a clear primary pattern; reassess values and clinical context";
+    }
+  } else if (pH > 7.45) {
+    if (hco3 > 26 && co2 < 35) {
+      primary = "Mixed metabolic and respiratory alkalosis";
+      mixed = true;
+    } else if (hco3 > 26) {
+      primary = "Metabolic alkalosis";
+    } else if (co2 < 35) {
+      primary = "Respiratory alkalosis";
+    } else {
+      primary = "Alkalemia without a clear primary pattern; reassess values and clinical context";
+    }
+  } else {
+    if (hco3 < 22 && co2 < 35) {
+      primary = "Possible mixed metabolic acidosis and respiratory alkalosis";
+      mixed = true;
+    } else if (hco3 > 26 && co2 > 45) {
+      primary = "Possible mixed metabolic alkalosis and respiratory acidosis";
+      mixed = true;
+    } else {
+      primary = "pH is normal; consider compensated disorder or mixed disorder";
+    }
+  }
+
+  messages.push(addResult(
+    "Primary acid–base assessment",
+    primary,
+    mixed
+  ));
+
+  /* Metabolic acidosis: Winter's formula */
+  if (hco3 < 22 && pH < 7.35) {
+    const expected = 1.5 * hco3 + 8;
+    const low = expected - 2;
+    const high = expected + 2;
+
+    if (co2 < low) {
+      compensation =
+        "PaCO₂ is below expected: additional respiratory alkalosis is likely.";
+      mixed = true;
+    } else if (co2 > high) {
+      compensation =
+        "PaCO₂ is above expected: additional respiratory acidosis is likely.";
+      mixed = true;
+    } else {
+      compensation =
+        "Appropriate respiratory compensation by Winter's formula.";
+    }
+
+    messages.push(addResult(
+      "Expected PaCO₂ (Winter's formula)",
+      `${fmt(expected)} mmHg (range ${fmt(low)}–${fmt(high)} mmHg)`
+    ));
+    messages.push(addResult("Compensation", compensation, mixed));
+  }
+
+  /* Metabolic alkalosis */
+  if (hco3 > 26 && pH > 7.45) {
+    const expected = 40 + 0.7 * (hco3 - 24);
+    const low = expected - 5;
+    const high = expected + 5;
+
+    if (co2 < low) {
+      compensation =
+        "PaCO₂ below expected: additional respiratory alkalosis is possible.";
+      mixed = true;
+    } else if (co2 > high) {
+      compensation =
+        "PaCO₂ above expected: additional respiratory acidosis is possible.";
+      mixed = true;
+    } else {
+      compensation =
+        "PaCO₂ is within the expected compensatory range.";
+    }
+
+    messages.push(addResult(
+      "Expected PaCO₂",
+      `${fmt(expected)} mmHg (approximate range ${fmt(low)}–${fmt(high)} mmHg)`
+    ));
+    messages.push(addResult("Compensation", compensation, mixed));
+  }
+
+  /* Respiratory acidosis */
+  if (co2 > 45 && pH < 7.35) {
+    const increase = co2 - 40;
+    const acute = 24 + increase / 10;
+    const chronic = 24 + 3.5 * increase / 10;
+
+    messages.push(addResult(
+      "Expected HCO₃⁻ in respiratory acidosis",
+      `Acute: approximately ${fmt(acute)} mmol/L; chronic: approximately ${fmt(chronic)} mmol/L`
+    ));
+    messages.push(addResult(
+      "Compensation",
+      "Compare measured HCO₃⁻ with acute and chronic estimates. Clinical duration is essential."
+    ));
+  }
+
+  /* Respiratory alkalosis */
+  if (co2 < 35 && pH > 7.45) {
+    const decrease = 40 - co2;
+    const acute = 24 - 2 * decrease / 10;
+    const chronic = 24 - 4 * decrease / 10;
+
+    messages.push(addResult(
+      "Expected HCO₃⁻ in respiratory alkalosis",
+      `Acute: approximately ${fmt(acute)} mmol/L; chronic: approximately ${fmt(chronic)} mmol/L`
+    ));
+    messages.push(addResult(
+      "Compensation",
+      "Compare measured HCO₃⁻ with acute and chronic estimates. Clinical duration is essential."
+    ));
+  }
+
+  /* Anion gap */
+  if (na !== null && cl !== null) {
+    const ag = na - (cl + hco3);
+
+    messages.push(addResult(
+      "Anion gap",
+      `${fmt(ag)} mmol/L (without potassium)`
+    ));
+
+    if (albumin !== null && albumin >= 0) {
+      const correctedAG = ag + 2.5 * (4 - albumin);
+
+      messages.push(addResult(
+        "Albumin-corrected anion gap",
+        `${fmt(correctedAG)} mmol/L`
+      ));
+
+      if (correctedAG > 12) {
+        messages.push(addResult(
+          "Anion gap assessment",
+          "Elevated using a conventional reference threshold of 12 mmol/L. Check your laboratory's reference interval.",
+          true
+        ));
+      } else {
+        messages.push(addResult(
+          "Anion gap assessment",
+          "Not elevated using a conventional threshold of 12 mmol/L. Check your laboratory's reference interval."
+        ));
+      }
+    } else {
+      messages.push(addResult(
+        "Anion gap assessment",
+        ag > 12
+          ? "Above conventional threshold; albumin correction may be useful."
+          : "Not above conventional threshold. Interpret using local reference range."
+      ));
+    }
+  }
+
+  /* Oxygenation */
+  if (pao2 !== null && pao2 > 0 &&
+      fio2 !== null && fio2 >= 21 && fio2 <= 100) {
+    const pf = pao2 / (fio2 / 100);
+
+    messages.push(addResult(
+      "P/F ratio",
+      `${fmt(pf, 0)}`
+    ));
+  }
+
+  if (lactate !== null && lactate >= 0) {
+    messages.push(addResult(
+      "Lactate",
+      `${fmt(lactate)} mmol/L`
+    ));
+  }
+
+  if (mixed) {
+    messages.push(addResult(
+      "Important",
+      "Possible mixed disorder. Review the full ABG, clinical history and expected compensation.",
+      true
+    ));
+  }
+
+  output.innerHTML = `
+    <h4>ABG Interpretation</h4>
+    ${messages.join("")}
+    <p class="abg-muted">
+      This is a rule-based interpretation aid, not a diagnosis.
+      Compensation formulas are estimates. Consider clinical context,
+      sampling conditions, laboratory reference intervals and serial ABGs.
+      A normal pH does not exclude a mixed acid–base disorder.
+    </p>
+  `;
+}
+
 function escapeInvestigationText(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -1304,6 +1723,7 @@ function renderInvestigations() {
       </div>
     `).join("") +
     '</div>';
+    renderABG();
 }
 
 function saveInvestigationField(event) {
