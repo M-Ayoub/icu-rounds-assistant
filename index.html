@@ -47,7 +47,7 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui}
 .pi.done{opacity:.45}.pi.done input:not([type=checkbox]){text-decoration:line-through}
 .body details{margin:10px 0 0}.body details>summary{background:#2f6485;padding:12px;font-size:15px}.body details.sub>summary{background:#e6eef4;color:#123047}
 </style></head><body>
-<header><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds</small></header>
+<header><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v5</small></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -85,6 +85,7 @@ biomarkers:{n:"Biomarker",t:"Cardiac biomarkers",f:[["test","Test","sel",["","Hi
 vasoactive:{n:"Drug",t:"Vasopressors and inotropes",f:[["dose","Dose","number"],["unit","Unit","sel",["","mcg/kg/min","mcg/min","mg/hr","mcg/hr","units/min","units/hr","mg/kg/hr","Other"]],["trend","Dose trend","sel",["","Increasing","Stable","Decreasing","Stopped"]],["targetMap","Target MAP (mmHg)","number"],["lastAdjustment","Last adjustment","datetime-local"],["response","Response / reason for use","area"]]}};
 LISTS.lines={r:1,days:1,n:"Line",t:"Lines and tubes",f:[["type","Type","sel",["","CVC","Arterial line","Dialysis catheter","Urinary catheter","ETT","Tracheostomy","NG/OG tube","Chest drain","Other"]],["site","Site / size"],["date","Inserted","date"],["note","Notes"]]};
 LISTS.abx={r:1,days:1,n:"Antibiotic",t:"Antimicrobials",f:[["drug","Antibiotic"],["dose","Dose / route / frequency"],["date","Start date","date"],["indication","Cause / source"],["note","Plan (stop or review date, levels)"]]};
+LISTS.cultures={r:1,n:"Culture",t:"Cultures",f:[["type","Specimen","sel",["","Blood","Sputum","Tracheal aspirate","BAL","Urine","Wound swab","Throat swab","Nasal / rectal screening swab","Stool","CSF","Pleural fluid","Ascitic fluid","Catheter tip","Other"]],["date","Date sent","date"],["status","Status","sel",["","Pending","No growth","Growth"]],["organism","Organism"],["susceptible","Susceptible antibiotics"]]};
 LISTS.anticoag={r:1,days:1,n:"Anticoagulant",t:"Pharmacological anticoagulation",sel:"Anticoagulant",opts:["Enoxaparin","Unfractionated heparin (prophylactic)","Unfractionated heparin (infusion)","Dalteparin","Fondaparinux","Warfarin","Apixaban","Rivaroxaban","Dabigatran","Argatroban","Other"],f:[["dose","Dose / route / frequency"],["date","Start date","date"],["indication","Cause / indication"]]};
 const ARR=(p,x)=>LISTS[x]?(LISTS[x].r?p[x]:p.cardio[x]):p[x];
 const dayN=d=>d?Math.floor((Date.now()-new Date(d+"T00:00"))/864e5)+1:null;
@@ -102,7 +103,7 @@ function ensure(p){
  if(!Array.isArray(I.laboratory))I.laboratory=LAB.map(([n,u])=>({name:n,date:"",result:"",unit:u,trend:"",lastResult:""}));
  if(!Array.isArray(I.radiology))I.radiology=RAD.map(n=>({name:n,date:"",result:""}));
  if(!I.abg||typeof I.abg!=="object")I.abg={};
- if(!Array.isArray(p.lines))p.lines=[];if(!Array.isArray(p.abx))p.abx=[];if(!Array.isArray(p.anticoag))p.anticoag=[];if(!Array.isArray(p.plans))p.plans=[];if(!Array.isArray(p.scoreList))p.scoreList=[];
+ if(!Array.isArray(p.lines))p.lines=[];if(!Array.isArray(p.abx))p.abx=[];if(!Array.isArray(p.anticoag))p.anticoag=[];if(!Array.isArray(p.plans))p.plans=[];if(!Array.isArray(p.scoreList))p.scoreList=[];if(!Array.isArray(p.cultures))p.cultures=[];
  if(!p.cardio||typeof p.cardio!=="object")p.cardio={};const c=p.cardio;
  if(!c.vitals||typeof c.vitals!=="object")c.vitals={};if(c.vitals.targetMap===undefined)c.vitals.targetMap="65";
  for(const k of["ecg","biomarkers","vasoactive"])if(!Array.isArray(c[k]))c[k]=[];
@@ -128,7 +129,7 @@ function radRow(it,i){const b=`investigations.radiology.${i}.`;
 
 function listHTML(name){const L=LISTS[name],arr=L.r?P()[name]:P().cardio[name],bs=L.r?name:"cardio."+name;
  let top=L.opts?`<label>${L.sel}<select id="sel_${name}"><option value="">Select...</option>${L.opts.map(d=>`<option>${d}</option>`).join("")}</select></label>`:"";
- return`<h4>${L.t}</h4>${top}<button data-a="add:${name}">+ Add ${L.n}</button>`+arr.map((it,i)=>`<div class="ent"><b>${esc(it.drug||L.n+" "+(i+1))}</b>${L.days&&it.date?" · day "+dayN(it.date):""}${grid(L.f,`${bs}.${i}`)}<button class="x" data-a="del:${name}:${i}">Remove</button></div>`).join("")}
+ return`<h4>${L.t}</h4>${top}<button data-a="add:${name}">+ Add ${L.n}</button>`+arr.map((it,i)=>`<div class="ent"><b>${esc(it.drug||it.type||L.n+" "+(i+1))}</b>${L.days&&it.date?" · day "+dayN(it.date):""}${grid(L.f,`${bs}.${i}`)}<button class="x" data-a="del:${name}:${i}">Remove</button></div>`).join("")}
 
 function cards(p){
  const I=p.investigations,c=p.cardio;
@@ -151,17 +152,17 @@ function cards(p){
  listHTML("vasoactive")+listHTML("ecg")+listHTML("biomarkers")+
  `<h4>Echocardiography</h4><div id="invEcho" class="out"></div>`+(c.echo.enabled?`<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO,"cardio.echo")}`:`<button data-a="echo:on">+ Add echo</button>`)+T("Additional cardiovascular notes","cv","area")+`<h4>Recommendations</h4><div id="cvRec" class="out"></div>`),
  S("🩺 Renal and metabolic",T("Urine output, creatinine, electrolytes, acid-base...","renal","area")),
- S("🦠 Infection",grid([["temp","Temperature (°C)","number"],["sepsisMarker","Sepsis marker","sel",["","Procalcitonin elevated","CRP elevated","Lactate elevated (>2 mmol/L)","WBC high","WBC low","Markers rising","Markers falling","Normal"]],["sepsisValue","Marker value"]])+listHTML("abx")+T("Cultures, source, source control...","infection","area")+`<h4>Recommendations</h4><div id="infRec" class="out"></div>`),
- S("🍽️ Other systems and nutrition",T("GI, skin, nutrition, prophylaxis...","other","area")+`<h4>Anticoagulation / VTE prophylaxis</h4>`+T("Type","acType","sel",["","None","Mechanical","Pharmacological"])+(p.acType==="Mechanical"?T("Mechanical method","acMech","sel",["","Intermittent pneumatic compression","Compression stockings","Both"]):"")+(p.acType==="Pharmacological"?listHTML("anticoag"):"")),
+ S("🦠 Infection",grid([["temp","Temperature (°C)","number"],["sepsisMarker","Sepsis marker","sel",["","Procalcitonin elevated","CRP elevated","Lactate elevated (>2 mmol/L)","WBC high","WBC low","Markers rising","Markers falling","Normal"]],["sepsisValue","Marker value"]])+listHTML("abx")+listHTML("cultures")+T("Source, source control, other notes","infection","area")+`<h4>Recommendations</h4><div id="infRec" class="out"></div>`),
+ S("🍽️ Other systems and nutrition",`<h4>Anticoagulation / VTE prophylaxis</h4>`+T("Type","acType","sel",["","None","Mechanical","Pharmacological"])+(p.acType==="Mechanical"?T("Mechanical method","acMech","sel",["","Intermittent pneumatic compression","Compression stockings","Both"]):"")+(p.acType==="Pharmacological"?listHTML("anticoag"):"")+T("GI, skin, nutrition, prophylaxis...","other","area")),
  S("💧 Fluid balance",grid([["weight","Weight (kg)","number"],["duration","Duration (hours)","number"],["fluidIn","Total intake (mL)","number"],["fluidOut","Total output (mL)","number"]])+`<p class="small">Output rate uses the total output entered. For urine output, enter urine volume alone.</p><div id="fluidOut2" class="out"></div>`),
  S("📝 Assessment and daily plan",T("Problems, targets, interventions...","plan","area")+`<h4>Plan checklist</h4>`+(p.plans||[]).map((it,i)=>`<div class="pi${it.done?" done":""}"><input type="checkbox" data-p="plans.${i}.done"${it.done?" checked":""} aria-label="Done"><input data-p="plans.${i}.text" value="${esc(it.text)}" placeholder="Plan item"><button class="x" data-a="del:plans:${i}">×</button></div>`).join("")+`<button data-a="addplan">+ Add plan</button>`),
  S("✅ Daily checklist",CHK.map(([k,l])=>`<label class="chk"><input type="checkbox" data-p="checks.${k}"${getp(p,"checks."+k)?" checked":""}>${l}</label>`).join("")+`<button class="g" data-a="resetchk">Reset for new day</button>`),
- S("📊 Scores",`<h4>Recommended for this patient</h4><div id="recScores" class="out"></div><label>ICU score<select id="scoreSel"><option value="">Select score...</option>${SCORES.map(s=>`<option>${s}</option>`).join("")}</select></label><button data-a="addscore">+ Add score</button>`+(p.scoreList||[]).map((it,i)=>`<div class="ent"><b>${esc(it.name)}</b> <span class="small" id="sa${i}"></span><div class="g2"><label>Value<input data-p="scoreList.${i}.value" value="${esc(it.value)}"></label><label>Note<input data-p="scoreList.${i}.note" value="${esc(it.note)}"></label></div><button class="g" data-a="autosc:${i}">Use auto value</button><button class="x" data-a="del:scoreList:${i}">Remove</button></div>`).join("")+grid([["uo","Urine output (mL/24 h), for SOFA","number"]],"scores")+`<div id="scoreOut" class="out"></div>`),
+ S("📊 Scores",`<h4>Recommended for this patient</h4><div id="recScores" class="out"></div><label>ICU score<select id="scoreSel"><option value="">Select score...</option>${SCORES.map(s=>`<option>${s}</option>`).join("")}</select></label><button data-a="addscore">+ Add score</button>`+(p.scoreList||[]).map((it,i)=>{const d=SD[it.name];return`<div class="ent"><b>${esc(it.name)}</b> <span class="small" id="sa${i}"></span>${d&&d.c?`<div class="g2">${d.c.map(([l],j)=>`<label>${l}<input type="number" step="any" data-p="scoreList.${i}.comps.${j}" value="${esc((it.comps||{})[j])}"></label>`).join("")}</div><p>Total: <b id="st${i}">—</b></p>`:`<label>Value<input data-p="scoreList.${i}.value" value="${esc(it.value)}"></label>`}<div class="r" id="si${i}" hidden></div><label>Note<input data-p="scoreList.${i}.note" value="${esc(it.note)}"></label><button class="g" data-a="autosc:${i}">Use auto values</button><button class="x" data-a="del:scoreList:${i}">Remove</button></div>`}).join("")+grid([["uo","Urine output (mL/24 h), for SOFA","number"]],"scores")+`<div id="scoreOut" class="out"></div>`),
  S("🔌 Lines and tubes",listHTML("lines")),
  S("📄 SBAR handover",`<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><textarea id="sbar" style="min-height:220px" placeholder="SBAR appears here..."></textarea>`)
  ];
  const ABD=S("🫃 Abdomen",grid([["palpation","Palpation","sel",["","Soft and lax","Distended","Tense","Tender","Guarding / rebound","Rigid"]],["bowelSounds","Bowel sounds","sel",["","Present","Hypoactive","Absent","Hyperactive"]],["feeding","Feeding","sel",["","Oral","Enteral (NG/OG)","Parenteral","Enteral + parenteral","Nil by mouth"]],["stool","Stool","sel",["","Passed stool","Not passed","Diarrhea","Constipated"]],["rbs","RBS (mg/dL)","number"]])+`<div id="rbsOut" class="small"></div>`+T("Abdomen notes","abdNotes","area"));
- return[A[0],S("🩺 Examination",A[1]+A[5]+A[3]+A[4],1),ABD,A[7],A[13],A[2],A[8],A[9],A[12],A[10],A[11],A[14]].join("")}
+ return[A[0],S("🩺 Examination",A[1]+A[5]+A[3]+A[4]+ABD,1),A[7],A[13],A[2],A[8],A[9],A[12],A[10],A[11],A[14]].join("")}
 
 /* ---------- calculations ---------- */
 function labFlag(it,p){
@@ -269,7 +270,25 @@ function gcsHTML(p){const g=scoreCalc(p).gcs,s=p.scores||{};return g===null?"Sel
 const SCORES=["SOFA","qSOFA","APACHE II","SAPS II","GCS","RASS","Shock index","CAM-ICU","CPOT","Braden","NUTRIC","CURB-65"];
 function autoScore(n,p){const g=scoreCalc(p),c=cardioCalc(p.cardio.vitals);
  if(n==="SOFA")return g.n?g.total:null;if(n==="GCS")return g.gcs;if(n==="RASS")return(p.scores||{}).rass||null;if(n==="Shock index")return c.si!==null?c.si.toFixed(2):null;return null}
-const scoreVal=(p,it)=>it.manual?it.value:(autoScore(it.name,p)??it.value);
+const gv=(p,k)=>{const v=parseInt((p.scores||{})[k]);return isNaN(v)?null:v},V0=p=>p.cardio.vitals,pos=x=>{x=parseFloat(x);return x>0?x:null},gcsN=p=>scoreCalc(p).gcs;
+const SD={
+"SOFA":{c:["Respiratory","Coagulation","Liver","Cardiovascular","CNS","Renal"].map((l,i)=>[l,p=>scoreCalc(p).parts[i]]),i:v=>v<2?"0–1: minimal dysfunction":v<6?"2–5: mild to moderate; a rise of ≥2 with infection meets the Sepsis-3 definition":v<10?"6–9: significant organ dysfunction":"≥10: severe, high mortality"},
+"GCS":{all:1,c:[["Eye",p=>gv(p,"gcsE")],["Verbal",p=>gv(p,"gcsV")],["Motor",p=>gv(p,"gcsM")]],i:v=>v<=8?"3–8: severe impairment":v<=12?"9–12: moderate impairment":"13–15: mild or normal"},
+"qSOFA":{c:[["RR ≥22",()=>null],["SBP ≤100",p=>{const s=pos(V0(p).sbp);return s===null?null:+(s<=100)}],["Altered mentation",p=>{const g=gcsN(p);return g===null?null:+(g<15)}]],i:v=>v>=2?"≥2: higher risk of poor outcome; look for sepsis and organ dysfunction":"0–1: lower risk; does not exclude sepsis"},
+"CURB-65":{c:[["Confusion",p=>{const g=gcsN(p);return g===null?null:+(g<15)}],["Urea >42 mg/dL (7 mmol/L)",p=>{const u=labVal(p,"urea","mg/dL");return u===null?null:+(u>42)}],["RR ≥30",()=>null],["SBP <90 or DBP ≤60",p=>{const s=pos(V0(p).sbp),d=pos(V0(p).dbp);return s&&d?+(s<90||d<=60):null}],["Age ≥65",p=>{const a=pos(p.age);return a===null?null:+(a>=65)}]],i:v=>v<=1?"0–1: low risk":v==2?"2: moderate risk":"3–5: high risk (consider ICU if 4–5)"},
+"Shock index":{f:1,c:[["HR (bpm)",p=>pos(V0(p).hr)],["SBP (mmHg)",p=>pos(V0(p).sbp)]],i:v=>v>=1?"≥1.0: marked elevation; likely significant shock or hypovolemia":v>=0.9?"0.9–1.0: elevated; suggests hemodynamic compromise":v>=0.7?"0.7–0.9: borderline":"<0.7: normal range"},
+"RASS":{i:v=>{const n=parseInt(v);return isNaN(n)?"":n>=1?"Agitated":n===0?"Alert and calm":n>=-2?"Light sedation (usual target)":n===-3?"Moderate sedation":"Deep sedation or unarousable"}},
+"CAM-ICU":{i:v=>/pos|\+|yes/i.test(v)?"Positive: delirium present":/neg|no/i.test(v)?"Negative: no delirium":""},
+"CPOT":{i:v=>v>=3?"≥3: significant pain":"<3: pain controlled or minimal"},
+"Braden":{i:v=>v<=9?"≤9: very high pressure-injury risk":v<=12?"10–12: high risk":v<=14?"13–14: moderate risk":v<=18?"15–18: mild risk":"≥19: low risk"},
+"NUTRIC":{i:v=>v>=5?"≥5: high nutritional risk (modified NUTRIC)":"<5: low nutritional risk"},
+"APACHE II":{i:()=>"Higher score = higher predicted mortality; interpret with the diagnosis"},
+"SAPS II":{i:()=>"Higher score = higher predicted mortality; interpret with the diagnosis"}};
+const scoreVal=(p,it)=>{const d=SD[it.name];if(d&&d.c)return scoreState(p,it).val??"";return it.manual?it.value:(autoScore(it.name,p)??it.value)};
+function scoreState(p,it){const d=SD[it.name],cm=it.cman||{},cs=it.comps||{};
+ const vals=d.c.map(([l,f],j)=>{if(cm[j]){const x=parseFloat(cs[j]);return isFinite(x)?x:null}return f(p)}),got=vals.filter(x=>x!==null);let t=null;
+ if(d.f)t=vals[0]>0&&vals[1]>0?+(vals[0]/vals[1]).toFixed(2):null;else if(got.length&&(!d.all||got.length===vals.length))t=got.reduce((a,b)=>a+b,0);
+ return{vals,val:t,n:got.length}}
 function recScores(p){const c=cardioCalc(p.cardio.vitals),R=[],t=parseFloat(p.temp),a=p.investigations.abg,lac=parseFloat(a.Lactate),w=parseFloat(p.weight),o=parseFloat(p.fluidOut),h=parseFloat(p.duration),uop=w>0&&h>0&&o>=0?o/(w*h):null,sh=[];
  if(c.si!==null&&c.si>=0.9)sh.push("shock index "+c.si.toFixed(2));if(c.map!==null&&c.map<65)sh.push("MAP "+c.map.toFixed(0));if(uop!==null&&uop<0.5)sh.push("output "+uop.toFixed(2)+" mL/kg/h");if(lac>2)sh.push("lactate "+lac);
  if(sh.length)R.push(["Shock index","Possible shock: "+sh.join(", ")]);
@@ -295,6 +314,7 @@ function cvRecs(p){const c=p.cardio,v=c.vitals,k=cardioCalc(v),R=[],t=parseFloat
 function infRecs(p){const R=[],age=parseFloat(p.age),w=parseFloat(p.weight),cr=labVal(p,"creat","mg/dL"),t=parseFloat(p.temp),mk=p.sepsisMarker||"",A=p.abx.filter(a=>a.drug);
  A.forEach(a=>{const d=dayN(a.date);if(d)R.push(`${a.drug}: day ${d}.`+(d>=7?" Define a stop date or planned duration.":d>=3?" Review cultures; consider de-escalation or stopping.":""))});
  if(!A.length&&(t>=38.3||t<36||(mk&&mk!=="Normal"&&mk!=="Markers falling")))R.push("Fever or sepsis markers but no antibiotic listed: if infection is suspected, take cultures and start antimicrobials without delay (within 1 h if septic shock or high likelihood of sepsis).");
+ p.cultures.filter(c=>c.organism).forEach(c=>R.push(`${c.type||"Culture"}: ${c.organism}${c.susceptible?", susceptible to "+c.susceptible:""}. Check that current antibiotics match the susceptibilities.`));
  if(t>=38.3)R.push(`Temperature ${t} °C: repeat cultures if not done, check lines and likely sources, review antibiotic spectrum.`);else if(t<36)R.push(`Temperature ${t} °C: hypothermia can accompany sepsis; reassess.`);
  if(mk==="Markers rising")R.push("Markers rising on treatment: reassess source control, cultures, resistance and antibiotic cover.");
  if(mk==="Markers falling"&&A.length)R.push("Markers falling: supports de-escalation or stopping once clinically improving.");
@@ -315,7 +335,14 @@ function upd(){
  const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
  set("abgOut",abgCalc(p));set("scoreOut",scoreHTML(p));
  set("recScores",recScores(p).map(r=>{const v=autoScore(r[0],p);return`<div class="r"><b>${r[0]}</b>${v!==null?" = <b>"+esc(v)+"</b>":""} — ${esc(r[1])} <button data-a="addscore:${r[0]}">+ Add</button></div>`}).join("")||"No score recommended from the entered data.");
- p.scoreList.forEach((it,i)=>{const a=autoScore(it.name,p),e=document.querySelector(`[data-p="scoreList.${i}.value"]`),s=$("sa"+i);if(s)s.textContent=it.manual?"manual":a!==null?"auto":"manual entry";if(!it.manual&&a!==null){it.value=String(a);if(e&&document.activeElement!==e)e.value=a}});
+ p.scoreList.forEach((it,i)=>{const d=SD[it.name]||{},s=$("sa"+i);
+ if(d.c){it.comps=it.comps||{};it.cman=it.cman||{};
+  d.c.forEach(([l,f],j)=>{if(it.cman[j])return;const a=f(p);it.comps[j]=a===null?"":String(a);const e=document.querySelector(`[data-p="scoreList.${i}.comps.${j}"]`);if(e&&document.activeElement!==e)e.value=it.comps[j]});
+  const st=scoreState(p,it);it.value=st.val===null?"":String(st.val);
+  const t=$("st"+i);if(t)t.textContent=st.val===null?"—":st.val+(d.f||st.n===st.vals.length?"":" (partial "+st.n+"/"+st.vals.length+")");
+  if(s)s.textContent=Object.values(it.cman).some(Boolean)?"edited":"auto"}
+ else{const a=autoScore(it.name,p),e=document.querySelector(`[data-p="scoreList.${i}.value"]`);if(s)s.textContent=it.manual?"manual":a!==null?"auto":"manual entry";if(!it.manual&&a!==null){it.value=String(a);if(e&&document.activeElement!==e)e.value=a}}
+ const ie=$("si"+i),iv=d.i&&it.value!==""&&it.value!=null?d.i(it.value):"";if(ie){ie.textContent=iv?"Interpretation: "+iv:"";ie.hidden=!iv}});
  set("cvRec",recList(cvRecs(p)));set("infRec",recList(infRecs(p)));set("invEcho",ctBox(p,/echo/i,"Echo"));set("rbsOut",esc(rbsTxt(p)));set("gcsOut",gcsHTML(p));set("ctBrain",ctBox(p,/ct\s*brain/i,"CT brain"));set("ctChest",ctBox(p,/ct\s*chest/i,"CT chest"));set("ventOut",ventCalc(p));set("fluidOut2",fluidCalc(p));
  const c=cardioCalc(p.cardio.vitals);
  set("cvOut",`MAP <b>${c.map===null?"—":c.map.toFixed(1)}</b> mmHg · Shock index <b>${c.si===null?"—":c.si.toFixed(2)}</b> · Pulse pressure <b>${c.pp===null?"—":c.pp.toFixed(0)}</b> mmHg`+(c.al.length?c.al.map(m=>`<div class="al">${esc(m)}</div>`).join(""):`<div class="r">No alert triggered by entered thresholds.</div>`)+`<p class="small">Screening prompts, not diagnoses. Individualize the MAP target.</p>`)}
@@ -332,9 +359,9 @@ function sbarText(p){
  const x=(t,s)=>s&&L.push(t+": "+s);
  L.push("SITUATION",`${p.bed||""}${p.age?", "+p.age+"y":""}${p.ventSex?" "+p.ventSex:""} — ${p.diagnosis||""}`,"","BACKGROUND",p.presentIllness||"",p.events?"Last 24 h: "+p.events:"","","ASSESSMENT");
  const g0=scoreCalc(p);x("CNS",[g0.gcs!==null&&"GCS "+g0.gcs+" (E"+p.scores.gcsE+" V"+p.scores.gcsV+" M"+p.scores.gcsM+")",p.sedation&&"Sedation: "+p.sedation,(p.scores||{}).rass&&"RASS "+p.scores.rass,p.pupils&&"Pupils: "+p.pupils,p.seizures&&"Seizures: "+p.seizures,ctTxt(p,/ct\s*brain/i),p.cns].filter(Boolean).join(" | "));x("Respiratory",[p.respSupport,p.spo2&&"SpO₂ "+p.spo2+"%",(p.breathSounds||p.ausc)&&"Auscultation: "+[p.breathSounds,p.ausc].filter(Boolean).join(", "),ctTxt(p,/ct\s*chest/i),p.resp,vent&&"Vent: "+vent].filter(Boolean).join(" | "));x("Cardiovascular",[hemo,dr.length&&"Support: "+dr.join("; "),ctTxt(p,/echo/i),p.cv].filter(Boolean).join(" | "));
- x("Renal/metabolic",p.renal);x("Infection",[p.temp&&"Temp "+p.temp+"°C",p.sepsisMarker&&p.sepsisMarker+(p.sepsisValue?" "+p.sepsisValue:""),p.infection].filter(Boolean).join(" | "));x("Abdomen",[p.palpation&&"Palpation: "+p.palpation,p.bowelSounds&&"Bowel sounds: "+p.bowelSounds,p.feeding&&"Feeding: "+p.feeding,p.stool,p.rbs&&"RBS "+p.rbs,p.abdNotes].filter(Boolean).join(" | "));x("Other",p.other);
+ x("Renal/metabolic",p.renal);x("Infection",[p.temp&&"Temp "+p.temp+"°C",p.sepsisMarker&&p.sepsisMarker+(p.sepsisValue?" "+p.sepsisValue:""),p.infection].filter(Boolean).join(" | "));x("Cultures",p.cultures.map(c=>`${c.type||"Culture"}${c.date?" "+c.date:""}: ${c.organism||c.status||"pending"}${c.susceptible?" (susceptible: "+c.susceptible+")":""}`).join("; "));x("Abdomen",[p.palpation&&"Palpation: "+p.palpation,p.bowelSounds&&"Bowel sounds: "+p.bowelSounds,p.feeding&&"Feeding: "+p.feeding,p.stool,p.rbs&&"RBS "+p.rbs,p.abdNotes].filter(Boolean).join(" | "));x("Other",p.other);
  x("Anticoagulation",p.acType==="Pharmacological"?(p.anticoag.map(a=>`${a.drug}${a.dose?" "+a.dose:""}${a.date?" D"+dayN(a.date):""}${a.indication?" ("+a.indication+")":""}`).join("; ")||"Pharmacological"):p.acType==="Mechanical"?"Mechanical"+(p.acMech?" – "+p.acMech:""):p.acType);
- {const g=scoreCalc(p),sc=p.scores||{};x("Scores",[g.gcs!==null&&"GCS "+g.gcs,sc.rass&&"RASS "+sc.rass,g.n>0&&"SOFA "+g.total+(g.n<6?" (partial "+g.n+"/6)":""),...p.scoreList.filter(it=>!["GCS","RASS","SOFA"].includes(it.name)).map(it=>it.name+" "+scoreVal(p,it))].filter(Boolean).join(", "))}
+ {const g=scoreCalc(p),sc=p.scores||{};x("Scores",[g.gcs!==null&&"GCS "+g.gcs,sc.rass&&"RASS "+sc.rass,g.n>0&&"SOFA "+g.total+(g.n<6?" (partial "+g.n+"/6)":""),...p.scoreList.filter(it=>!["GCS","RASS","SOFA"].includes(it.name)).map(it=>{const v=scoreVal(p,it),d=SD[it.name];return it.name+" "+v+(d&&d.i&&v!==""?" — "+d.i(v):"")})].filter(Boolean).join(", "))}
  x("Lines/tubes",p.lines.map(l=>`${l.type||"Line"}${l.site?" "+l.site:""}${l.date?" D"+dayN(l.date):""}`).join("; "));
  x("Antimicrobials",p.abx.map(a=>`${a.drug||"?"}${a.dose?" "+a.dose:""}${a.date?" D"+dayN(a.date):""}${a.indication?" ("+a.indication+")":""}`).join("; "));
  x("Checklist not ticked",CHK.filter(([k])=>!(p.checks||{})[k]).map(c=>c[1].split(" (")[0].split(":")[0]).join("; "));x("ABG",abg);x("Labs",abn.join("; ")+(p.labs?" | "+p.labs:""));x("Imaging",rad.join("; "));
@@ -371,7 +398,7 @@ $("imp").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;co
 
 /* ---------- events ---------- */
 function onField(e){const t=e.target;if(!t.dataset||!t.dataset.p||active===null||!P())return;
- setp(P(),t.dataset.p,t.type==="checkbox"?t.checked:t.value);if(/^scoreList\.\d+\.value$/.test(t.dataset.p))setp(P(),t.dataset.p.replace(".value",".manual"),true);persist();const pi=t.closest(".pi");if(pi&&t.type==="checkbox")pi.classList.toggle("done",t.checked);if(t.dataset.p==="acType"){draw();return}upd()}
+ setp(P(),t.dataset.p,t.type==="checkbox"?t.checked:t.value);if(/^scoreList\.\d+\.value$/.test(t.dataset.p))setp(P(),t.dataset.p.replace(".value",".manual"),true);if(/^scoreList\.\d+\.comps\.\d+$/.test(t.dataset.p))setp(P(),t.dataset.p.replace(".comps.",".cman."),true);persist();const pi=t.closest(".pi");if(pi&&t.type==="checkbox")pi.classList.toggle("done",t.checked);if(t.dataset.p==="acType"){draw();return}upd()}
 document.addEventListener("input",onField);document.addEventListener("change",onField);
 document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b||active===null||!P())return;
  const[a,x,y]=b.dataset.a.split(":"),p=P(),I=p.investigations,c=p.cardio;
@@ -382,7 +409,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
   else ARR(p,x).push(Object.fromEntries([...LISTS[x].f.map(f=>[f[0],f[0]==="date"?today:""])]))}
  else if(a==="del"){if(!confirm("Remove this entry?"))return;ARR(p,x).splice(Number(y),1)}
  else if(a==="addscore"){const n=x||$("scoreSel").value;if(!n){alert("Select a score first.");return}if(p.scoreList.some(i=>i.name===n)){alert("Already added.");return}p.scoreList.push({name:n,value:"",manual:false,note:""})}
- else if(a==="autosc"){p.scoreList[Number(x)].manual=false}
+ else if(a==="autosc"){const it=p.scoreList[Number(x)];it.manual=false;it.cman={}}
  else if(a==="addplan")p.plans.push({text:"",done:false});
  else if(a==="resetchk"){if(!confirm("Clear all checklist ticks?"))return;p.checks={}}
  else if(a==="echo")c.echo.enabled=x==="on";
