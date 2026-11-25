@@ -1946,97 +1946,334 @@ function calculateVentilator() {
     if (vtPerKgValue > 8) {
       ventilationStatus = "Review: VT above 8 mL/kg PBW";
     } else if (vtPerKgValue < 4) {
-      ventilationStatus = "Review: VT below 4 mL/kg PBW";
+
+function calculateVentilator() {
+  const getValue = id => {
+    const el = document.getElementById(id);
+    if (!el || el.value.trim() === "") return null;
+    const n = Number(el.value);
+    return Number.isFinite(n) ? n : null;
+  };
+
+  const getText = id =>
+    document.getElementById(id)?.value?.trim() || "";
+
+  const result = document.getElementById("ventResult");
+  if (!result) return;
+
+  const sex = getText("ventSex").toLowerCase();
+  const mode = getText("ventMode");
+  const rate = getValue("ventRate");
+  const height = getValue("heightCm");
+  const vt = getValue("setVT");
+  const fio2 = getValue("fio2Percent");
+  const pao2 = getValue("paO2");
+  const setPeep = getValue("setPEEP");
+  const totalPeep = getValue("totalPeep");
+  const plateau = getValue("plateauPressure");
+  const peak = getValue("peakPressure");
+  const ps = getValue("pressureSupport");
+
+  const rows = [];
+  const alerts = [];
+
+  const fmt = (n, digits = 1) =>
+    Number.isFinite(n) ? n.toFixed(digits) : "—";
+
+  function addRow(name, value, target, interpretation, status = "info") {
+    rows.push(`
+      <tr>
+        <td>${name}</td>
+        <td>${value}</td>
+        <td>${target}</td>
+        <td class="vent-status vent-${status}">${interpretation}</td>
+      </tr>
+    `);
+  }
+
+  // Ventilator settings summary
+  addRow("Ventilator mode", mode || "—", "As clinically indicated", "Entered setting");
+  addRow("Set respiratory rate", rate !== null ? rate + " /min" : "—", "Individualized", "Entered setting");
+  addRow("Pressure support", ps !== null ? ps + " cmH₂O" : "—", "If applicable", "Entered setting");
+  addRow("Peak pressure", peak !== null ? peak + " cmH₂O" : "—", "Interpret with airway resistance and mechanics", "Entered measurement");
+
+  // Predicted body weight
+  let pbw = null;
+
+  if (
+    height !== null && height > 0 && height <= 250 &&
+    (sex === "male" || sex === "female")
+  ) {
+    pbw = sex === "male"
+      ? 50 + 0.91 * (height - 152.4)
+      : 45.5 + 0.91 * (height - 152.4);
+
+    if (pbw > 0) {
+      addRow(
+        "Predicted body weight",
+        fmt(pbw) + " kg",
+        "Calculated from sex and height",
+        "Calculated",
+        "info"
+      );
     } else {
-      ventilationStatus = "Within the 4–8 mL/kg PBW reference range";
+      pbw = null;
     }
   }
 
-  let oxygenationStatus = "Not assessed";
-
-  if (pfRatio !== null) {
-    if (pfRatio <= 100) {
-      oxygenationStatus = "Severe oxygenation impairment";
-    } else if (pfRatio <= 200) {
-      oxygenationStatus = "Moderate oxygenation impairment";
-    } else if (pfRatio <= 300) {
-      oxygenationStatus = "Mild oxygenation impairment";
-    } else {
-      oxygenationStatus = "P/F ratio above 300";
-    }
+  if (pbw === null) {
+    addRow(
+      "Predicted body weight",
+      "—",
+      "Requires valid sex and height",
+      "Enter missing information",
+      "warning"
+    );
   }
 
-  const reviewItems = [];
+  // Tidal volume per PBW
+  let vtPerKg = null;
 
-  if (vtPerKgValue !== null && vtPerKgValue > 8)
-    reviewItems.push("Reassess high tidal volume.");
+  if (vt !== null && vt > 0 && pbw !== null) {
+    vtPerKg = vt / pbw;
 
-  if (vtPerKgValue !== null && vtPerKgValue < 4)
-    reviewItems.push("Review very low tidal volume and clinical indication.");
+    let status = "good";
+    let interpretation = "Within 4–8 mL/kg PBW";
 
-  if (plateau >= 30)
-    reviewItems.push("Reassess elevated plateau pressure.");
+    if (vtPerKg < 4) {
+      status = "warning";
+      interpretation = "Below 4 mL/kg PBW";
+    } else if (vtPerKg > 8) {
+      status = "warning";
+      interpretation = "Above 8 mL/kg PBW";
+    }
 
-  if (pfRatio !== null && pfRatio <= 100)
-    reviewItems.push("Review severe oxygenation impairment.");
+    addRow(
+      "Tidal volume / PBW",
+      fmt(vtPerKg, 2) + " mL/kg",
+      "4–8 mL/kg PBW; commonly start around 6 in ARDS",
+      interpretation,
+      status
+    );
 
-  if (reviewItems.length === 0)
-    reviewItems.push("No threshold-based alerts identified by this calculator.");
+    addRow(
+      "PBW-based VT range",
+      "—",
+      fmt(pbw * 4, 0) + "–" + fmt(pbw * 8, 0) + " mL",
+      "Calculated 4–8 mL/kg range",
+      "info"
+    );
+  } else {
+    addRow(
+      "Tidal volume / PBW",
+      "—",
+      "Requires VT, sex and height",
+      "Not calculated",
+      "info"
+    );
+  }
 
-  const assessmentHTML = `
-    <div class="vent-assessment">
-      <h3>Ventilator Daily Assessment</h3>
+  // P/F ratio
+  let pf = null;
 
-      <h4>1. Lung-protective ventilation</h4>
-      <p><strong>PBW:</strong> ${pbw.toFixed(1)} kg</p>
-      <p><strong>VT/PBW:</strong> ${vtPerKgValue !== null ? vtPerKgValue.toFixed(2) + " mL/kg" : "Not available"}</p>
-      <p><strong>Assessment:</strong> ${ventilationStatus}</p>
+  if (
+    pao2 !== null && pao2 > 0 &&
+    fio2 !== null && fio2 >= 21 && fio2 <= 100
+  ) {
+    pf = pao2 / (fio2 / 100);
 
-      <h4>2. Oxygenation</h4>
-      <p><strong>P/F ratio:</strong> ${pfRatio !== null ? pfRatio.toFixed(0) : "Not available"}</p>
-      <p><strong>Assessment:</strong> ${oxygenationStatus}</p>
+    let interpretation = "Above 300";
+    let status = "good";
 
-      <h4>3. Respiratory mechanics</h4>
-      <p><strong>Plateau pressure:</strong> ${plateau} cmH₂O</p>
-      <p><strong>Total PEEP:</strong> ${peep} cmH₂O</p>
-      <p><strong>Driving pressure:</strong> ${drivingValue !== null ? drivingValue.toFixed(1) + " cmH₂O" : "Not available"}</p>
-      <p><strong>Static compliance:</strong> ${complianceValue !== null ? complianceValue.toFixed(1) + " mL/cmH₂O" : "Not available"}</p>
+    if (pf <= 100) {
+      interpretation = "≤100: severe oxygenation impairment range";
+      status = "warning";
+    } else if (pf <= 200) {
+      interpretation = "101–200: moderate range";
+      status = "warning";
+    } else if (pf <= 300) {
+      interpretation = "201–300: mild range";
+      status = "info";
+    }
 
-      <h4>4. Parameters requiring review</h4>
-      ${reviewItems.map(item => `<p>• ${item}</p>`).join("")}
+    if (totalPeep === null || totalPeep < 5) {
+      interpretation += "; Berlin ARDS category requires PEEP/CPAP ≥5";
+      status = "info";
+    }
 
-      <h4>5. ICU rounds report</h4>
-      <div class="vent-report">
-        Ventilator assessment:
-        VT ${vt} mL (${vtPerKgValue !== null ? vtPerKgValue.toFixed(1) : "—"} mL/kg PBW).
-        P/F ratio ${pfRatio !== null ? pfRatio.toFixed(0) : "—"}.
-        Plateau pressure ${plateau} cmH₂O.
-        Total PEEP ${peep} cmH₂O.
-        Driving pressure ${drivingValue !== null ? drivingValue.toFixed(1) : "—"} cmH₂O.
-        Static compliance ${complianceValue !== null ? complianceValue.toFixed(1) : "—"} mL/cmH₂O.
-      </div>
+    addRow(
+      "P/F ratio",
+      fmt(pf, 0),
+      "Interpret with full ARDS criteria and clinical context",
+      interpretation,
+      status
+    );
+  } else {
+    addRow(
+      "P/F ratio",
+      "—",
+      "PaO₂ and FiO₂ required",
+      "Enter valid values; FiO₂ as percentage",
+      "info"
+    );
+  }
+
+  // Plateau pressure
+  if (plateau !== null && plateau > 0) {
+    addRow(
+      "Plateau pressure",
+      fmt(plateau) + " cmH₂O",
+      "Generally ≤30 cmH₂O in ARDS",
+      plateau <= 30 ? "At or below common target" : "Above common target",
+      plateau <= 30 ? "good" : "warning"
+    );
+  } else {
+    addRow(
+      "Plateau pressure",
+      "—",
+      "Measure when applicable",
+      "Not entered",
+      "info"
+    );
+  }
+
+  // Driving pressure
+  let driving = null;
+
+  if (
+    plateau !== null && plateau > 0 &&
+    totalPeep !== null && totalPeep >= 0
+  ) {
+    driving = plateau - totalPeep;
+
+    if (driving > 0) {
+      addRow(
+        "Driving pressure",
+        fmt(driving) + " cmH₂O",
+        "Trend; 15 cmH₂O is a commonly discussed threshold, not a universal cutoff",
+        driving > 15 ? "Above 15; review in clinical context" : "At or below 15",
+        driving > 15 ? "warning" : "info"
+      );
+    } else {
+      driving = null;
+      addRow(
+        "Driving pressure",
+        "—",
+        "Plateau pressure should exceed total PEEP",
+        "Check measurements",
+        "warning"
+      );
+    }
+  } else {
+    addRow(
+      "Driving pressure",
+      "—",
+      "Plateau pressure − total PEEP",
+      "Enter both values",
+      "info"
+    );
+  }
+
+  // Static compliance
+  if (vt !== null && vt > 0 && driving !== null) {
+    const compliance = vt / driving;
+
+    addRow(
+      "Static compliance",
+      fmt(compliance) + " mL/cmH₂O",
+      "No single universal ICU target",
+      "Trend over time",
+      "info"
+    );
+  } else {
+    addRow(
+      "Static compliance",
+      "—",
+      "VT ÷ driving pressure",
+      "Requires VT and valid driving pressure",
+      "info"
+    );
+  }
+
+  // Intrinsic PEEP estimate
+  if (
+    totalPeep !== null && totalPeep >= 0 &&
+    setPeep !== null && setPeep >= 0
+  ) {
+    const autoPeep = totalPeep - setPeep;
+
+    if (autoPeep >= 0) {
+      addRow(
+        "Intrinsic PEEP estimate",
+        fmt(autoPeep) + " cmH₂O",
+        "Confirm with expiratory hold when appropriate",
+        autoPeep > 0 ? "Possible intrinsic PEEP" : "No difference detected",
+        autoPeep > 0 ? "warning" : "info"
+      );
+    } else {
+      addRow(
+        "Intrinsic PEEP estimate",
+        "—",
+        "Total PEEP should be ≥ set PEEP",
+        "Check measurements",
+        "warning"
+      );
+    }
+  } else {
+    addRow(
+      "Intrinsic PEEP estimate",
+      "—",
+      "Total PEEP − set PEEP",
+      "Enter set and total PEEP",
+      "info"
+    );
+  }
+
+  // Threshold-based alerts
+  if (vtPerKg !== null && vtPerKg > 8) {
+    alerts.push("VT exceeds 8 mL/kg PBW.");
+  }
+
+  if (plateau !== null && plateau > 30) {
+    alerts.push("Plateau pressure exceeds 30 cmH₂O.");
+  }
+
+  if (pf !== null && pf <= 100) {
+    alerts.push("P/F ratio is ≤100; assess severe oxygenation impairment.");
+  }
+
+  if (driving !== null && driving > 15) {
+    alerts.push("Driving pressure is above 15 cmH₂O; interpret in clinical context.");
+  }
+
+  const alertHTML = alerts.length
+    ? `<div class="vent-alert vent-alert-warning">
+        <strong>Parameters to review:</strong>
+        <ul>${alerts.map(a => `<li>${a}</li>`).join("")}</ul>
+      </div>`
+    : `<div class="vent-alert vent-alert-success">
+        No threshold-based alerts identified by this calculator.
+        This does not establish that ventilation is safe or optimal.
+      </div>`;
+
+  result.innerHTML = `
+    ${alertHTML}
+    <div class="vent-table-wrap">
+      <table class="vent-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+            <th>Reference / target</th>
+            <th>Interpretation</th>
+          </tr>
+        </thead>
+        <tbody>${rows.join("")}</tbody>
+      </table>
     </div>
   `;
-
-  document.getElementById("ventAssessment").innerHTML = assessmentHTML;
-
-  document.getElementById("ventResult").innerHTML = `
-   ${alertHTML}
-    <table class="vent-table">
-      <thead>
-        <tr>
-          <th>Parameter</th>
-          <th>Calculated</th>
-          <th>Reference / target</th>
-          <th>Interpretation</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.join("")}
-      </tbody>
-    </table>
-  `;
 }
+
 
 
 function calculateFluid() {
