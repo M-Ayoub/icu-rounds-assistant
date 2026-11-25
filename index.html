@@ -46,15 +46,18 @@ pre{white-space:pre-wrap;font:13px/1.5 system-ui}
 .pi{display:flex;gap:8px;align-items:center;margin:6px 0}.pi input[type=checkbox]{width:24px;height:24px;margin:0;flex:none}.pi input:not([type=checkbox]){margin:0}.pi button{margin:0}
 .pi.done{opacity:.45}.pi.done input:not([type=checkbox]){text-decoration:line-through}
 .body details{margin:10px 0 0}.body details>summary{background:#2f6485;padding:12px;font-size:15px}.body details.sub>summary{background:#e6eef4;color:#123047}
+#infoSvg svg{width:100%;height:auto;border:1px solid #dfe7ee;border-radius:10px;display:block;margin-bottom:8px}
+@media print{body.pinfo main>#rec{display:block!important}body.pinfo #rec>*:not(#infoBox){display:none!important}body.pinfo #infoBox>button{display:none}}
 </style></head><body>
-<header><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v5</small></header>
+<header><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v6</small></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
 <label>Bed label<input id="bed" placeholder="Example: Bed 01"></label>
 <button onclick="addPatient()">Add patient</button><button class="g" onclick="showSheet()">Handover sheet (all beds)</button></section>
 <section id="rec" hidden><h3 id="heading"></h3><div id="cards"></div>
-<button onclick="exportOne()">Export this patient</button><button class="x" onclick="delPatient()">Delete patient</button></section>
+<button onclick="showInfo()">🖼️ Patient infographic</button><button onclick="exportOne()">Export this patient</button><button class="x" onclick="delPatient()">Delete patient</button>
+<div id="infoBox" hidden><div id="infoSvg"></div><button onclick="dlInfo()">Download PNG</button><button class="g" onclick="printInfo()">Print / PDF</button><button class="g" onclick="$('infoBox').hidden=true">Close</button></div></section>
 <section><h3>Backup</h3>
 <button onclick="exportAll()">Export all patients</button>
 <button class="g" onclick="$('imp').click()">Import backup</button>
@@ -323,6 +326,34 @@ function infRecs(p){const R=[],age=parseFloat(p.age),w=parseFloat(p.weight),cr=l
  if(age>=65&&A.length)R.push("Age ≥65: creatinine can overestimate renal function; take care with nephrotoxic antibiotics.");
  return R}
 const rbsTxt=p=>{const r=parseFloat(p.rbs);return r>0?(r<70?"Below 70 mg/dL: treat hypoglycemia per protocol.":r>180?"Above 180 mg/dL: review insulin per local protocol (usual ICU target about 140–180).":"Within 70–180 mg/dL."):""};
+/* ---------- patient infographic ---------- */
+function pack(a,m=26){const o=[];let l="";for(const s of a){if(!s)continue;const t=s.length>m?s.slice(0,m-1)+"…":s;if(l&&(l+" · "+t).length>m+4){o.push(l);l=t}else l=l?l+" · "+t:t}if(l)o.push(l);return o}
+const wrap=(t,m,max)=>{const o=[];let l="";for(const w of String(t||"").split(/\s+/)){if(!w)continue;if(l&&(l+" "+w).length>m){o.push(l);l=w}else l=l?l+" "+w:w}if(l)o.push(l);return o.slice(0,max)};
+function infoData(p){ensure(p);const c=p.cardio,v=c.vitals,k=cardioCalc(v),s=p.scores||{},g=scoreCalc(p),a=p.investigations.abg,pf=pfOf(p),ct=(re,l)=>{const r=ctLast(p,re);return r?`${l}: ${r.result||"entered"}`:""};
+ const open=p.plans.filter(x=>x.text&&!x.done),tk=CHK.filter(([q])=>(p.checks||{})[q]).length,bal=parseFloat(p.fluidIn)-parseFloat(p.fluidOut);
+ return[
+ {t:"CNS",e:"🧠",col:"#8a55b8",l:[g.gcs!==null&&`GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,s.rass&&`RASS ${s.rass}`,p.sedation&&p.sedation!=="None"&&p.sedation,p.pupils,p.seizures&&p.seizures!=="None"&&p.seizures,ct(/ct\s*brain/i,"CT brain")]},
+ {t:"Cardiovascular",e:"❤️",col:"#c9474b",l:[v.sbp&&v.dbp&&`BP ${v.sbp}/${v.dbp}`,k.map!==null&&`MAP ${k.map.toFixed(0)}`,v.hr&&`HR ${v.hr}`,v.rhythm,k.si!==null&&`SI ${k.si.toFixed(2)}`,...c.vasoactive.filter(d=>d.trend!=="Stopped"&&d.drug).map(d=>`${d.drug.split(" ")[0]} ${d.dose||""}`),ct(/echo/i,"Echo")]},
+ {t:"Respiratory",e:"🫁",col:"#1f9aa8",l:[p.respSupport,p.spo2&&`SpO₂ ${p.spo2}%`,p.breathSounds,p.ventMode,p.setVT&&`VT ${p.setVT}`,p.setPEEP&&`PEEP ${p.setPEEP}`,p.fio2Percent&&`FiO₂ ${p.fio2Percent}%`,pf!==null&&`P/F ${pf.toFixed(0)}`,ct(/ct\s*chest/i,"CT chest")]},
+ {t:"Abdomen",e:"🫃",col:"#d4a02b",l:[p.palpation,p.bowelSounds&&`Bowel sounds ${p.bowelSounds.toLowerCase()}`,p.feeding,p.stool,p.rbs&&`RBS ${p.rbs}`]},
+ {t:"Infection",e:"🦠",col:"#e07a2f",l:[p.temp&&`T ${p.temp}°C`,p.sepsisMarker&&p.sepsisMarker+(p.sepsisValue?" "+p.sepsisValue:""),...p.abx.filter(x=>x.drug).map(x=>`${x.drug}${x.date?" D"+dayN(x.date):""}`),...p.cultures.filter(x=>x.organism).map(x=>`${x.type||"Cx"}: ${x.organism}`)]},
+ {t:"Investigations",e:"🧪",col:"#2f6fcf",l:[...p.investigations.laboratory.map(it=>{const f=labFlag(it,p);return f[1]==="hi"||f[1]==="lo"?`${it.name} ${it.result}${f[1]==="hi"?"↑":"↓"}`:""}),a.pH&&`ABG pH ${a.pH} CO₂ ${a.PaCO2||"—"} HCO₃ ${a.HCO3||"—"}`,a.Lactate&&`Lactate ${a.Lactate}`,(n=>n&&`${n} imaging result(s)`)(p.investigations.radiology.filter(r=>r.result).length)]},
+ {t:"Lines & support",e:"🔌",col:"#5c6b78",l:[...p.lines.map(x=>`${x.type||"Line"}${x.date?" D"+dayN(x.date):""}`),p.acType==="Pharmacological"?p.anticoag.map(x=>(x.drug||"").split(" ")[0]).join("/")||"Anticoagulated":p.acType==="Mechanical"?"Mechanical VTE prophylaxis":"",Number.isFinite(bal)&&`Fluid balance ${bal>0?"+":""}${bal} mL`]},
+ {t:"Scores & plan",e:"📝",col:"#3a9d4a",l:[g.n>0&&`SOFA ${g.total}${g.n<6?"*":""}`,...p.scoreList.filter(x=>!["SOFA","GCS","RASS"].includes(x.name)).map(x=>`${x.name} ${scoreVal(p,x)}`),open.length&&`${open.length} open plan(s)`,...open.slice(0,2).map(x=>x.text),tk>0&&`Checklist ${tk}/${CHK.length}`]}]}
+function infoSVG(p){const S=infoData(p),n=S.length,A=2*Math.PI/n,a0=-Math.PI/2-A/2,pt=(r,a)=>[500+r*Math.cos(a),500+r*Math.sin(a)].map(x=>x.toFixed(1)).join(","),sec=(r1,r2,x,y)=>`M${pt(r2,x)}A${r2},${r2} 0 0 1 ${pt(r2,y)}L${pt(r1,y)}A${r1},${r1} 0 0 0 ${pt(r1,x)}Z`;
+ let o=`<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1020" viewBox="0 0 1000 1020" font-family="Arial,Helvetica,sans-serif"><rect width="1000" height="1020" fill="#fff"/>`;
+ S.forEach((s,i)=>{const x=a0+i*A,y=x+A,m=x+A/2,[tx,ty]=pt(365,m).split(",").map(Number),[ix,iy]=pt(200,m).split(",").map(Number),L=pack(s.l).slice(0,6);
+  o+=`<path d="${sec(255,485,x,y)}" fill="${s.col}" fill-opacity=".13" stroke="#fff" stroke-width="3"/><path d="${sec(145,250,x,y)}" fill="${s.col}" stroke="#fff" stroke-width="3"/><text x="${ix}" y="${iy-4}" text-anchor="middle" font-size="26">${s.e}</text><text x="${ix}" y="${iy+22}" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">${esc(s.t)}</text>`;
+  (L.length?L:["No data entered"]).forEach((t,j,r)=>o+=`<text x="${tx}" y="${(ty+(j-(r.length-1)/2)*18+5).toFixed(1)}" text-anchor="middle" font-size="14" fill="${L.length?"#17212b":"#8a96a1"}"${L.length?"":' font-style="italic"'}>${esc(t)}</text>`)});
+ const d=dayN(p.admissionDate);
+ o+=`<circle cx="500" cy="500" r="140" fill="#fff" stroke="#123047" stroke-width="6"/><text x="500" y="452" text-anchor="middle" font-size="30" font-weight="700" fill="#123047">${esc(p.bed||"Patient")}</text><text x="500" y="480" text-anchor="middle" font-size="16" fill="#315f91">${esc([p.age&&p.age+"y",p.ventSex,d>0&&"ICU day "+d].filter(Boolean).join(" · "))}</text>`;
+ wrap(p.diagnosis,22,4).forEach((t,j)=>o+=`<text x="500" y="${510+j*19}" text-anchor="middle" font-size="15" fill="#17212b">${esc(t)}</text>`);
+ return o+`<text x="500" y="1010" text-anchor="middle" font-size="13" fill="#718096">Generated ${new Date().toLocaleDateString()} · * partial SOFA · verify all data before use</text></svg>`}
+function showInfo(){if(active===null||!P())return;$("infoSvg").innerHTML=infoSVG(P());$("infoBox").hidden=false;$("infoBox").scrollIntoView()}
+function dlInfo(){const img=new Image(),u=URL.createObjectURL(new Blob([$("infoSvg").innerHTML],{type:"image/svg+xml;charset=utf-8"}));
+ img.onload=()=>{const c=document.createElement("canvas");c.width=2000;c.height=2040;c.getContext("2d").drawImage(img,0,0,2000,2040);URL.revokeObjectURL(u);c.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(P().bed||"patient")+"-infographic.png";document.body.append(a);a.click();a.remove()},"image/png")};
+ img.onerror=()=>alert("Could not create the image. Use Print / PDF instead.");img.src=u}
+function printInfo(){document.body.classList.add("pinfo");window.print();setTimeout(()=>document.body.classList.remove("pinfo"),800)}
 function fluidCalc(p){
  const w=parseFloat(p.weight),i=parseFloat(p.fluidIn),o=parseFloat(p.fluidOut),h=parseFloat(p.duration);
  if(!(w>0&&h>0&&i>=0&&o>=0))return"Enter weight, duration, intake and output.";
@@ -380,7 +411,7 @@ function renderList(){$("list").innerHTML=data.length?"":'<p class="small">No pa
   const b=document.createElement("button");b.textContent=i===active?"Open ✓":"Open";b.onclick=()=>openPatient(i);d.append(b);$("list").append(d)})}
 function addPatient(){const b=$("bed").value.trim();if(!b){alert("Enter a bed label.");return}
  data.push({bed:b});$("bed").value="";persist();openPatient(data.length-1)}
-function openPatient(i){if(!data[i])return;active=i;ensure(P());persist();$("rec").hidden=false;$("heading").textContent=P().bed||"Patient record";renderList();draw();$("rec").scrollIntoView()}
+function openPatient(i){if(!data[i])return;active=i;ensure(P());persist();$("rec").hidden=false;$("infoBox").hidden=true;$("heading").textContent=P().bed||"Patient record";renderList();draw();$("rec").scrollIntoView()}
 function draw(){const open=[...document.querySelectorAll("#cards details")].map(d=>d.open),y=scrollY;
  $("cards").innerHTML=cards(P());
  document.querySelectorAll("#cards details").forEach((d,i)=>{if(open[i]!==undefined)d.open=open[i]});scrollTo(0,y);upd()}
