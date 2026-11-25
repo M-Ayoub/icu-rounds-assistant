@@ -2330,7 +2330,10 @@ function makeSBAR() {
     "\n\nRECOMMENDATION / PLAN\n" +
     (p.plan || "") +
 
-    "\n\nVerify all details before handover.";
+   "\n\nVerify all details before handover.";
+
+  document.getElementById("sbar").value = summary;
+} 
 
   
 }
