@@ -93,7 +93,7 @@ body.dark .calc-result{background:#1b3342;border-color:#34566b}
 body.dark .calc-result .calc-value{color:#b8e4ff}
 @media(max-width:420px){.calc-inputs{grid-template-columns:1fr}}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v18.1</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v18.2</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -121,6 +121,9 @@ if(!Object.entries)Object.entries=function(o){return Object.keys(o).map(function
 if(!String.prototype.matchAll)String.prototype.matchAll=function(re){var r=[],m,x=new RegExp(re.source,re.flags.indexOf("g")<0?re.flags+"g":re.flags);while((m=x.exec(this))){r.push(m);if(m[0]==="")x.lastIndex++}return r[Symbol.iterator]()};
 })();
 "use strict";
+/* Expose inline-button handlers before startup/rendering. This prevents a later
+   initialization error from leaving Add patient and other buttons undefined. */
+Object.assign(window, {addPatient, applyImportPreview, copySBAR, copySheet, delPatient, dlInfo, exportAll, exportOne, fontStep, forceUpdate, importPreview, jump, makeSBAR, newDay, newDayAll, openPatient, printInfo, restore, shareTxt, showInfo, showSheet, toggleDark});
 const KEY = "icu_rounds_data";
 let data = [], active = null, bad = false;
 try {
@@ -1107,7 +1110,14 @@ function exportOne() { if (P()) downloadJSON({ version: 16, exportedAt: new Date
 function exportAll() { downloadJSON({ version: 16, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
 function importBackupFile(file) {
   const reader = new FileReader(); reader.onload = () => { try { const raw = JSON.parse(reader.result), incoming = Array.isArray(raw) ? raw : raw.patients; if (!Array.isArray(incoming)) throw new Error("No patient array found."); let count = 0; incoming.forEach((p, i) => { if (!p || typeof p !== "object") return; ensure(p); let bed = p.bed || "Imported " + (i + 1); if (data.some(q => q.bed === bed)) bed += " (imported " + (count + 1) + ")"; p.bed = bed; data.push(p); count++; }); persist(); active = data.length ? data.length - 1 : null; renderList(); draw(); alert(count + " patient record(s) imported."); } catch (e) { alert("Import failed: " + e.message); } }; reader.readAsText(file); }
-function forceUpdate() { if (!confirm("Refresh the app and check for the latest published version? Your saved data in this browser will be kept.")) return; if ("serviceWorker" in navigator) navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.update().catch(() => {})))).finally(() => location.reload()); else location.reload(); }
+function forceUpdate() {
+  if (!confirm("Refresh the app and remove its offline cache? Saved patient data in this browser will be kept.")) return;
+  const clearCaches = "caches" in window ? caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))) : Promise.resolve();
+  const removeWorkers = "serviceWorker" in navigator ? navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))) : Promise.resolve();
+  Promise.all([clearCaches, removeWorkers]).finally(() => {
+    const u = new URL(location.href); u.searchParams.set("refresh", String(Date.now())); location.replace(u.href);
+  });
+}
 function importPreview(asNew) {
   const src = $("caseTxt").value.trim(); if (!src) { alert("Paste case text first."); return; }
   if (!asNew && !P()) { alert("Open a patient first, or choose Preview as new bed."); return; }
@@ -1126,6 +1136,4 @@ function applyImportPreview() {
 }
 function addEntry(name) {
   const p = P(); if (!p) return;
-  if (name === "anticoag") { const sel = $("sel_anticoag"), drug = sel && sel.value; if (!drug) { alert("Select an anticoagulant first."); return; } p.anticoag.push({ drug, dose: "", date: "", indication: "", editing: true }); sel.value = ""; }
-  else if (name === "vasoactive") { const sel = $("sel_vasoactive"), drug = sel && sel.value; if (!drug) { alert("Select a vasopressor or inotrope first."); return; } p.cardio.vasoactive.push({ drug, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", lastAdjustment: "", response: "" }); sel.value = ""; }
-  else { const L = LISTS[name]; if (!L) return; const arr = ARR(p, name); let item = {}; if (L.opts) { const sel = $("sel_" + name); item.drug = sel && sel.value; if (!item.drug) { alert("Select " + L.n.toLowerCase() + " first."); return; } sel.value = ""; } L.f.forEach(([k]) => { if (!(k in item)) item[k] = ""; }); if (
+  if (name === "anticoag") { const sel = $("sel_anticoag"), drug = sel && sel.value; if (!drug) { alert("Select an anticoagulant first."); return; } p.anticoag.push({ drug,
