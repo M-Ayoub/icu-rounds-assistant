@@ -70,7 +70,7 @@ button.sm{min-height:34px;padding:4px 12px;margin:0}
 .acadd{display:flex;gap:6px;align-items:center}.acadd select{margin:0}.acadd button{margin:0;white-space:nowrap}
 body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}body.dark .seg button{background:#26384a;color:#e6edf3}body.dark .seg button.on{background:#2b7a9c;color:#fff}body.dark .chip span{border-color:#46607a}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v12</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v13</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -87,7 +87,7 @@ body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff
 <section id="sheet" hidden><h3>Handover sheet</h3><button onclick="window.print()">Print / save as PDF</button><button class="g" onclick="copySheet()">Copy all</button><button class="g" onclick="shareTxt($('sheetTxt').textContent)">Share</button><button class="g" onclick="$('sheet').hidden=true">Close</button><pre id="sheetTxt"></pre></section>
 </main>
 <script>
-window.addEventListener("error",function(e){var d=document.createElement("div");d.style.cssText="background:#fde8e7;color:#a3211b;padding:10px;font-size:13px";d.textContent="Page error: "+e.message+" (line "+e.lineno+"). Send this message to get it fixed.";document.body.insertBefore(d,document.body.firstChild)});
+window.addEventListener("error",function(e){if(window._eb)return;window._eb=1;var d=document.createElement("div");d.style.cssText="background:#fde8e7;color:#a3211b;padding:10px;font-size:13px;word-break:break-word;white-space:pre-wrap";var m="Page error: "+e.message+" ("+String(e.filename||"").split("/").pop()+" line "+e.lineno+":"+e.colno+")";try{if(e.error&&e.error.stack)m+="\n"+String(e.error.stack).slice(0,400)}catch(x){}d.textContent=m+"\n";var b=document.createElement("button");b.textContent="Save a copy of stored data";b.onclick=function(){try{var s=localStorage.getItem("icu_rounds_data")||"";var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([s],{type:"application/json"}));a.download="icu-raw-data.json";document.body.appendChild(a);a.click();a.remove()}catch(x){alert("Could not read stored data.")}};d.appendChild(b);document.body.insertBefore(d,document.body.firstChild)});
 </script>
 <script>
 (function(){if(!Array.prototype.flatMap)Array.prototype.flatMap=function(f){return[].concat.apply([],this.map(f))};
@@ -105,6 +105,13 @@ try {
     data = s ? JSON.parse(s) : [];
     if (!Array.isArray(data))
         throw 0;
+    if (data.some(x => !x || typeof x !== "object" || Array.isArray(x))) {
+        try {
+            localStorage.setItem("icu_rounds_data_rawbackup", s);
+        }
+        catch (e) { }
+        data = data.filter(x => x && typeof x === "object" && !Array.isArray(x));
+    }
 }
 catch (e) {
     bad = true;
@@ -155,6 +162,12 @@ LISTS.vasoactive.opts = DRUGS;
 LISTS.vasoactive.sel = "Drug";
 const ABGF = [["pH", "pH", "0.01"], ["PaCO2", "PaCO₂ (mmHg)"], ["HCO3", "HCO₃⁻ (mmol/L)"], ["PaO2", "PaO₂ (mmHg)"], ["FiO2", "FiO₂ (%)"], ["Na", "Na⁺ (mmol/L)"], ["Cl", "Cl⁻ (mmol/L)"], ["Albumin", "Albumin (g/dL)"], ["Lactate", "Lactate (mmol/L)"]];
 function ensure(p) {
+    if (!p || typeof p !== "object")
+        return;
+    if (typeof p.bed !== "string")
+        p.bed = String(p.bed == null ? "" : p.bed);
+    Object.keys(p).forEach(k => { if (typeof p[k] === "number")
+        p[k] = String(p[k]); });
     if (!p.investigations || typeof p.investigations !== "object")
         p.investigations = {};
     const I = p.investigations;
@@ -1044,18 +1057,4 @@ function parseCase(src) {
     if (v >= 5 && v <= 80)
         add("LVEF " + v + "%", [["cardio.echo.ef", String(v)], ["cardio.echo.enabled", true]]);
     /* abdomen / extremities */
-    const pa = pick([[/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"], [/^(?![\s\S]*non[- ]tender)[\s\S]*\btender/i, "Tender"], [/distend|distension/i, "Distended"], [/\btense\b/i, "Tense"], [/\bsoft\b|\blax\b/i, "Soft and lax"]], T);
-    if (pa)
-        add("Abdomen: " + pa, [["palpation", pa]]);
-    m = T.match(/bowel sounds?\s*(?:are\s*|is\s*)?[:\-]?\s*(present|normal|absent|hypoactive|sluggish|hyperactive)/i);
-    if (m) {
-        const b = /^(present|normal)/i.test(m[1]) ? "Present" : /^(hypo|slug)/i.test(m[1]) ? "Hypoactive" : /^abs/i.test(m[1]) ? "Absent" : "Hyperactive";
-        add("Bowel sounds: " + b, [["bowelSounds", b]]);
-    }
-    const fd = pick([[/\bNPO\b|nil by mouth|\bNBM\b/i, "Nil by mouth"], [/\bTPN\b|parenteral/i, "Parenteral"], [/enteral|ng feed|tube feed|feeding via/i, "Enteral (NG/OG)"], [/oral (?:diet|intake|feeding)|tolerating oral|eating/i, "Oral"]], T);
-    if (fd)
-        add("Feeding: " + fd, [["feeding", fd]]);
-    const st = pick([[/no stool|not passed stool|constipat|bowels? not open/i, "Not passed"], [/diarrh/i, "Diarrhea"], [/passed stool|stool passed|bowels? open/i, "Passed stool"]], T);
-    if (st)
-        add("Stool: " + st, [["stool", st]]);
-    v = num(/(?:\brbs|blood sugar|\bbg\b|glucose|\bfbs)\s*[:=]?\s*(\d{2,3}(?:\.\d)
+    const pa = pick([[/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"], [/^(?![\s\S]*non[- ]tender)[\s\S]*\btender/i, "Tender"], [/distend|distension/i, "Distended"], [/\bt
