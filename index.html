@@ -3,180 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#123047">
-<title>ICU Rounds</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg">
+<title>ICU Rounds Assistant</title>
 <style>
-:root{--fs:15px}
+:root{--fs:15px;--bg:#f4f7fa;--card:#ffffff;--ink:#17212b;--muted:#5a6b7c;--acc:#145b78;--acc2:#1d789b;--bd:#d7e0e8;--warn:#8a5a00;--warnbg:#fff8e6;--err:#b42318;--errbg:#fef3f2;--ok:#127347;--okbg:#ecfdf3}
 *{box-sizing:border-box}
-html{scroll-padding-top:8px}
-body{font-family:system-ui,Arial,sans-serif;background:#f2f5f7;color:#17212b;margin:0}
-header{background:#123047;color:#fff;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-header h2{margin:0 0 2px}
-header small{opacity:.8}
-header button{min-height:36px;margin:0 0 0 4px;padding:6px 10px}
-main{max-width:720px;margin:auto;padding:12px}
-@media(min-width:900px){main{max-width:860px}}
-
-section{background:#fff;border-radius:12px;padding:14px;margin:12px 0;box-shadow:0 1px 3px rgba(18,48,71,.08)}
-h3{margin:0 0 8px}
-h4{margin:16px 0 6px;color:#123047;font-size:15px}
-label{display:block;font-weight:600;font-size:calc(var(--fs) - 2px);margin-top:10px}
-input,textarea,select{width:100%;padding:10px;margin-top:4px;border:1px solid #bbb;border-radius:7px;font:inherit;font-size:var(--fs);background:#fff;color:#17212b}
-textarea{min-height:70px}
-input:focus,textarea:focus,select:focus{outline:2px solid #5aa9d6;outline-offset:1px}
-button{padding:10px 14px;min-height:42px;background:#145b78;color:#fff;border:0;border-radius:7px;margin:4px 4px 4px 0;font:inherit;cursor:pointer}
-button.x{background:#a12622}
-button.g{background:#5c6b78}
-button.sm{min-height:34px;padding:4px 12px;margin:0}
-
-.warn{background:#fff0cc;padding:12px;border-radius:8px;font-size:13px;line-height:1.5}
-.pt{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #e5e9ed}
-.pt span{flex:1;min-width:0;overflow-wrap:anywhere}
-.pt button{margin:0}
-
-details{background:#fff;border:1px solid #dfe7ee;border-radius:12px;margin:10px 0;overflow:visible;box-shadow:0 1px 3px rgba(18,48,71,.08)}
-details>summary{list-style:none;padding:14px;background:#123047;color:#fff;font-weight:700;font-size:16px;cursor:pointer;display:flex;gap:10px;position:sticky;top:0;z-index:20;border-radius:11px;box-shadow:0 3px 10px rgba(8,28,42,.18);isolation:isolate;transition:box-shadow .18s ease}
-details>summary::-webkit-details-marker{display:none}
-details>summary::after{content:"+";margin-left:auto}
-details[open]>summary{border-radius:11px 11px 7px 7px;box-shadow:0 4px 12px rgba(8,28,42,.22)}
-details[open]>summary::after{content:"−"}
-.body{padding:4px 14px 14px}
-.body details{margin:10px 0 0}
-.body details>summary{background:#2f6485;padding:12px;font-size:15px;top:0;z-index:21}
-.body details.sub>summary{background:#e6eef4;color:#123047}
-
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
-.abg-grid{display:grid;grid-template-columns:minmax(76px,1.1fr) repeat(3,minmax(0,1fr));gap:5px 7px;align-items:center;min-width:0}
-.abg-head{font-size:10px;font-weight:800;text-align:center;color:#526879}
-.abg-name{font-size:12px;font-weight:800;color:#103954;background:#eaf5fb;border-radius:6px;padding:7px 5px}
-.abg-grid label{font-size:10px;min-width:0;margin:0}
-.abg-grid input{font-size:12px;padding:6px 4px;margin-top:0;min-width:0;text-align:center}
-.abg-grid .abg-prev{background:#f3f6f8}
-
-.med-row{border:1px solid #dce6ed;border-radius:8px;padding:8px;margin:7px 0;background:#f7fafc}
-.med-summary{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-width:0}
-.med-summary .med-name{font-size:18px;font-weight:900;color:#102f45;letter-spacing:.1px;min-width:70px;flex:1 1 35%;overflow-wrap:anywhere}
-.med-summary .med-details{font-size:12px;color:#526879;flex:1 1 100%;order:3;min-width:0;line-height:1.55;overflow-wrap:anywhere}
-.med-summary button{flex:none}
-.med-details .entry-value{font-size:14px;font-weight:800;color:#103954}
-.med-details .entry-part{display:inline-block;margin:2px 8px 2px 0}
-.med-edit{border-top:1px solid #dce6ed;margin-top:8px;padding-top:6px}
-.med-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}
-.med-grid label{min-width:0}
-.med-grid input,.med-grid select,.med-grid textarea{padding:7px;font-size:13px}
-.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:7px 9px;margin:5px 0;background:#eaf5fb;border-radius:7px;font-size:12px;color:#103954}
-.abx-copy-row b,.abx-copy-row span{overflow-wrap:anywhere}
-
-@media(max-width:420px){
-  .g2,.med-grid,.calc-inputs{grid-template-columns:1fr}
-  .abg-grid{grid-template-columns:minmax(65px,.9fr) repeat(3,minmax(0,1fr));gap:4px}
-  .abg-grid input{font-size:11px;padding:6px 2px}
-  .abg-name{font-size:11px;padding:6px 3px}
-}
-
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:var(--fs);line-height:1.45;background:var(--bg);color:var(--ink)}
+header{background:var(--acc);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+header h2{margin:0;font-size:1.15em}
+header small{opacity:.88;display:block;font-size:.8em}
+main{max-width:980px;margin:0 auto;padding:14px}
+section{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:14px}
+h3{margin:0 0 10px;font-size:1.05em;color:var(--acc)}
+h4{margin:12px 0 6px;font-size:.95em;color:var(--acc2)}
+button{background:var(--acc2);color:#fff;border:0;border-radius:7px;padding:7px 12px;font-size:.9em;cursor:pointer;margin:3px 4px 3px 0}
+button:hover{filter:brightness(1.06)}
+button.g{background:#eef3f7;color:var(--ink);border:1px solid var(--bd)}
+button.x{background:var(--err)}
+button.sm{padding:4px 8px;font-size:.8em}
+label{display:block;margin:6px 0;font-size:.9em;color:var(--muted)}
+input,select,textarea{width:100%;padding:7px 9px;margin-top:3px;border:1px solid var(--bd);border-radius:7px;font-family:inherit;font-size:.95em;background:#fff;color:var(--ink)}
+textarea{resize:vertical;min-height:68px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 12px}
+.warn{background:var(--warnbg);color:var(--warn);border:1px solid #f0d58c;border-radius:8px;padding:9px 12px;font-size:.88em;margin:0 0 14px}
+.small{font-size:.82em;color:var(--muted)}
+.pt{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.pt:last-child{border-bottom:0}
+.trash-head{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+details{border:1px solid var(--bd);border-radius:8px;margin:8px 0;background:#fbfcfd}
+details>summary{padding:9px 12px;cursor:pointer;font-weight:600;list-position:outside}
+details>.body{padding:8px 12px 12px;border-top:1px solid var(--bd)}
+details.sub{background:#f7fafc;margin:8px 0}
+details.sub>summary{background:#e9eff5;font-size:.92em;padding:7px 10px}
+.ent{border:1px solid var(--bd);border-radius:8px;padding:9px;margin:8px 0;background:#fff}
+.med-row{border-bottom:1px solid var(--bd);padding:6px 0}
+.med-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.med-name{font-weight:700;color:var(--acc)}
+.med-details{font-size:.88em;color:var(--muted);flex:1}
+.med-edit{margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd)}
+.med-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.abx-copy-row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;background:#eef7fb;padding:6px 10px;border-radius:6px;margin:4px 0;font-size:.88em}
+.entry-part{margin-right:10px}
+.entry-value{color:var(--ink)}
 .scroll{overflow-x:auto}
-.lab{display:grid;grid-template-columns:64px 108px 76px 54px 46px 62px 62px 62px;gap:6px;min-width:590px;margin-bottom:6px;align-items:start}
-.rad{display:grid;grid-template-columns:70px 120px 1fr;gap:6px;min-width:380px;margin-bottom:6px}
-.lab input,.lab select,.rad input{margin:0;padding:7px 5px;font-size:12px}
-.nm{background:#ade3ff;color:#103954;font-weight:700;font-size:12px;padding:9px 6px;border-radius:7px}
-.fl{display:block;font-size:10px;font-weight:800;text-align:center;margin-top:2px}
-.hi{color:#c62828}
-.lo{color:#1769aa}
-.ok{color:#187448}
-.na{color:#718096}
-.trend[data-v=up]{color:#16833d}
-.trend[data-v=down]{color:#d62828}
-
-.ent{background:#f4f8fb;border:1px solid #dce6ed;border-radius:9px;padding:4px 10px 10px;margin:10px 0}
-.out{background:#f2f6f9;border-radius:8px;padding:10px;margin-top:10px;font-size:var(--fs);line-height:1.5;overflow-x:auto}
-.r{padding:7px;margin:5px 0;border-radius:6px;background:#fff;border-left:4px solid #315f91;font-size:var(--fs)}
-.r.a{border-color:#c62828;background:#fff0ef}
-table{border-collapse:collapse;font-size:var(--fs);min-width:430px;width:100%;background:#fff}
-td,th{border:1px solid #dce5eb;padding:6px;text-align:left;vertical-align:top}
-th{background:#123047;color:#fff}
-.w{color:#b45309;font-weight:700}
-.gd{color:#18733b;font-weight:700}
-.small{font-size:12px;color:#647b8c;line-height:1.5}
-.al{background:#fff0ef;color:#a12622;border-left:4px solid #c62828;padding:7px;margin:5px 0;border-radius:6px;font-size:13px}
-.chk{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:8px}
-.chk input{width:auto;margin:0}
-.chk:has(input[type=checkbox]:checked){opacity:.32}
-.chk:has(input[type=checkbox]:checked) span{text-decoration:line-through}
-pre{white-space:pre-wrap;font:13px/1.55 system-ui}
-
-.pi{display:flex;gap:8px;align-items:center;margin:6px 0}
-.pi input[type=checkbox]{width:24px;height:24px;margin:0;flex:none}
-.pi input:not([type=checkbox]){margin:0}
-.pi button{margin:0}
-.pi.done{opacity:.28}
-.pi.done input:not([type=checkbox]){text-decoration:line-through}
-
-#infoSvg svg{width:100%;height:auto;border:1px solid #dfe7ee;border-radius:10px;display:block;margin-bottom:8px}
-@media print{
-  header,.warn,main>*:not(#sheet){display:none!important}
-  body.pinfo main>#rec{display:block!important}
-  body.pinfo #rec>*:not(#infoBox){display:none!important}
-  body.pinfo #infoBox>button{display:none}
-}
-
-#navRow{position:relative;z-index:4;display:flex;gap:6px;align-items:center;background:#fff;padding:6px 0;margin:0 0 10px;border-radius:9px}
-#navRow button{flex:0 0 44px;margin:0}
-#navRow select{flex:1;min-width:0;margin:0}
-
-.abn{color:#c62828!important;border-color:#c62828!important;background:#fdecea!important;font-weight:800}
-.chips{display:flex;flex-wrap:wrap}
-.chip{display:inline-flex;margin:3px 4px 3px 0}
+.lab,.rad{display:grid;grid-template-columns:92px 115px 115px 78px 64px 72px 72px 72px;gap:6px;align-items:center;margin:4px 0;min-width:680px}
+.rad{grid-template-columns:110px 135px 1fr;min-width:440px}
+.nm{font-weight:600;font-size:.88em}
+.fl{display:inline-block;margin-top:2px;font-size:.72em;font-weight:700;padding:1px 5px;border-radius:4px}
+.fl.hi,.fl.lo,.hi{color:var(--err);background:var(--errbg)}
+.fl.ok,.gd{color:var(--ok);background:var(--okbg)}
+.fl.na,.w{color:var(--warn);background:var(--warnbg)}
+.abg-grid{display:grid;grid-template-columns:110px repeat(3,minmax(85px,1fr));gap:6px;align-items:center;max-width:520px}
+.abg-head{font-size:.8em;font-weight:700;color:var(--muted);text-align:center}
+.abg-name{font-size:.86em;font-weight:600;background:#eef5f9;padding:5px 7px;border-radius:6px}
+.abg-grid label{margin:0}
+.abg-grid input{margin-top:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{display:inline-flex;align-items:center;margin:0;cursor:pointer}
 .chip input{display:none}
-.chip span{padding:7px 12px;border:1px solid #9fb3c2;border-radius:18px;font-size:13px;font-weight:600;cursor:pointer}
-.chip input:checked+span{background:#145b78;color:#fff;border-color:#145b78}
-.seg{display:flex;gap:6px;margin:8px 0}
-.seg button{flex:1;margin:0;background:#dde6ed;color:#123047}
-.seg button.on{background:#145b78;color:#fff}
-
-.calc-select{margin:4px 0 10px}
-.calc-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
-.calc-result{border:1px solid #c9dce8;border-left:5px solid #145b78;background:#eef6fa;border-radius:10px;padding:12px;margin-top:12px}
-.calc-result .calc-value{font-size:22px;font-weight:900;color:#103954;overflow-wrap:anywhere}
-.calc-result .calc-rec{margin-top:8px;font-size:13px;line-height:1.5}
-
-.trash-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:16px}
-.trash-head h4{margin:0}
-
-body.dark{background:#10161c;color:#e6edf3}
-body.dark section,body.dark details,body.dark .ent,body.dark table,body.dark #navRow{background:#1a232c;color:#e6edf3;border-color:#2a3744}
-body.dark input,body.dark textarea,body.dark select{background:#0f171e;color:#e6edf3;border-color:#33424f}
-body.dark .out,body.dark .r{background:#212d38;color:#e6edf3}
-body.dark .r.a,body.dark .al{background:#3a1f1f;color:#ffb4ab}
-body.dark .nm{background:#1d4a63;color:#d6efff}
-body.dark .med-row{background:#202d38;border-color:#3b4c5b}
+.chip span{border:1px solid var(--bd);border-radius:16px;padding:4px 10px;font-size:.84em;color:var(--ink);background:#fff}
+.chip input:checked+span{background:var(--acc2);color:#fff;border-color:var(--acc2)}
+.chk{display:flex;align-items:flex-start;gap:8px;margin:6px 0;cursor:pointer;color:var(--ink)}
+.chk input{width:auto;margin:3px 0 0}
+.pi{display:flex;align-items:center;gap:6px;margin:5px 0}
+.pi input[type=checkbox]{width:auto}
+.pi.done input[type=text]{text-decoration:line-through;opacity:.65}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.seg button{margin:0;background:#e9eff5;color:var(--ink)}
+.seg button.on{background:var(--acc);color:#fff}
+.out{background:#f5f9fc;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;margin:8px 0;font-size:.9em}
+.r{padding:3px 0}
+.r.a{color:var(--err);font-weight:600}
+.al{background:var(--errbg);color:var(--err);border:1px solid #fecdca;border-radius:8px;padding:8px 10px;margin:8px 0;font-size:.9em}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.86em}
+td,th{border:1px solid var(--bd);padding:5px 7px;text-align:left}
+th{background:#f0f5f9}
+.calc-inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px 12px}
+.calc-result{background:#eef7fb;border:1px solid #b8d8e6;border-radius:8px;padding:10px;margin-top:8px}
+.calc-value{font-size:1.25em;font-weight:700;color:var(--acc);margin:3px 0}
+.calc-rec{font-size:.88em;margin-top:6px}
+#navRow{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+#navRow button{width:auto;margin:0}
+#navRow select{flex:1;margin:0}
+#infoBox{margin-top:12px;border-top:1px solid var(--bd);padding-top:12px}
+#infoSvg svg{max-width:100%;height:auto;border:1px solid var(--bd);border-radius:8px}
+body.dark{--bg:#0e161f;--card:#16222e;--ink:#e6edf3;--muted:#9fb0bf;--acc:#2b7a9c;--acc2:#3592ba;--bd:#2a3a4a;--warn:#ffe9a8;--warnbg:#3b3216;--err:#ff8a80;--errbg:#4a1d1d;--ok:#7ee2b8;--okbg:#163829}
+body.dark input,body.dark select,body.dark textarea,body.dark button.g,body.dark .chip span,body.dark .ent,body.dark details,body.dark details>summary,body.dark .out,body.dark th{background:#1d2c3b;color:#e6edf3;border-color:#3b4c5b}
 body.dark .med-summary .med-name{color:#b8e4ff}
 body.dark .med-summary .med-details{color:#b5c5d1}
 body.dark .med-edit{border-color:#3b4c5b}
 body.dark .abx-copy-row{background:#18394b;color:#d6efff}
-body.dark .warn{background:#3b3216;color:#ffe9a8}
-body.dark td,body.dark th{border-color:#2f3d4a}
-body.dark .small{color:#9fb0bf}
 body.dark .body details.sub>summary{background:#26384a;color:#e6edf3}
 body.dark .pt{border-color:#2a3744}
 body.dark h4{color:#9fd3f0}
 body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}
 body.dark .seg button{background:#26384a;color:#e6edf3}
 body.dark .seg button.on{background:#2b7a9c;color:#fff}
-body.dark .chip span{border-color:#46607a}
-body.dark .calc-result{background:#1b3342;border-color:#34566b}
-body.dark .calc-result .calc-value{color:#b8e4ff}
 body.dark .abg-name{background:#1d4a63;color:#d6efff}
 body.dark .abg-grid .abg-prev{background:#15202b}
 body.dark .med-details .entry-value{color:#b8e4ff}
+body.dark .calc-result{background:#1b3342;border-color:#34566b}
+body.dark .calc-result .calc-value{color:#b8e4ff}
+@media print{header,.warn,#list,#bed,button,details.imp,#rec>button,#infoBox,#sheet>button,.trash-head,#trashBox,.small{display:none!important}body{background:#fff;color:#000}section{border:0;padding:0}}
+body.pinfo>*:not(#rec),body.pinfo #rec>*:not(#infoBox){display:none!important}
+body.pinfo #infoBox button{display:none!important}
 </style>
 </head>
 <body>
 <header>
   <div>
     <h2>ICU Rounds Assistant</h2>
-    <small>Offline organizer for rounds · v18.4</small>
+    <small>Offline organizer for rounds · v19.0</small>
   </div>
   <div>
     <button class="g" onclick="toggleDark()" aria-label="Toggle dark mode">🌓</button>
@@ -197,13 +133,13 @@ body.dark .med-details .entry-value{color:#b8e4ff}
     <details class="imp">
       <summary>📥 Import case from text</summary>
       <div class="body">
-        <textarea id="caseTxt" style="min-height:150px" placeholder="Paste or dictate the case: age, sex, diagnosis, PMH, HPI, vitals, labs, ABG, ventilator, drugs, cultures, plan..."></textarea>
+        <textarea id="caseTxt" style="min-height:150px" placeholder="Paste or dictate the case: bed/patient name, age, gender, admission date, PMH, diagnosis, HPI, 24h events, exam & vitals, ABG, radiology, labs, antibiotics, anticoagulation, meds, plan..."></textarea>
         <button onclick="autoImportCase(0)">⚡ Auto-import to open patient</button>
         <button onclick="autoImportCase(1)">⚡ Auto-import as new bed</button>
         <button class="g" onclick="importPreview(0)">Preview for open patient</button>
         <button class="g" onclick="importPreview(1)">Preview as new bed</button>
         <div id="importOut"></div>
-        <p class="small">Runs on this device only. Automatically extracts demographics, diagnosis, vitals, labs (with unit conversion), ABG, ventilator settings, drugs, lines, cultures, and plan items. Verify all imported data against the clinical chart.</p>
+        <p class="small">Runs on this device only. Imports patient name into bed name, age &amp; gender into specific boxes, ABG into the ABG grid, and examination findings into each specific examination box. Verify all imported data against the clinical chart.</p>
       </div>
     </details>
   </section>
@@ -260,8 +196,10 @@ window.addEventListener("error", function(e) {
   var d = document.createElement("div");
   d.style.cssText = "background:#fde8e7;color:#a3211b;padding:10px;font-size:13px;word-break:break-word;white-space:pre-wrap";
   var m = "Page error: " + e.message + " (" + String(e.filename || "").split("/").pop() + " line " + e.lineno + ":" + e.colno + ")";
-  try { if (e.error && e.error.stack) m += "\n" + String(e.error.stack).slice(0, 400); } catch (x) {}
-  d.textContent = m + "\n";
+  try { if (e.error && e.error.stack) m += "
+" + String(e.error.stack).slice(0, 400); } catch (x) {}
+  d.textContent = m + "
+";
   var b = document.createElement("button");
   b.textContent = "Save a copy of stored data";
   b.onclick = function() {
@@ -285,7 +223,6 @@ window.addEventListener("error", function(e) {
 <script>
 "use strict";
 
-/* Expose inline-button handlers before startup/rendering */
 Object.assign(window, {
   addPatient, applyImportPreview, autoImportCase, clearTrash, copySBAR, copySheet,
   delPatient, delTrash, dlInfo, exportAll, exportOne, fontStep, forceUpdate,
@@ -649,7 +586,7 @@ function cards(p) {
   const RS = ["+4 Combative", "+3 Very agitated", "+2 Agitated", "+1 Restless", "0 Alert and calm", "-1 Drowsy", "-2 Light sedation", "-3 Moderate sedation", "-4 Deep sedation", "-5 Unarousable"];
 
   const DX = S("📋 Diagnosis and daily events",
-    grid([["age", "Age (years)", "number"], ["ventSex", "Sex", "sel", ["", "male", "female"]]]) +
+    grid([["age", "Age (years)", "number"], ["ventSex", "Gender / Sex", "sel", ["", "male", "female"]]]) +
     T("Date of admission", "admissionDate", "date") +
     T("Working diagnosis", "diagnosis", "area") +
     T("Past medical history (PMH)", "pastMedicalHistory", "area") +
@@ -790,7 +727,7 @@ function cards(p) {
     `<button class="g" data-a="resetchk">Reset for new day</button>`);
 
   const SBAR_CARD = S("📄 SBAR handover",
-    `<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:240px" placeholder="SBAR appears here..."></textarea>`);
+    `<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:260px" placeholder="SBAR appears here..."></textarea>`);
 
   return [
     DX,
@@ -1313,7 +1250,7 @@ function infoSVG(p) {
   });
 
   const d = dayN(p.admissionDate);
-  o += `<circle cx="500" cy="500" r="140" fill="#fff" stroke="#123047" stroke-width="6"/><text x="500" y="452" text-anchor="middle" font-size="30" font-weight="700" fill="#123047">${esc(p.bed || "Patient")}</text><text x="500" y="480" text-anchor="middle" font-size="16" fill="#315f91">${esc([p.age && p.age + "y", p.ventSex, d > 0 && "ICU day " + d].filter(Boolean).join(" · "))}</text>`;
+  o += `<circle cx="500" cy="500" r="140" fill="#fff" stroke="#123047" stroke-width="6"/><text x="500" y="452" text-anchor="middle" font-size="28" font-weight="700" fill="#123047">${esc(p.bed || "Patient")}</text><text x="500" y="480" text-anchor="middle" font-size="16" fill="#315f91">${esc([p.age && p.age + "y", p.ventSex, d > 0 && "ICU day " + d].filter(Boolean).join(" · "))}</text>`;
   wrap(p.diagnosis, 22, 4).forEach((t, j) => {
     o += `<text x="500" y="${510 + j * 19}" text-anchor="middle" font-size="15" fill="#17212b">${esc(t)}</text>`;
   });
@@ -1574,14 +1511,14 @@ function calcHTML(p) {
   return `<div class="calc-inputs">${fields}</div>${box}`;
 }
 
-/* ---------- Import case from text (rule-based, offline) ---------- */
+/* ---------- Import case from text (specific boxes) ---------- */
 const LABPAT = {
   "Hb": "hb|hemoglobin|haemoglobin", "WBC": "wbc|tlc|white (?:blood )?cells?", "Plts": "plts?|platelets?",
-  "Na": "na\\+?|sodium", "K": "k\\+?|potassium", "Creat": "creat(?:inine)?|cr", "Urea": "urea|bun",
-  "Ca I": "(?:ionized|ionised)\\s*(?:ca|calcium)|ica|ca\\s*i", "Ca T": "(?:total\\s*)?calcium|ca(?!\\s*i)",
+  "Na": "na\+?|sodium", "K": "k\+?|potassium", "Creat": "creat(?:inine)?|cr", "Urea": "urea|bun",
+  "Ca I": "(?:ionized|ionised)\s*(?:ca|calcium)|ica|ca\s*i", "Ca T": "(?:total\s*)?calcium|ca(?!\s*i)",
   "Mg": "mg|magnesium", "Po4": "po4|phos(?:phate|phorus)?", "Alb": "alb(?:umin)?",
-  "Alt": "alt|sgpt", "Ast": "ast|sgot", "Bil D": "(?:direct|conj(?:ugated)?)\\s*bil(?:irubin)?|bil\\.?\\s*d",
-  "Bil T": "(?:total\\s*)?bilirubin|t\\.?\\s*bil|bil\\.?\\s*t",
+  "Alt": "alt|sgpt", "Ast": "ast|sgot", "Bil D": "(?:direct|conj(?:ugated)?)\s*bil(?:irubin)?|bil\.?\s*d",
+  "Bil T": "(?:total\s*)?bilirubin|t\.?\s*bil|bil\.?\s*t",
   "INR": "inr", "PT": "pt(?!t)", "PTT": "a?ptt", "CRP": "crp", "Tgen": "troponin|trop|tgen|hs-?tni|hs-?tnt"
 };
 const LCONV = {
@@ -1601,7 +1538,7 @@ const ABXL = [
   ["colistin", "Colistin"], ["amikacin", "Amikacin"], ["gentamicin", "Gentamicin"],
   ["azithromycin", "Azithromycin"], ["levofloxacin", "Levofloxacin"], ["ciprofloxacin", "Ciprofloxacin"],
   ["metronidazole", "Metronidazole"], ["clindamycin", "Clindamycin"],
-  ["augmentin|amoxicillin[- ]clav\\w*", "Amoxicillin-clavulanate"], ["ampicillin", "Ampicillin"],
+  ["augmentin|amoxicillin[- ]clav\w*", "Amoxicillin-clavulanate"], ["ampicillin", "Ampicillin"],
   ["imipenem", "Imipenem"], ["tigecycline", "Tigecycline"], ["fluconazole", "Fluconazole"],
   ["caspofungin|micafungin", "Echinocandin"], ["acyclovir", "Acyclovir"],
   ["doxycycline", "Doxycycline"], ["cotrimoxazole|bactrim", "Co-trimoxazole"]
@@ -1615,99 +1552,129 @@ const ACL = [
 ];
 const PRL = [
   ["norepinephrine|noradrenaline|noradrenalin|levophed", "Norepinephrine (Noradrenaline)"],
-  ["\\bepinephrine|\\badrenaline", "Epinephrine (Adrenaline)"], ["vasopressin", "Vasopressin"],
+  ["\bepinephrine|\badrenaline", "Epinephrine (Adrenaline)"], ["vasopressin", "Vasopressin"],
   ["dobutamine", "Dobutamine"], ["dopamine", "Dopamine"], ["phenylephrine", "Phenylephrine"], ["milrinone", "Milrinone"]
 ];
 const LNL = [
-  [/central (?:venous )?(?:line|catheter)|\bCVC\b|\bCVL\b/i, "CVC"],
-  [/arterial line|\ba-?line\b/i, "Arterial line"],
+  [/central (?:venous )?(?:line|catheter)| CVC | CVL /i, "CVC"],
+  [/arterial line| a-?line /i, "Arterial line"],
   [/dialysis catheter|permcath/i, "Dialysis catheter"],
-  [/foley|urinary catheter|\bIDC\b/i, "Urinary catheter"],
-  [/\bETT\b|endotracheal tube/i, "ETT"],
+  [/foley|urinary catheter| IDC /i, "Urinary catheter"],
+  [/ ETT |endotracheal tube/i, "ETT"],
   [/tracheostomy/i, "Tracheostomy"],
-  [/\bNGT\b|\bOGT\b|nasogastric|orogastric|\bng tube\b/i, "NG/OG tube"],
+  [/ NGT | OGT |nasogastric|orogastric| ng tube /i, "NG/OG tube"],
   [/chest drain|chest tube/i, "Chest drain"]
 ];
-const ORGX = /(klebsiella(?:\s+pneumoniae)?|e\.?\s*coli|escherichia\s+coli|pseudomonas(?:\s+aeruginosa)?|acinetobacter(?:\s+baumannii)?|\bmrsa\b|staph(?:ylococcus)?\s+aureus|enterococcus(?:\s+faecalis|\s+faecium)?|\bvre\b|streptococcus\s+\w+|candida(?:\s+\w+)?|enterobacter|proteus|stenotrophomonas|serratia|citrobacter)/i;
+const ORGX = /(klebsiella(?:\s+pneumoniae)?|e\.?\s*coli|escherichia\s+coli|pseudomonas(?:\s+aeruginosa)?|acinetobacter(?:\s+baumannii)?| mrsa |staph(?:ylococcus)?\s+aureus|enterococcus(?:\s+faecalis|\s+faecium)?| vre |streptococcus\s+\w+|candida(?:\s+\w+)?|enterobacter|proteus|stenotrophomonas|serratia|citrobacter)/i;
 const SPEC = [
-  [/blood cult(?:ure)?s?|blood cx|\bBC\b/i, "Blood"], [/sputum/i, "Sputum"],
-  [/tracheal aspirate/i, "Tracheal aspirate"], [/\bBAL\b|bronchoalveolar/i, "BAL"],
+  [/blood cult(?:ure)?s?|blood cx| BC /i, "Blood"], [/sputum/i, "Sputum"],
+  [/tracheal aspirate/i, "Tracheal aspirate"], [/ BAL |bronchoalveolar/i, "BAL"],
   [/urine cult(?:ure)?|urine cx/i, "Urine"], [/wound swab/i, "Wound swab"],
-  [/\bCSF\b/i, "CSF"], [/catheter tip/i, "Catheter tip"]
+  [/ CSF /i, "CSF"], [/catheter tip/i, "Catheter tip"]
 ];
 
 function parseCase(src) {
-  const T = String(src || "").replace(/\r/g, "").replace(/[–—]/g, "-"), I = [];
+  const T = String(src || "").replace(/
+/g, "").replace(/[–—]/g, "-"), I = [];
   const num = (re, t = T) => { const m = t.match(re); return m ? parseFloat(m[1]) : null; };
   const add = (label, fields = [], apply = null) => I.push({ label, fields, apply });
   const pick = (a, t = T) => { for (const [re, v] of a) if (re.test(t)) return v; return null; };
 
-  const age = num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b/i) ?? num(/\bage\s*[:=]?\s*(\d{1,3})\b/i);
-  if (age > 0 && age < 120) add("Age " + age + " y", [["age", String(age)]]);
+  /* 1. Patient name & bed name */
+  const bedM = T.match(/ bed\s*[:#-]?\s*([A-Za-z0-9-]+)/i);
+  const nameM = T.match(/(?:patient\s*name|pt\s*name|patient|pt|name)\s*[:\-]\s*([A-Za-z][A-Za-z .'-]{1,40}?)(?=\s*(?:,|
+|\d{1,3}\s*(?:y\/o|yo|yrs?|years?)| (?:male|female|[MF]) | (?:age|sex|gender|dx|diagnosis|pmh|hpi|bp|hr|temp|abg|exam) |$))/i);
+  const parsedBed = bedM ? "Bed " + bedM[1].trim() : "";
+  const parsedName = nameM ? nameM[1].trim().replace(/[,.-]+$/, "") : "";
+  const combinedBed = [parsedBed, parsedName].filter(Boolean).join(" - ");
+  if (combinedBed) {
+    add("Bed / Name -> " + combinedBed, [], (p, over) => {
+      if (over || !p.bed || /^Bed \d+$/i.test(p.bed)) p.bed = combinedBed;
+    });
+  }
 
-  let sx = (T.match(/\b(male|female|woman|man)\b/i) || [])[1];
+  /* 2. Age -> specific box */
+  const age = num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)? /i) ?? num(/ age\s*[:=]?\s*(\d{1,3}) /i);
+  if (age > 0 && age < 120) add("Age -> " + age + " y", [["age", String(age)]]);
+
+  /* 3. Gender -> specific box */
+  let sx = (T.match(/ (?:gender|sex)\s*[:=]?\s*(male|female|woman|man|[MF]) /i) || T.match(/ (male|female|woman|man) /i) || [])[1];
   if (!sx) {
-    const m = T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF])\b/);
+    const m = T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF]) /);
     sx = m && (m[1].toUpperCase() === "M" ? "male" : "female");
   }
   if (sx) {
-    sx = /^(male|man)$/i.test(sx) ? "male" : "female";
-    add("Sex: " + sx, [["ventSex", sx]]);
+    sx = /^(male|man|m)$/i.test(sx) ? "male" : "female";
+    add("Gender -> " + sx, [["ventSex", sx]]);
   }
 
-  const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg\b/i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm\b/i);
-  if (wt > 30 && wt < 300) add("Weight " + wt + " kg", [["weight", String(wt)]]);
-  if (ht > 100 && ht < 230) add("Height " + ht + " cm", [["heightCm", String(ht)]]);
+  const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg /i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm /i);
+  if (wt > 30 && wt < 300) add("Weight -> " + wt + " kg", [["weight", String(wt)]]);
+  if (ht > 100 && ht < 230) add("Height -> " + ht + " cm", [["heightCm", String(ht)]]);
 
-  let m = T.match(/(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)\s*[:\-]\s*([^\n]+)/i);
-  if (m) add("Diagnosis: " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
+  let m = T.match(/(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Diagnosis -> " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
   else {
-    const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
-    const afterDemo = firstLine.replace(/^(?:bed\s*\w+\s*[:\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
-    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 140 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
-      add("Diagnosis (from summary): " + afterDemo.slice(0, 60), [["diagnosis", afterDemo]]);
+    const firstLine = (T.split("
+").map(x => x.trim()).find(Boolean) || "");
+    const afterDemo = firstLine.replace(/^(?:(?:bed|pt|patient|name)\s*[:#-]?\s*[A-Za-z0-9 .'-]+\s*[,;-]?\s*)*\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
+    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 140 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc) /i.test(afterDemo)) {
+      add("Diagnosis -> " + afterDemo.slice(0, 60), [["diagnosis", afterDemo]]);
     }
   }
 
-  m = T.match(/(?:past medical history|past history|\bPMH\b|comorbidities|known case of|\bKCO\b)\s*[:\-]?\s*([^\n]+)/i);
-  if (m) add("Past medical history: " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
-  m = T.match(/(?:history of present illness|\bHPI\b|presented with|presenting with|chief complaint|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([^\n]+)/i);
-  if (m) add("History of present illness: " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
-  m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^\n]+)/i);
-  if (m) add("Events: " + m[1].slice(0, 60), [["events", m[1].trim()]]);
-  m = T.match(/admi\w+\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2})/i);
-  if (m) add("Admission " + m[1], [["admissionDate", m[1]]]);
+  m = T.match(/(?:past medical history|past history| PMH |comorbidities|known case of| KCO )\s*[:\-]?\s*([^
+]+)/i);
+  if (m) add("Past history -> " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
+  m = T.match(/(?:history of (?:present )?illness| HPI |presented with|presenting with|chief complaint| c\/o |complaining of|admitted (?:with|for))\s*[:\-]?\s*([^
+]+)/i);
+  if (m) add("HPI -> " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
+  m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Events -> " + m[1].slice(0, 60), [["events", m[1].trim()]]);
+  m = T.match(/(?:admi\w+|DOA)\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/i);
+  if (m) {
+    let dStr = m[1];
+    const dm = dStr.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+    if (dm) {
+      const yr = dm[3].length === 2 ? "20" + dm[3] : dm[3];
+      dStr = `${yr}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
+    }
+    add("Admission -> " + dStr, [["admissionDate", dStr]]);
+  }
 
-  m = T.match(/(?:\bbp\b|blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
-  if (m) add(`BP ${m[1]}/${m[2]}`, [["cardio.vitals.sbp", m[1]], ["cardio.vitals.dbp", m[2]]]);
-  let v = num(/(?:\bhr\b|heart rate|pulse)\s*[:=]?\s*(\d{2,3})/i);
-  if (v > 20 && v < 250) add("HR " + v, [["cardio.vitals.hr", String(v)]]);
-  v = num(/(?:temp(?:erature)?|\bT)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i);
-  if (v >= 95 && v <= 108) add("Temp " + ((v - 32) * 5 / 9).toFixed(1) + " °C", [["temp", String(Math.round((v - 32) * 5 / 9 * 10) / 10)]]);
-  else if (v >= 30 && v <= 43) add("Temp " + v + " °C", [["temp", String(v)]]);
-  v = num(/(?:spo2|spo₂|\bsats?\b|saturation|o2 sat)\s*[:=]?\s*(\d{2,3})/i);
-  if (v >= 50 && v <= 100) add("SpO₂ " + v + "%", [["spo2", String(v)]]);
-  v = num(/\bcvp\s*[:=]?\s*(\d{1,2})/i);
-  if (v !== null && v >= 0 && v < 40) add("CVP " + v, [["cardio.vitals.cvp", String(v)]]);
+  /* 4. Examination & vitals -> specific boxes */
+  m = T.match(/(?: bp |blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
+  if (m) add(`BP -> ${m[1]}/${m[2]}`, [["cardio.vitals.sbp", m[1]], ["cardio.vitals.dbp", m[2]]]);
+  let v = num(/(?: hr |heart rate|pulse)\s*[:=]?\s*(\d{2,3})/i);
+  if (v > 20 && v < 250) add("HR -> " + v, [["cardio.vitals.hr", String(v)]]);
+  v = num(/(?:temp(?:erature)?| T)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i);
+  if (v >= 95 && v <= 108) add("Temp -> " + ((v - 32) * 5 / 9).toFixed(1) + " °C", [["temp", String(Math.round((v - 32) * 5 / 9 * 10) / 10)]]);
+  else if (v >= 30 && v <= 43) add("Temp -> " + v + " °C", [["temp", String(v)]]);
+  v = num(/(?:spo2|spo₂| sats? |saturation|o2 sat)\s*[:=]?\s*(\d{2,3})/i);
+  if (v >= 50 && v <= 100) add("SpO₂ -> " + v + "%", [["spo2", String(v)]]);
+  v = num(/ cvp\s*[:=]?\s*(\d{1,2})/i);
+  if (v !== null && v >= 0 && v < 40) add("CVP -> " + v, [["cardio.vitals.cvp", String(v)]]);
 
   const rh = pick([
-    [/atrial fibrillation|\bAF\b|afib/i, "Atrial fibrillation"],
+    [/atrial fibrillation| AF |afib/i, "Atrial fibrillation"],
     [/atrial flutter/i, "Atrial flutter"],
-    [/\bSVT\b/i, "SVT"],
+    [/ SVT /i, "SVT"],
     [/ventricular tachycardia/i, "VT"],
-    [/sinus rhythm|\bNSR\b/i, "Sinus rhythm"]
+    [/sinus rhythm| NSR /i, "Sinus rhythm"]
   ]);
-  if (rh) add("Rhythm: " + rh, [["cardio.vitals.rhythm", rh]]);
+  if (rh) add("Rhythm -> " + rh, [["cardio.vitals.rhythm", rh]]);
 
-  const vent = /intubat|ventilat|\bETT\b|\bPEEP\b|\bSIMV\b|\bPSV\b/i.test(T);
-  const rs = vent && /intubat|mechanically ventilated|on ventilator|invasive ventilation|\bETT\b/i.test(T)
+  const vent = /intubat|ventilat| ETT | PEEP | SIMV | PSV /i.test(T);
+  const rs = vent && /intubat|mechanically ventilated|on ventilator|invasive ventilation| ETT /i.test(T)
     ? "Ventilator"
     : pick([
-        [/\bHFNC\b|high[- ]flow|\bNIV\b|\bBiPAP\b/i, "HFNC / NIV"],
-        [/nasal cannula|face ?mask|\bNRB\b|non[- ]rebreather|venturi/i, "Oxygen (nasal cannula / mask)"],
-        [/room air|\bon RA\b/i, "Room air"]
+        [/ HFNC |high[- ]flow| NIV | BiPAP /i, "HFNC / NIV"],
+        [/nasal cannula|face ?mask| NRB |non[- ]rebreather|venturi/i, "Oxygen (nasal cannula / mask)"],
+        [/room air| on RA /i, "Room air"]
       ]);
-  if (rs) add("Respiratory support: " + rs, [["respSupport", rs]]);
+  if (rs) add("Resp support -> " + rs, [["respSupport", rs]]);
 
   const bs = pick([
     [/wheez/i, "Wheeze"], [/crackles|crepitations|crepts/i, "Crackles"],
@@ -1716,56 +1683,64 @@ function parseCase(src) {
     [/absent breath sounds|no air entry/i, "Absent breath sounds"],
     [/clear chest|vesicular|bilateral equal air entry|normal breath sounds/i, "Normal vesicular"]
   ]);
-  if (bs) add("Breath sounds: " + bs, [["breathSounds", bs]]);
+  if (bs) add("Breath sounds -> " + bs, [["breathSounds", bs]]);
+
+  m = T.match(/(?:auscultation|chest exam)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Auscultation -> " + m[1].slice(0, 50), [["ausc", m[1].trim()]]);
+  m = T.match(/(?:resp(?:iratory)? exam(?:ination)?|chest)\s*[:\-]\s*([^
+]+)/i);
+  if (m && !/ct\s*chest/i.test(m[1])) add("Resp exam -> " + m[1].slice(0, 50), [["resp", m[1].trim()]]);
 
   if (vent) {
     const md = pick([
-      [/\bSIMV[- ]?PC\b/i, "SIMV-PC"], [/\bSIMV\b/i, "SIMV-VC"], [/\bPSV\b|pressure support/i, "PSV"],
-      [/\bCPAP\b/i, "CPAP"], [/\bAPRV\b/i, "APRV"],
-      [/\bPC(?:V)?\b|pressure control/i, "PC"], [/\bVC(?:V)?\b|volume control/i, "VC"]
+      [/ SIMV[- ]?PC /i, "SIMV-PC"], [/ SIMV /i, "SIMV-VC"], [/ PSV |pressure support/i, "PSV"],
+      [/ CPAP /i, "CPAP"], [/ APRV /i, "APRV"],
+      [/ PC(?:V)? |pressure control/i, "PC"], [/ VC(?:V)? |volume control/i, "VC"]
     ]);
-    if (md) add("Vent mode " + md, [["ventMode", md]]);
+    if (md) add("Vent mode -> " + md, [["ventMode", md]]);
     const S = (label, key, re, lo, hi) => {
       const x = num(re);
-      if (x !== null && x >= lo && x <= hi) add(label + " " + x, [[key, String(x)]]);
+      if (x !== null && x >= lo && x <= hi) add(label + " -> " + x, [[key, String(x)]]);
     };
-    S("VT", "setVT", /(?:\bVT|tidal volume)\s*[:=]?\s*(\d{3})\b/i, 150, 1000);
-    S("PEEP", "setPEEP", /\bpeep\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
-    S("Set RR", "ventRate", /\b(?:set\s*)?RR\s*[:=]?\s*(\d{1,2})\b/i, 6, 40);
+    S("VT", "setVT", /(?: VT|tidal volume)\s*[:=]?\s*(\d{3}) /i, 150, 1000);
+    S("PEEP", "setPEEP", / peep\s*[:=]?\s*(\d{1,2}) /i, 0, 30);
+    S("Set RR", "ventRate", / (?:set\s*)?RR\s*[:=]?\s*(\d{1,2}) /i, 6, 40);
     S("Pplat", "plateauPressure", /(?:pplat|plateau(?: pressure)?)\s*[:=]?\s*(\d{1,2})/i, 5, 60);
-    S("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?|\bPIP\b)\s*[:=]?\s*(\d{1,2})/i, 5, 80);
-    S("Pressure support", "pressureSupport", /(?:\bPS|pressure support)\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
-    m = T.match(/\bI\s*:\s*E\s*[:=]?\s*(1\s*:\s*\d+(?:\.\d)?)/i);
-    if (m) add("I:E " + m[1].replace(/\s+/g, ""), [["ieRatio", m[1].replace(/\s+/g, "")]]);
+    S("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?| PIP )\s*[:=]?\s*(\d{1,2})/i, 5, 80);
+    S("Pressure support", "pressureSupport", /(?: PS|pressure support)\s*[:=]?\s*(\d{1,2}) /i, 0, 30);
+    m = T.match(/ I\s*:\s*E\s*[:=]?\s*(1\s*:\s*\d+(?:\.\d)?)/i);
+    if (m) add("I:E -> " + m[1].replace(/\s+/g, ""), [["ieRatio", m[1].replace(/\s+/g, "")]]);
   }
 
   let f2 = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
   if (f2 > 0) {
     if (f2 <= 1) f2 *= 100;
-    if (f2 >= 21 && f2 <= 100) add("FiO₂ " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
+    if (f2 >= 21 && f2 <= 100) add("FiO₂ -> " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
   }
 
+  /* 5. ABG -> specific ABG area */
   const A = (label, key, re, lo, hi) => {
     const x = num(re);
-    if (x !== null && x >= lo && x <= hi) add(label + " " + x, [["investigations.abg." + key, String(x)]]);
+    if (x !== null && x >= lo && x <= hi) add("ABG " + label + " -> " + x, [["investigations.abg." + key, String(x)]]);
   };
-  A("pH", "pH", /\bpH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
+  A("pH", "pH", / pH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
   A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 10, 150);
   A("HCO₃⁻", "HCO3", /hco3-?\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
   A("PaO₂", "PaO2", /(?:^|[^a-z])(?:pao2|po2|pao₂|po₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 20, 600);
   A("Lactate", "Lactate", /lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
-  A("Cl⁻", "Cl", /\bcl-?\s*[:=]?\s*(\d{2,3})\b/i, 70, 140);
+  A("Cl⁻", "Cl", / cl-?\s*[:=]?\s*(\d{2,3}) /i, 70, 140);
 
   const today = new Date().toISOString().slice(0, 10);
-  const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu)\b(?!\/\s*d?l\b)/gi, " ");
+  const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu) (?!\/\s*d?l )/gi, " ");
   for (const [name, pat] of Object.entries(LABPAT)) {
-    const mm = cleanedLabs.match(new RegExp("(?:^|[^a-z])(?:" + pat + ")(?:\\s*[:=]?\\s*)(\\d+(?:\\.\\d+)?)", "i"));
+    const mm = cleanedLabs.match(new RegExp("(?:^|[^a-z])(?:" + pat + ")(?:\s*[:=]?\s*)(\d+(?:\.\d+)?)", "i"));
     if (!mm) continue;
     let x = parseFloat(mm[1]), note = "";
     const cv = LCONV[name] && LCONV[name](x);
     if (cv) { x = Math.round(cv[0] * 100) / 100; note = " (" + cv[1] + ")"; }
     const value = x;
-    add(`${name} ${x}${note}`, [], (p, over) => {
+    add(`${name} -> ${x}${note}`, [], (p, over) => {
       const r = p.investigations.laboratory.find(q => q.name === name);
       if (r && (over || String(r.result).trim() === "")) {
         r.result = String(value);
@@ -1789,127 +1764,173 @@ function parseCase(src) {
   }
 
   v = num(/(?:pct|procalcitonin)\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
-  if (v > 0) add("Procalcitonin " + v, [["sepsisM.Procalcitonin elevated", true], ["sepsisMarkerValues.0", String(v)]]);
+  if (v > 0) add("Procalcitonin -> " + v, [["sepsisM.Procalcitonin elevated", true], ["sepsisMarkerValues.0", String(v)]]);
 
+  /* CNS & Sedation examination boxes */
   m = T.match(/E\s*([1-4])\s*[,\/ ]?\s*V\s*([1-5])\s*[,\/ ]?\s*M\s*([1-6])/i);
-  if (m) add(`GCS E${m[1]} V${m[2]} M${m[3]}`, [["scores.gcsE", m[1]], ["scores.gcsV", m[2]], ["scores.gcsM", m[3]]]);
+  if (m) add(`GCS -> E${m[1]} V${m[2]} M${m[3]}`, [["scores.gcsE", m[1]], ["scores.gcsV", m[2]], ["scores.gcsM", m[3]]]);
   else {
-    v = num(/GCS\s*[:=\/]?\s*(\d{1,2})\b/i);
-    if (v >= 3 && v <= 15) add("GCS " + v + " (total only)", [["cns", "GCS " + v]]);
+    v = num(/GCS\s*[:=\/]?\s*(\d{1,2}) /i);
+    if (v >= 3 && v <= 15) add("GCS -> " + v + " (CNS notes)", [["cns", "GCS " + v]]);
   }
   v = num(/RASS\s*[:=]?\s*([+-]?\d)/i);
-  if (v !== null && v >= -5 && v <= 4) add("RASS " + v, [["scores.rass", String(v)]]);
+  if (v !== null && v >= -5 && v <= 4) add("RASS -> " + v, [["scores.rass", String(v)]]);
 
   const sed = [
     [/propofol/i, "Propofol"], [/midazolam/i, "Midazolam"],
     [/dexmedetomidine|precedex/i, "Dexmedetomidine"], [/ketamine/i, "Ketamine"]
   ].filter(([r]) => r.test(T)).map(x => x[1]);
-  if (sed.length) add("Sedation: " + sed.join(" + "), [["sedation", sed.length > 1 ? "Other / combination" : sed[0]]]);
+  if (sed.length) add("Sedation -> " + sed.join(" + "), [["sedation", sed.length > 1 ? "Other / combination" : sed[0]]]);
 
   const pu = /pupils?|perr?l/i.test(T) ? pick([
     [/fixed.{0,15}dilated|dilated.{0,15}fixed/i, "Fixed and dilated"],
     [/pinpoint/i, "Pinpoint"], [/unequal|anisocoria/i, "Unequal"],
-    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l/i, "Equal and reactive"]
+    [/sluggish/i, "Equal, sluggish"], [/equal| perr?l/i, "Equal and reactive"]
   ]) : null;
-  if (pu) add("Pupils: " + pu, [["pupils", pu]]);
+  if (pu) add("Pupils -> " + pu, [["pupils", pu]]);
 
   const sz = pick([
     [/status epilepticus/i, "Status epilepticus"],
     [/(?:no|nil|denies)\s+(?:\w+\s)?seizures?/i, "None"],
     [/seizure/i, "Seizure in last 24 h"]
   ]);
-  if (sz) add("Seizures: " + sz, [["seizures", sz]]);
+  if (sz) add("Seizures -> " + sz, [["seizures", sz]]);
 
+  m = T.match(/(?:cns|neuro(?:logical)?)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("CNS exam -> " + m[1].slice(0, 50), [["cns", m[1].trim()]]);
+
+  /* Radiology */
   const rad = (name, re) => {
     const mm = T.match(re);
-    if (mm) add(`${name}: ${mm[1].slice(0, 60)}`, [], (p, over) => {
+    if (mm) add(`${name} -> ${mm[1].slice(0, 60)}`, [], (p, over) => {
       let r = p.investigations.radiology.find(q => q.name.toLowerCase() === name.toLowerCase());
       if (!r) { r = { name, date: today, result: "" }; p.investigations.radiology.push(r); }
       if (over || !r.result) { r.result = mm[1].trim(); if (!r.date) r.date = today; }
     });
   };
-  rad("CT brain", /ct\s*(?:brain|head)\s*[:\-]\s*([^\n]+)/i);
-  rad("CT chest", /ct\s*(?:chest|thorax)\s*[:\-]\s*([^\n]+)/i);
-  rad("Echo", /echo(?:cardiogram)?\s*[:\-]\s*([^\n]+)/i);
-  rad("U/S", /(?:u\/s|ultrasound|usg)\s*[:\-]\s*([^\n]+)/i);
-  rad("CXR", /(?:cxr|chest x-?ray)\s*[:\-]\s*([^\n]+)/i);
+  rad("CT brain", /ct\s*(?:brain|head)\s*[:\-]\s*([^
+]+)/i);
+  rad("CT chest", /ct\s*(?:chest|thorax)\s*[:\-]\s*([^
+]+)/i);
+  rad("Echo", /echo(?:cardiogram)?\s*[:\-]\s*([^
+]+)/i);
+  rad("U/S", /(?:u\/s|ultrasound|usg)\s*[:\-]\s*([^
+]+)/i);
+  rad("CXR", /(?:cxr|chest x-?ray)\s*[:\-]\s*([^
+]+)/i);
 
-  v = num(/\b(?:lv)?ef\s*[:=]?\s*(\d{2})\s*%/i);
-  if (v >= 5 && v <= 80) add("LVEF " + v + "%", [["cardio.echo.ef", String(v)], ["cardio.echo.enabled", true]]);
+  v = num(/ (?:lv)?ef\s*[:=]?\s*(\d{2})\s*%/i);
+  if (v >= 5 && v <= 80) add("LVEF -> " + v + "%", [["cardio.echo.ef", String(v)], ["cardio.echo.enabled", true]]);
 
+  /* Abdomen & Extremities examination boxes */
   const abdomen = pick([
     [/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"],
-    [/^(?![\s\S]*non[- ]tender)[\s\S]*\btender/i, "Tender"],
+    [/^(?![\s\S]*non[- ]tender)[\s\S]* tender/i, "Tender"],
     [/distend|distension/i, "Distended"], [/soft and lax|soft abdomen/i, "Soft and lax"]
   ]);
-  if (abdomen) add("Abdomen: " + abdomen, [["palpation", abdomen]]);
+  if (abdomen) add("Abdomen palpation -> " + abdomen, [["palpation", abdomen]]);
+
+  const bsAb = pick([
+    [/absent bowel sounds|no bowel sounds/i, "Absent"],
+    [/hypoactive bowel sounds|sluggish bowel sounds/i, "Hypoactive"],
+    [/hyperactive bowel sounds/i, "Hyperactive"],
+    [/normal bowel sounds|bowel sounds present| \+ve\s*BS /i, "Present"]
+  ]);
+  if (bsAb) add("Bowel sounds -> " + bsAb, [["bowelSounds", bsAb]]);
+
+  const rbsVal = num(/ (?:rbs|blood glucose|bg)\s*[:=]?\s*(\d{2,3}) /i);
+  if (rbsVal > 20 && rbsVal < 900) add("RBS -> " + rbsVal, [["rbs", String(rbsVal)]]);
+
+  m = T.match(/(?:abdomen|abd)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Abdomen notes -> " + m[1].slice(0, 50), [["abdNotes", m[1].trim()]]);
 
   const ext = pick([
     [/anasarca|generalized edema/i, "Generalized (anasarca)"],
     [/severe edema/i, "Severe pitting"], [/moderate edema/i, "Moderate pitting"],
     [/mild edema|pedal edema/i, "Mild pitting"], [/no edema|without edema/i, "None"]
   ]);
-  if (ext) add("Edema: " + ext, [["edema", ext]]);
+  if (ext) add("Edema -> " + ext, [["edema", ext]]);
 
+  m = T.match(/(?:extremities|limbs)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Extremities notes -> " + m[1].slice(0, 50), [["extNotes", m[1].trim()]]);
+
+  /* Antibiotics with dose, route, frequency & indication/cause */
   for (const [re, drug] of ABXL) {
-    const am = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n.;,]*)", "i"));
+    const am = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
     if (!am) continue;
     const tail = am[1] || "";
-    const dm = tail.match(/\b(\d+(?:\.\d+)?\s*(?:g|mg|mcg|units?|iu))\b/i);
-    const rm = tail.match(/\b(IV|PO|IM|SC|inhaled)\b/i);
-    const fm = tail.match(/\b(q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|stat)\b/i);
+    const dm = tail.match(/ (\d+(?:\.\d+)?\s*(?:g|mg|mcg|units?|iu)) /i);
+    const rm = tail.match(/ (IV|PO|IM|SC|inhaled) /i);
+    const fm = tail.match(/ (q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|stat) /i);
+    const im = tail.match(/(?:for|indication|cause|source)\s+([A-Za-z0-9 /-]+)/i);
     const dose = dm ? dm[1] : "", route = rm ? rm[1].toUpperCase() : "", frequency = fm ? fm[1] : "";
-    add(`Antibiotic: ${drug}${dose ? " " + dose : ""}${frequency ? " " + frequency : ""}`, [], p => {
+    const indication = im ? im[1].trim() : "";
+    add(`Antibiotic -> ${drug}${dose ? " " + dose : ""}${frequency ? " " + frequency : ""}`, [], p => {
       if (!p.abx.some(x => (x.drug || "").toLowerCase() === drug.toLowerCase())) {
-        p.abx.push({ drug, dose, route, frequency, date: today, indication: "", note: "", editing: false });
+        p.abx.push({ drug, dose, route, frequency, date: today, indication, note: "", editing: false });
       }
     });
   }
 
-  for (const [re, drug] of ACL) if (new RegExp(re, "i").test(T)) add("Anticoagulant: " + drug, [], p => {
-    p.acType = "Pharmacological";
-    if (!p.anticoag.some(x => x.drug === drug)) {
-      p.anticoag.push({ drug, dose: "", route: "", frequency: "", date: today, indication: "", editing: false });
-    }
-  });
+  /* Anticoagulation */
+  for (const [re, drug] of ACL) {
+    const acm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
+    if (!acm) continue;
+    const tail = acm[1] || "";
+    const dm = tail.match(/ (\d+(?:\.\d+)?\s*(?:mg|units?|iu)) /i);
+    const rm = tail.match(/ (SC|IV|PO) /i);
+    const fm = tail.match(/ (OD|BD|q12h|q24h|daily|twice daily) /i);
+    add("Anticoagulant -> " + drug, [], p => {
+      p.acType = "Pharmacological";
+      if (!p.anticoag.some(x => x.drug === drug)) {
+        p.anticoag.push({ drug, dose: dm ? dm[1] : "", route: rm ? rm[1].toUpperCase() : "", frequency: fm ? fm[1] : "", date: today, indication: "", editing: false });
+      }
+    });
+  }
 
+  /* Vasopressors */
   for (const [re, drug] of PRL) {
-    const pm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n.;,]*)", "i"));
+    const pm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
     if (!pm) continue;
     const tail = pm[1] || "";
     const dm = tail.match(/(\d+(?:\.\d+)?)\s*(mcg\/kg\/min|mcg\/min|mg\/hr|mcg\/hr|units\/min|units\/hr)?/i);
     const dose = dm ? dm[1] : "";
     const unit = dm && dm[2] ? dm[2].toLowerCase() : "mcg/kg/min";
-    add(`Vasoactive: ${drug}${dose ? " " + dose + " " + unit : ""}`, [], p => {
+    add(`Vasoactive -> ${drug}${dose ? " " + dose + " " + unit : ""}`, [], p => {
       if (!p.cardio.vasoactive.some(x => x.drug === drug)) {
         p.cardio.vasoactive.push({ drug, dose, unit, trend: "Stable", targetMap: "", response: "" });
       }
     });
   }
 
-  for (const [re, type] of LNL) if (re.test(T)) add("Line / tube: " + type, [], p => {
+  for (const [re, type] of LNL) if (re.test(T)) add("Line / tube -> " + type, [], p => {
     if (!p.lines.some(x => x.type === type)) {
       p.lines.push({ type, site: "", size: "", date: today, time: "", note: "", editing: false });
     }
   });
 
   for (const [re, type] of SPEC) {
-    const sm = T.match(new RegExp("(?:^|[^a-z])(" + re.source + ")([^\\n.;]*)", "i"));
+    const sm = T.match(new RegExp("(?:^|[^a-z])(" + re.source + ")([^\n.;]*)", "i"));
     if (!sm) continue;
     const tail = sm[2] || "";
     const om = tail.match(ORGX);
     const organism = om ? om[1].trim() : "";
     const status = organism ? "Growth" : /no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending";
-    add(`Culture: ${type}${organism ? " (" + organism + ")" : ""}`, [], p => {
+    add(`Culture -> ${type}${organism ? " (" + organism + ")" : ""}`, [], p => {
       if (!p.cultures.some(x => x.type === type && x.organism === organism)) {
         p.cultures.push({ type, date: today, status, organism, susceptible: "", editing: false });
       }
     });
   }
 
-  const planMatch = T.match(/(?:^|\n)\s*(?:plan|recommendations?|management)\s*[:\-]\s*([\s\S]+)$/i);
+  const planMatch = T.match(/(?:^|
+)\s*(?:plan|recommendations?|management)\s*[:\-]\s*([\s\S]+)$/i);
   if (planMatch) {
-    const rawItems = planMatch[1].split(/\n+/).map(x => x.replace(/^[-*•\d.)\s]+/, "").trim()).filter(Boolean).slice(0, 10);
+    const rawItems = planMatch[1].split(/
++/).map(x => x.replace(/^[-*•\d.)\s]+/, "").trim()).filter(Boolean).slice(0, 10);
     if (rawItems.length) {
       add(`Plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
         rawItems.forEach(text => {
@@ -2072,158 +2093,177 @@ function delPatient() {
   draw();
 }
 
-/* ---------- Refined SBAR Handout ---------- */
+/* ---------- SBAR Handover in Exact Requested Order ---------- */
 function sbarText(p) {
   ensure(p);
   const c = p.cardio, v = c.vitals, k = cardioCalc(v), pf = pfOf(p), g = scoreCalc(p), s = p.scores || {};
-  const inn = parseFloat(p.fluidIn), out = parseFloat(p.fluidOut), w = parseFloat(p.weight), dur = parseFloat(p.duration);
-  const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
-  const uop = w > 0 && dur > 0 && out >= 0 ? out / (w * dur) : null;
   const icuDay = dayN(p.admissionDate);
 
-  const demo = [
-    p.age && `${p.age}y`,
-    p.ventSex,
-    icuDay > 0 ? `ICU Day ${icuDay} (Adm ${p.admissionDate})` : (p.admissionDate && `Adm ${p.admissionDate}`),
-    p.weight && `${p.weight} kg`
+  const headerBits = [
+    p.bed || "Bed",
+    p.age ? `${p.age}y` : "",
+    p.ventSex || "",
+    p.admissionDate ? `Admission: ${p.admissionDate}${icuDay > 0 ? " (Day " + icuDay + ")" : ""}` : ""
+  ].filter(Boolean).join(" | ");
+
+  const vitalsStr = [
+    (v.sbp || v.dbp) && `BP ${v.sbp || "?"}/${v.dbp || "?"}`,
+    k.map !== null && `MAP ${k.map.toFixed(0)}`,
+    v.hr && `HR ${v.hr}`,
+    p.temp && `Temp ${p.temp}°C`,
+    p.spo2 && `SpO₂ ${p.spo2}%`,
+    v.cvp && `CVP ${v.cvp}`,
+    v.rhythm
   ].filter(Boolean).join(" · ");
 
-  const abnLabs = p.investigations.laboratory
-    .map(it => {
-      const f = labFlag(it, p);
-      if (f[1] === "hi" || f[1] === "lo") return `${it.name} ${it.result}${f[1] === "hi" ? "↑" : "↓"}`;
-      if (String(it.result).trim() !== "" && ["creat", "urea", "na", "k", "hb", "plts", "wbc", "crp", "inr"].includes(it.name.trim().toLowerCase())) {
-        return `${it.name} ${it.result}`;
-      }
-      return "";
-    })
-    .filter(Boolean);
+  const activePressors = c.vasoactive
+    .filter(x => x.trend !== "Stopped" && x.drug)
+    .map(x => `${x.drug}${x.dose ? " " + x.dose + " " + (x.unit || "") : ""}`);
+
+  const examParts = [
+    vitalsStr && `Vital signs: ${vitalsStr}`,
+    (g.gcs !== null || s.rass || p.sedation || p.pupils || p.seizures || p.cns) && `CNS: ${[
+      g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,
+      s.rass && `RASS ${s.rass}`,
+      p.sedation && p.sedation !== "None" && `Sedation ${p.sedation}`,
+      p.pupils && `Pupils ${p.pupils}`,
+      p.seizures && p.seizures !== "None" && p.seizures,
+      p.cns
+    ].filter(Boolean).join(", ")}`,
+    (activePressors.length || p.cv) && `CVS: ${[activePressors.join(", "), p.cv].filter(Boolean).join(" · ")}`,
+    (p.respSupport || p.breathSounds || p.ventMode || p.ausc || p.resp || pf !== null) && `Resp: ${[
+      p.respSupport,
+      p.breathSounds,
+      p.ventMode && `${p.ventMode}${p.setVT ? " VT " + p.setVT : ""}${p.setPEEP ? " PEEP " + p.setPEEP : ""}${p.fio2Percent ? " FiO₂ " + p.fio2Percent + "%" : ""}`,
+      pf !== null && `P/F ${pf.toFixed(0)}`,
+      p.ausc,
+      p.resp
+    ].filter(Boolean).join(" · ")}`,
+    (p.palpation || p.bowelSounds || p.feeding || p.stool || p.rbs || p.abdNotes) && `Abdomen: ${[
+      p.palpation,
+      p.bowelSounds && `BS ${p.bowelSounds}`,
+      p.feeding,
+      p.stool,
+      p.rbs && `RBS ${p.rbs}`,
+      p.abdNotes
+    ].filter(Boolean).join(" · ")}`,
+    (p.edema || p.pulses || p.capRefill || p.limbTemp || p.dvtSigns || p.skin || p.extNotes) && `Extremities: ${[
+      p.edema && `Edema ${p.edema}`,
+      p.pulses && `Pulses ${p.pulses}`,
+      p.capRefill && `Cap refill ${p.capRefill}`,
+      p.limbTemp && `Temp ${p.limbTemp}`,
+      p.dvtSigns === "Yes" && "DVT signs +",
+      p.skin,
+      p.extNotes
+    ].filter(Boolean).join(" · ")}`
+  ].filter(Boolean);
+
+  const radItems = p.investigations.radiology
+    .filter(r => r.result || r.date)
+    .map(r => `${r.name}${r.date ? " (" + r.date + ")" : ""}: ${r.result || "done"}`);
 
   const a = p.investigations.abg;
-  const abgParts = [
+  const abgBits = [
     a.pH && `pH ${a.pH}`,
     a.PaCO2 && `PaCO₂ ${a.PaCO2}`,
     a.HCO3 && `HCO₃⁻ ${a.HCO3}`,
     a.PaO2 && `PaO₂ ${a.PaO2}`,
-    a.Lactate && `Lac ${a.Lactate}`
+    a.Lactate && `Lactate ${a.Lactate}`
   ].filter(Boolean);
 
-  const activePressors = c.vasoactive
-    .filter(x => x.trend !== "Stopped" && x.drug)
-    .map(x => `${x.drug}${x.dose ? " " + x.dose + " " + (x.unit || "") : ""}${x.trend ? " (" + x.trend.toLowerCase() + ")" : ""}`);
-
-  const activeAbx = p.abx
-    .filter(x => x.drug)
-    .map(x => {
-      const d = dayN(x.date);
-      return `${x.drug}${x.dose ? " " + x.dose : ""}${x.frequency ? " " + x.frequency : ""}${d ? " [D" + d + "]" : ""}`;
+  const labBits = p.investigations.laboratory
+    .filter(it => String(it.result).trim() !== "")
+    .map(it => {
+      const f = labFlag(it, p);
+      const flag = f[1] === "hi" ? "↑" : f[1] === "lo" ? "↓" : "";
+      return `${it.name} ${it.result}${flag}${it.unit ? " " + it.unit : ""}`;
     });
 
-  const posCultures = p.cultures
-    .filter(x => x.organism || x.status === "Pending")
-    .map(x => `${x.type || "Culture"}: ${x.organism || x.status}${x.susceptible ? " (S: " + x.susceptible + ")" : ""}`);
+  const labLines = [];
+  if (labBits.length) labLines.push(labBits.join(", "));
+  if (abgBits.length) labLines.push(`ABG: ${abgBits.join(" · ")}`);
+  if (p.labs) labLines.push(p.labs);
 
-  const lineList = p.lines
-    .filter(x => x.type)
+  const abxLines = (p.abx || [])
+    .filter(x => x.drug || x.date || x.dose || x.indication)
     .map(x => {
-      const d = dayN(x.date);
-      return `${x.type}${x.site ? " (" + x.site + ")" : ""}${d ? " D" + d : ""}`;
+      const meta = [
+        x.date && `Start: ${x.date}`,
+        [x.dose, x.route, x.frequency].filter(Boolean).join(" ") && `Dose: ${[x.dose, x.route, x.frequency].filter(Boolean).join(" ")}`,
+        x.indication && `Cause: ${x.indication}`
+      ].filter(Boolean).join(" | ");
+      return `  - ${x.drug || "Antibiotic"}${meta ? " (" + meta + ")" : ""}`;
     });
 
-  const cnsLine = [
-    g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,
-    s.rass && `RASS ${s.rass}`,
-    p.sedation && p.sedation !== "None" && `Sedation: ${p.sedation}`,
-    p.pupils && `Pupils: ${p.pupils}`,
-    p.seizures && p.seizures !== "None" && p.seizures,
-    p.cns
-  ].filter(Boolean).join(" | ");
+  const acLines = p.acType === "Pharmacological"
+    ? (p.anticoag || []).map(x => {
+        const meta = [
+          x.date && `Start: ${x.date}`,
+          [x.dose, x.route, x.frequency].filter(Boolean).join(" "),
+          x.indication
+        ].filter(Boolean).join(" | ");
+        return `  - ${x.drug || "Anticoagulant"}${meta ? " (" + meta + ")" : ""}`;
+      })
+    : p.acType === "Mechanical"
+      ? [`  - Mechanical (${p.acMech || "unspecified"})`]
+      : [];
 
-  const cvLine = [
-    (v.sbp || v.dbp) && `BP ${v.sbp || "?"}/${v.dbp || "?"}`,
-    k.map !== null && `MAP ${k.map.toFixed(0)} (target ${v.targetMap || 65})`,
-    v.hr && `HR ${v.hr}`,
-    v.rhythm,
-    v.cvp && `CVP ${v.cvp}`,
-    k.si !== null && k.si >= 0.9 && `SI ${k.si.toFixed(2)}`,
-    activePressors.length && `Infusions: ${activePressors.join(", ")}`
-  ].filter(Boolean).join(" | ");
+  const otherMedLines = (p.meds || [])
+    .filter(m => m.drug || m.dose || m.route || m.frequency || m.indication)
+    .map(m => {
+      const meta = [
+        [m.dose, m.route, m.frequency].filter(Boolean).join(" "),
+        m.date && `Start: ${m.date}`,
+        m.indication
+      ].filter(Boolean).join(" | ");
+      return `  - ${m.drug || "Medication"}${meta ? " (" + meta + ")" : ""}`;
+    });
 
-  const respLine = [
-    p.respSupport,
-    p.spo2 && `SpO₂ ${p.spo2}%`,
-    p.breathSounds,
-    p.ventMode && `Mode ${p.ventMode}`,
-    p.setVT && `VT ${p.setVT} mL`,
-    p.ventRate && `RR ${p.ventRate}`,
-    p.setPEEP && `PEEP ${p.setPEEP}`,
-    p.fio2Percent && `FiO₂ ${p.fio2Percent}%`,
-    pf !== null && `P/F ${pf.toFixed(0)}`,
-    p.resp
-  ].filter(Boolean).join(" | ");
+  const medBlock = [];
+  if (abxLines.length) medBlock.push(`Antibiotics:
+${abxLines.join("
+")}`);
+  if (acLines.length) medBlock.push(`Anticoagulation:
+${acLines.join("
+")}`);
+  if (otherMedLines.length) medBlock.push(`Other medications:
+${otherMedLines.join("
+")}`);
 
-  const renalLine = [
-    bal !== null && `Net balance ${bal > 0 ? "+" : ""}${bal.toFixed(0)} mL (In ${inn} / Out ${out})`,
-    uop !== null && `UO ${uop.toFixed(2)} mL/kg/h`,
-    p.feeding && `Feed: ${p.feeding}`,
-    p.rbs && `RBS ${p.rbs}`,
-    p.renal
-  ].filter(Boolean).join(" | ");
+  const fineDivider = "────────────────────";
+  const planSegments = [];
+  if (p.plan) planSegments.push(`Notes: ${p.plan}`);
+  (p.plans || []).filter(x => x.text).forEach(x => {
+    planSegments.push(`${x.done ? "[✓]" : "[ ]"} ${x.text}`);
+  });
 
-  const infLine = [
-    p.temp && `Temp ${p.temp}°C`,
-    mkList(p).length && `Markers: ${mkList(p).join(", ")}`,
-    activeAbx.length && `Abx: ${activeAbx.join("; ")}`,
-    posCultures.length && `Micro: ${posCultures.join("; ")}`,
-    p.infection
-  ].filter(Boolean).join(" | ");
-
-  const vteLine = p.acType === "Pharmacological"
-    ? `VTE: ${p.anticoag.map(x => [x.drug, x.dose, x.frequency].filter(Boolean).join(" ")).join("; ") || "Pharmacological"}`
-    : p.acType === "Mechanical" ? `VTE: Mechanical (${p.acMech || "unspecified"})`
-    : p.acType === "None" ? "VTE: None" : "";
-
-  const openPlans = (p.plans || []).filter(x => x.text && !x.done).map(x => `• [ ] ${x.text}`);
-  const donePlans = (p.plans || []).filter(x => x.text && x.done).map(x => `• [x] ${x.text}`);
-  const tk = CHK.filter(([q]) => (p.checks || {})[q]).length;
-
-  const outLines = [
+  return [
     `════════════════════════════════════════`,
-    `ICU HANDOVER — ${p.bed || "BED"}${demo ? " (" + demo + ")" : ""}`,
-    `Generated: ${new Date().toLocaleString()}`,
+    headerBits,
     `════════════════════════════════════════`,
-    ``,
-    `S — SITUATION`,
-    `• Diagnosis: ${p.diagnosis || "Not entered"}`,
-    p.events ? `• 24h Events: ${p.events}` : "",
-    g.n > 0 ? `• SOFA: ${g.total}${g.n < 6 ? " (" + g.n + "/6 scored)" : ""}` : "",
-    ``,
-    `B — BACKGROUND`,
-    p.pastMedicalHistory ? `• PMH: ${p.pastMedicalHistory}` : "",
-    p.presentIllness ? `• HPI: ${p.presentIllness}` : "",
-    (!p.pastMedicalHistory && !p.presentIllness) ? `• No background entered` : "",
-    ``,
-    `A — ASSESSMENT`,
-    cnsLine ? `• CNS: ${cnsLine}` : "",
-    cvLine ? `• CVS: ${cvLine}` : "",
-    respLine ? `• Resp: ${respLine}` : "",
-    renalLine ? `• Renal/Fluid: ${renalLine}` : "",
-    infLine ? `• Infection: ${infLine}` : "",
-    abgParts.length ? `• ABG: ${abgParts.join(" · ")}` : "",
-    abnLabs.length ? `• Key Labs: ${abnLabs.join(", ")}` : "",
-    (lineList.length || vteLine) ? `• Lines & VTE: ${[lineList.join(", "), vteLine].filter(Boolean).join(" | ")}` : "",
-    ``,
-    `R — RECOMMENDATION / PLAN`,
-    p.plan ? `• Notes: ${p.plan}` : "",
-    ...openPlans,
-    ...donePlans,
-    (!p.plan && !openPlans.length && !donePlans.length) ? `• No active plan items entered` : "",
-    `• Daily Checklist: ${tk}/${CHK.length} completed`,
-    ``,
-    `Verify all values against the bedside chart.`
-  ];
+    `Past History: ${p.pastMedicalHistory || "Not entered"}`,
+    `Diagnosis: ${p.diagnosis || "Not entered"}`,
+    `History of Illness: ${p.presentIllness || "Not entered"}`,
+    `Events: ${p.events || "Not entered"}`,
+    `Examination & Vital Signs:
+${examParts.length ? examParts.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Radiology:
+${radItems.length ? radItems.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Labs:
+${labLines.length ? labLines.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Medications:
+${medBlock.length ? medBlock.join("
+") : "• Not entered"}`,
+    `Plans:
+${planSegments.length ? planSegments.join(`
+${fineDivider}
+`) : "• Not entered"}`
+  ].join("
 
-  return outLines.filter((x, i, arr) => x !== "" && !(x === "" && arr[i - 1] === "")).join("\n");
+");
 }
 
 function makeSBAR() { if (!P()) return; $("sbar").value = sbarText(P()); persist(); }
@@ -2242,7 +2282,10 @@ function copyText(t) {
 }
 
 function showSheet() {
-  $("sheetTxt").textContent = data.map(p => sbarText(p)).join("\n\n");
+  $("sheetTxt").textContent = data.map(p => sbarText(p)).join("
+
+
+");
   $("sheet").hidden = false;
   $("sheet").scrollIntoView();
 }
@@ -2259,8 +2302,8 @@ function downloadJSON(obj, name) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(u), 1000);
 }
-function exportOne() { if (P()) downloadJSON({ version: 18, exportedAt: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + "-icu-backup.json"); }
-function exportAll() { downloadJSON({ version: 18, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
+function exportOne() { if (P()) downloadJSON({ version: 19, exportedAt: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + "-icu-backup.json"); }
+function exportAll() { downloadJSON({ version: 19, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
 
 function importBackupFile(file) {
   const reader = new FileReader();
@@ -2562,7 +2605,9 @@ document.addEventListener("click", e => {
   } else if (act === "prevsbar") {
     const last = (p.history || [])[p.history.length - 1];
     if (!last) { alert("No archived SBAR yet. Use New day to archive today's SBAR."); return; }
-    $("sbar").value = `Archived (${last.d}):\n\n${last.sbar}`;
+    $("sbar").value = `Archived (${last.d}):
+
+${last.sbar}`;
   }
 });
 
