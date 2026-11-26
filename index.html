@@ -71,6 +71,27 @@ button.sm{min-height:34px;padding:4px 12px;margin:0}
 .acard{border:3px solid;border-radius:12px;margin:10px 0;overflow:hidden}.acname{color:#fff;font-size:20px;font-weight:800;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}.acard .g2{padding:0 12px 12px}
 .acadd{display:flex;gap:6px;align-items:center}.acadd select{margin:0}.acadd button{margin:0;white-space:nowrap}
 body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}body.dark .seg button{background:#26384a;color:#e6edf3}body.dark .seg button.on{background:#2b7a9c;color:#fff}body.dark .chip span{border-color:#46607a}
+
+html{scroll-padding-top:8px}
+details>summary{position:sticky;top:0;z-index:20;background:#123047;color:#fff;border-radius:11px;box-shadow:0 3px 10px rgba(8,28,42,.18);isolation:isolate;transition:box-shadow .18s ease}
+details[open]>summary{border-radius:11px 11px 7px 7px;box-shadow:0 4px 12px rgba(8,28,42,.22)}
+.body details>summary{top:0;z-index:21}
+#navRow{position:relative;top:auto;z-index:4;margin:0 0 10px;border-radius:9px}
+#navRow button{flex:0 0 44px}
+#navRow select{flex:1;min-width:0}
+.med-summary .med-name{font-size:18px!important;font-weight:900!important;color:#102f45!important;letter-spacing:.1px}
+body.dark .med-summary .med-name{color:#b8e4ff!important}
+.pi.done{opacity:.28}
+.chk:has(input[type=checkbox]:checked){opacity:.32}
+.chk:has(input[type=checkbox]:checked) span{text-decoration:line-through}
+.calc-select{margin:4px 0 10px}
+.calc-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
+.calc-result{border:1px solid #c9dce8;border-left:5px solid #145b78;background:#eef6fa;border-radius:10px;padding:12px;margin-top:12px}
+.calc-result .calc-value{font-size:22px;font-weight:900;color:#103954;overflow-wrap:anywhere}
+.calc-result .calc-rec{margin-top:8px;font-size:13px;line-height:1.5}
+body.dark .calc-result{background:#1b3342;border-color:#34566b}
+body.dark .calc-result .calc-value{color:#b8e4ff}
+@media(max-width:420px){.calc-inputs{grid-template-columns:1fr}}
 </style></head><body>
 <header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v17</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
@@ -78,7 +99,7 @@ body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff
 <section><h3>Patients / beds</h3><div id="list"></div>
 <label>Bed label<input id="bed" placeholder="Example: Bed 01"></label>
 <button onclick="addPatient()">Add patient</button><button class="g" onclick="showSheet()">Handover sheet (all beds)</button><button class="g" onclick="newDayAll()">☀️ New day (all beds)</button><details class="imp"><summary>📥 Import case from text</summary><div class="body"><textarea id="caseTxt" style="min-height:150px" placeholder="Paste or dictate the case: age, sex, diagnosis, vitals, labs, ABG, ventilator, drugs, plan..."></textarea><button onclick="importPreview(0)">Preview for open patient</button><button class="g" onclick="importPreview(1)">Preview as new bed (uses the bed label above)</button><div id="importOut"></div><p class="small">Runs on this device only. It reads common English abbreviations (BP 90/50, HR 110, Creat 2.1, pH 7.25, PEEP 8) and you review everything before it is applied. Do not paste patient identifiers.</p></div></details></section>
-<section id="rec" hidden><h3 id="heading"></h3><div id="navRow"><button onclick="jump(-1)" aria-label="Previous bed">◀</button><select id="jumpSel" onchange="openPatient(+this.value)"></select><button onclick="jump(1)" aria-label="Next bed">▶</button></div><div id="cards"></div>
+<section id="rec" hidden><div id="navRow"><button onclick="jump(-1)" aria-label="Previous bed">◀</button><select id="jumpSel" onchange="openPatient(+this.value)"></select><button onclick="jump(1)" aria-label="Next bed">▶</button></div><h3 id="heading"></h3><div id="cards"></div>
 <button onclick="newDay()">☀️ New day</button><button onclick="showInfo()">🖼️ Patient infographic</button><button onclick="exportOne()">Export this patient</button><button class="x" onclick="delPatient()">Delete patient</button>
 <div id="infoBox" hidden><div id="infoSvg"></div><button onclick="dlInfo()">Download PNG</button><button onclick="dlInfo(1)">Share image</button><button class="g" onclick="printInfo()">Print / PDF</button><button class="g" onclick="$('infoBox').hidden=true">Close</button></div></section>
 <section><h3>Backup</h3>
@@ -194,7 +215,7 @@ function ensure(p) {
     if (!Array.isArray(p.meds))
         p.meds = [];
     if (p.pastMedicalHistory === undefined) p.pastMedicalHistory = "";
-    if (!p.sepsisMarkerValues || typeof p.sepsisMarkerValues !== "object") p.sepsisMarkerValues = {};
+    if (!p.sepsisMarkerValues || typeof p.sepsisMarkerValues !== "object") p.sepsisMarkerValues = {}; if (!p.calc || typeof p.calc !== "object") p.calc = {}; if (!p.calc.inputs || typeof p.calc.inputs !== "object") p.calc.inputs = {};
     p.meds.forEach(m => { if (!m || typeof m !== "object") return; if (m.route === undefined) m.route = ""; if (m.frequency === undefined) m.frequency = ""; if (m.indication === undefined) m.indication = ""; if (m.editing === undefined) m.editing = false; });
     [...p.abx, ...p.anticoag].forEach(x => { if (!x || typeof x !== "object") return; if (x.route === undefined) x.route = ""; if (x.frequency === undefined) x.frequency = ""; });
     p.lines.forEach(x => { if (x && typeof x === "object" && x.size === undefined) x.size = ""; });
@@ -282,7 +303,7 @@ function cards(p) {
         S("🦠 Infection", grid([["temp", "Temperature (°C)", "number"], ["sepsisTime", "Sepsis recognised (date/time)", "datetime-local"]]) + `<h4>Sepsis markers</h4><p class="small">Select one or more markers. Enter a separate value for each selected marker.</p><div class="chips">${MK.map((k,i) => `<label class="chip"><input type="checkbox" data-p="sepsisM.${k}"${getp(p, "sepsisM." + k) || p.sepsisMarker === k ? " checked" : ""}><span>${k}</span></label>`).join("")}</div><div class="g2">${MK.map((k,i) => (getp(p,"sepsisM."+k) || p.sepsisMarker === k) ? fld([String(i), k + " – value"], "sepsisMarkerValues") : "").join("")}</div>` + editableEntriesHTML("abx") + editableEntriesHTML("cultures") + T("Source, source control, other notes", "infection", "area") + `<h4>Recommendations</h4><div id="infRec" class="out"></div>`),
         S("🍽️ Other systems and nutrition", `<h4>Anticoagulation / VTE prophylaxis</h4>` + T("Type", "acType", "sel", ["", "None", "Mechanical", "Pharmacological"]) + (p.acType === "Mechanical" ? T("Mechanical method", "acMech", "sel", ["", "Intermittent pneumatic compression", "Compression stockings", "Both"]) : "") + (p.acType === "Pharmacological" ? listHTML("anticoag") : "") + T("GI, skin, nutrition, prophylaxis...", "other", "area")),
         S("💧 Fluid balance", grid([["weight", "Weight (kg)", "number"], ["duration", "Duration (hours)", "number"], ["fluidIn", "Total intake (mL)", "number"], ["fluidOut", "Total output (mL)", "number"]]) + `<p class="small">Output rate uses the total output entered. For urine output, enter urine volume alone.</p><div id="fluidOut2" class="out"></div>`),
-        S("📝 Assessment and daily plan", T("Problems, targets, interventions...", "plan", "area") + `<h4>Plan checklist</h4><select id="tplSel"><option value="">Add items from a template...</option>${Object.keys(TPL).map(k => `<option>${k}</option>`).join("")}</select><button class="g" data-a="tpl">Add template items</button>` + (p.plans || []).map((it, i) => `<div class="pi${it.done ? " done" : ""}"><input type="checkbox" data-p="plans.${i}.done"${it.done ? " checked" : ""} aria-label="Done"><input data-p="plans.${i}.text" value="${esc(it.text)}" placeholder="Plan item"><button class="x" data-a="del:plans:${i}">×</button></div>`).join("") + `<button data-a="addplan">+ Add plan</button><button class="g" data-a="clearplans">Clear all plan checks</button>`),
+        S("📝 Assessment and daily plan", T("Problems, targets, interventions...", "plan", "area") + `<h4>Plan checklist</h4><select id="tplSel"><option value="">Add items from a template...</option>${Object.keys(TPL).map(k => `<option>${k}</option>`).join("")}</select><button class="g" data-a="tpl">Add template items</button>` + (p.plans || []).map((it, i) => `<div class="pi${it.done ? " done" : ""}"><input type="checkbox" data-p="plans.${i}.done"${it.done ? " checked" : ""} aria-label="Done"><input data-p="plans.${i}.text" value="${esc(it.text)}" placeholder="Plan item"><button class="x" data-a="del:plans:${i}">×</button></div>`).join("") + `<button data-a="addplan">+ Add plan</button><button class="x" data-a="clearplans">Remove all plan items</button>`),
         S("✅ Daily checklist", CHK.map(([k, l]) => `<label class="chk"><input type="checkbox" data-p="checks.${k}"${getp(p, "checks." + k) ? " checked" : ""}>${l}</label>`).join("") + `<button class="g" data-a="resetchk">Reset for new day</button>`),
         S("📊 Scores", `<h4>Recommended for this patient</h4><div id="recScores" class="out"></div><label>ICU score<select id="scoreSel"><option value="">Select score...</option>${SCORES.map(s => `<option>${s}</option>`).join("")}</select></label><button data-a="addscore">+ Add score</button>` + (p.scoreList || []).map((it, i) => { const d = SD[it.name]; return `<div class="ent"><b>${esc(it.name)}</b> <span class="small" id="sa${i}"></span>${d && d.c ? `<div class="g2">${d.c.map(([l], j) => `<label>${l}<input type="number" step="any" data-p="scoreList.${i}.comps.${j}" value="${esc((it.comps || {})[j])}"></label>`).join("")}</div><p>Total: <b id="st${i}">—</b></p>` : `<label>Value<input data-p="scoreList.${i}.value" value="${esc(it.value)}"></label>`}<div class="r" id="si${i}" hidden></div><label>Note<input data-p="scoreList.${i}.note" value="${esc(it.note)}"></label><button class="g" data-a="autosc:${i}">Use auto values</button><button class="x" data-a="del:scoreList:${i}">Remove</button></div>`; }).join("") + grid([["uo", "Urine output (mL/24 h), for SOFA", "number"]], "scores") + `<div id="scoreOut" class="out"></div>`),
         S("🔌 Lines and tubes", editableEntriesHTML("lines")),
@@ -298,7 +319,7 @@ function cards(p) {
     const keys = [...new Set([...(p.trend || []).flatMap(e => Object.keys(e.v)), ...Object.keys(snap(p))])];
     const TREND = S("📈 Trends", `<select id="trSel">${keys.map(k => `<option${k === (window._tr || keys[0]) ? " selected" : ""}>${esc(k)}</option>`).join("")}</select><button data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`);
     const MEDS = S("💊 Medications", medsHTML(p) + `<div id="medOut"></div>`);
-    const CALC = S("🧮 Calculators", grid([["kcalLo", "kcal/kg low (default 20)", "number"], ["kcalHi", "kcal/kg high (default 25)", "number"], ["protG", "Protein g/kg (default 1.3)", "number"]], "calc") + `<div id="calcOut"></div><p class="small">Uses data from other cards. Targets are editable; match them to your unit's protocol.</p>`);
+    const CALC = S("🧮 Calculators", `<label>Choose calculator<select class="calc-select" data-p="calc.selected"><option value="">Select a calculator...</option>${Object.entries(CALC_DEFS).map(([k,v]) => `<option value="${k}"${(p.calc && p.calc.selected) === k ? " selected" : ""}>${v.label}</option>`).join("")}</select></label><div id="calcOut"></div><p class="small">Enter the requested values. Results are calculation aids, not treatment orders; verify inputs, units and clinical context.</p>`);
     return [A[0], S("🩺 Examination", A[1] + CV + A[3] + A[4] + WEAN + ABD + EXT, 1), INF, A[13], A[2], TREND, MEDS, ANTI, A[9], CALC, A[12], A[10], A[11], A[14]].join("");
 }
 /* ---------- calculations ---------- */
@@ -896,38 +917,32 @@ function medHTML(p) {
     const cg = crcl(p), cr = labVal(p, "creat", "mg/dL"), imp = (cg !== null && cg < 60) || (cr !== null && cr >= 1.5), names = [...p.meds, ...p.abx, ...p.anticoag].map(m => m.drug || "").filter(n => RENAL.test(n));
     return imp && names.length ? `<div class="al">Reduced renal function${cg !== null ? " (CrCl ≈ " + cg.toFixed(0) + " mL/min)" : ""}: review renal dosing of ${esc([...new Set(names)].join(", "))}.</div><p class="small">Covers common renally cleared drugs only; not complete and not an interaction check.</p>` : "";
 }
+const CALC_DEFS = {
+map:{label:"Mean arterial pressure (MAP)",fields:[["sbp","Systolic BP (mmHg)"],["dbp","Diastolic BP (mmHg)"]],run:v=>{const s=+v.sbp,d=+v.dbp;if(!(s>0&&d>0&&s>=d))return null;const x=(s+2*d)/3;return [x.toFixed(1)+" mmHg",x<65?"Below the commonly used initial target of 65 mmHg; interpret against the patient's perfusion and individualized target.":"Compare with the prescribed patient-specific MAP target and assess perfusion."];}},
+shock:{label:"Shock index",fields:[["hr","Heart rate (beats/min)"],["sbp","Systolic BP (mmHg)"]],run:v=>{const h=+v.hr,s=+v.sbp;if(!(h>0&&s>0))return null;const x=h/s;return [x.toFixed(2),x>=0.9?"Elevated in many adult contexts; assess for shock and interpret with age, pregnancy, medications and clinical findings.":"A value below 0.9 does not exclude shock; assess perfusion and trends."];}},
+pf:{label:"PaO₂ / FiO₂ ratio (P/F)",fields:[["pao2","PaO₂ (mmHg)"],["fio2","FiO₂ (%)"]],run:v=>{const p=+v.pao2,f=+v.fio2;if(!(p>0&&f>=21&&f<=100))return null;const x=p/(f/100);return [x.toFixed(0)+" mmHg",x<=100?"Severe oxygenation impairment range; ARDS severity requires the full Berlin criteria and PEEP/CPAP context.":x<=200?"Moderate oxygenation impairment range; interpret with ARDS criteria and PEEP/CPAP.":x<=300?"Mild oxygenation impairment range; interpret with the full clinical context.":"Not in the P/F oxygenation impairment thresholds; this alone does not exclude respiratory failure."];}},
+ibw:{label:"Ideal body weight and lung-protective VT",fields:[["sex","Sex","select",["male","female"]],["height","Height (cm)"],["vt","Set tidal volume (mL)"]],run:v=>{const h=+v.height,vt=+v.vt;if(!(h>100&&h<230)||!v.sex)return null;const x=(v.sex==="male"?50:45.5)+.91*(h-152.4),r=vt>0?`; current VT ${vt} mL = ${(vt/x).toFixed(1)} mL/kg PBW`:"";return [x.toFixed(1)+" kg PBW"+r,vt>0?(vt/x>8?"VT is above 8 mL/kg PBW; review against lung-protective ventilation targets.":vt/x<4?"VT is below 4 mL/kg PBW; confirm this is intended and clinically appropriate.":"Common ARDS target is 4–8 mL/kg PBW (often starting near 6); individualize to mechanics and gas exchange."):"For ARDS, a common initial target is about 6 mL/kg PBW, adjusted within 4–8 mL/kg with plateau-pressure monitoring."];}},
+crcl:{label:"Creatinine clearance (Cockcroft–Gault)",fields:[["age","Age (years)"],["sex","Sex","select",["male","female"]],["weight","Weight (kg)"],["creat","Serum creatinine (mg/dL)"]],run:v=>{const a=+v.age,w=+v.weight,c=+v.creat;if(!(a>0&&w>0&&c>0&&v.sex))return null;const x=((140-a)*w)/(72*c)*(v.sex==="female"?.85:1);return [x.toFixed(1)+" mL/min","Estimate may be unreliable in acute kidney injury, rapidly changing creatinine, extremes of body size or low muscle mass. Use local dosing guidance."];}},
+na:{label:"Corrected sodium for hyperglycemia",fields:[["na","Measured sodium (mmol/L)"],["glucose","Glucose (mg/dL)"]],run:v=>{const n=+v.na,g=+v.glucose;if(!(n>0&&g>=0))return null;const a=n+1.6*(g-100)/100,b=n+2.4*(g-100)/100;return [a.toFixed(1)+" to "+b.toFixed(1)+" mmol/L","Correction factors of 1.6 and 2.4 are commonly used; interpret with the degree of hyperglycemia and clinical context."];}},
+ca:{label:"Albumin-corrected total calcium",fields:[["ca","Total calcium (mg/dL)"],["albumin","Albumin (g/dL)"]],run:v=>{const c=+v.ca,a=+v.albumin;if(!(c>0&&a>0))return null;return [(c+.8*(4-a)).toFixed(1)+" mg/dL","Correction formulas are imprecise in critical illness, renal dysfunction and acid–base disturbance; use ionized calcium when clinically important."];}},
+ag:{label:"Anion gap (without potassium)",fields:[["na","Sodium (mmol/L)"],["cl","Chloride (mmol/L)"],["hco3","Bicarbonate (mmol/L)"]],run:v=>{const n=+v.na,c=+v.cl,b=+v.hco3;if(!(n>0&&c>=0&&b>=0))return null;const x=n-c-b;return [x.toFixed(1)+" mmol/L",x>12?"Elevated using a conventional 12 mmol/L reference; consider albumin correction and evaluate causes of high-anion-gap metabolic acidosis.":"Interpret against the laboratory's reference range and serum albumin; a normal gap does not exclude metabolic acidosis."];}},
+delta:{label:"Delta ratio",fields:[["na","Sodium (mmol/L)"],["cl","Chloride (mmol/L)"],["hco3","Bicarbonate (mmol/L)"]],run:v=>{const n=+v.na,c=+v.cl,b=+v.hco3;if(!(n>0&&c>=0&&b>0&&b<24))return null;const ag=n-c-b,x=(ag-12)/(24-b);return [x.toFixed(2),x<.4?"Pattern may suggest additional normal-anion-gap metabolic acidosis.":x<.8?"May indicate mixed high-anion-gap and normal-anion-gap metabolic acidosis.":x<=2?"Compatible with a predominantly high-anion-gap metabolic acidosis.":"May suggest concurrent metabolic alkalosis; interpret cautiously and use albumin-corrected gap when appropriate."];}},
+water:{label:"Free water deficit (hypernatremia)",fields:[["na","Serum sodium (mmol/L)"],["weight","Weight (kg)"],["sex","Sex","select",["male","female"]]],run:v=>{const n=+v.na,w=+v.weight;if(!(n>140&&w>0&&v.sex))return null;const x=w*(v.sex==="male"?.6:.5)*(n/140-1);return [x.toFixed(2)+" L","Estimate only. Plan correction rate and fluid choice according to acuity, volume status, ongoing losses and comorbidities; monitor sodium frequently."];}},
+bmi:{label:"Body mass index (BMI)",fields:[["weight","Weight (kg)"],["height","Height (cm)"]],run:v=>{const w=+v.weight,h=+v.height;if(!(w>0&&h>0))return null;const x=w/Math.pow(h/100,2);return [x.toFixed(1)+" kg/m²",x<18.5?"Below the usual adult reference range.":x<25?"Within the usual adult reference range.":x<30?"Overweight range by standard adult BMI categories.":"Obesity range by standard adult BMI categories; BMI has limitations in critical illness and altered fluid status."];}},
+uo:{label:"Urine output rate",fields:[["urine","Urine output (mL)"],["duration","Duration (hours)"],["weight","Weight (kg)"]],run:v=>{const u=+v.urine,d=+v.duration,w=+v.weight;if(!(u>=0&&d>0&&w>0))return null;const x=u/(d*w);return [x.toFixed(2)+" mL/kg/h",x<.5?"Below 0.5 mL/kg/h; assess duration, volume status, obstruction and kidney function.":"At or above 0.5 mL/kg/h; interpret with trends and the overall clinical picture."];}},
+fluid:{label:"Fluid balance",fields:[["input","Total intake (mL)"],["output","Total output (mL)"]],run:v=>{const i=+v.input,o=+v.output;if(!(i>=0&&o>=0))return null;const x=i-o;return [(x>0?"+":"")+x.toFixed(0)+" mL",x>0?"Positive balance; assess whether fluid administration remains indicated and review cumulative balance.":x<0?"Negative balance; assess perfusion, volume status and ongoing losses.":"Net balance is zero for the entered interval."];}},
+rsbi:{label:"Rapid shallow breathing index (RSBI)",fields:[["rr","Respiratory rate (breaths/min)"],["vt","Tidal volume (L)"]],run:v=>{const r=+v.rr,t=+v.vt;if(!(r>0&&t>0))return null;const x=r/t;return [x.toFixed(1)+" breaths/min/L",x<105?"Below the traditional 105 threshold; RSBI alone does not establish readiness for extubation.":"At or above the traditional 105 threshold; reassess clinical readiness and reversible causes."];}},
+osm:{label:"Effective serum osmolality (tonicity)",fields:[["na","Sodium (mmol/L)"],["glucose","Glucose (mg/dL)"]],run:v=>{const n=+v.na,g=+v.glucose;if(!(n>0&&g>=0))return null;const x=2*n+g/18;return [x.toFixed(1)+" mOsm/kg","Calculated effective osmolality excludes urea; interpret with measured osmolality, neurologic status and the clinical context."];}},
+bsa:{label:"Body surface area (Mosteller)",fields:[["weight","Weight (kg)"],["height","Height (cm)"]],run:v=>{const w=+v.weight,h=+v.height;if(!(w>0&&h>0))return null;const x=Math.sqrt(w*h/3600);return [x.toFixed(2)+" m²","Estimate only; verify whether the relevant medication or protocol uses actual, ideal or another dosing weight."];}},
+qtc:{label:"Corrected QT (Bazett)",fields:[["qt","QT interval (ms)"],["hr","Heart rate (beats/min)"]],run:v=>{const q=+v.qt,h=+v.hr;if(!(q>0&&h>0))return null;const x=q/Math.sqrt(60/h);return [x.toFixed(0)+" ms","Bazett correction may overcorrect at high heart rates and undercorrect at low rates; manually verify QT and consider Fridericia correction when appropriate."];}}
+};
 function calcHTML(p) {
-    var _a, _b;
-    const n = x => { x = parseFloat(x); return isFinite(x) ? x : null; }, a = p.investigations.abg, c = p.calc || {}, ca = labVal(p, "ca t", "mg/dL"), alb = (_a = labVal(p, "alb", "g/dL")) !== null && _a !== void 0 ? _a : n(a.Albumin), na = (_b = labVal(p, "na", "mmol/L")) !== null && _b !== void 0 ? _b : n(a.Na), g = n(p.rbs), w = n(p.weight), ht = n(p.heightCm), sx = p.ventSex, R = [], add = (t, f, v) => R.push([t, f, v]);
-    const ibw = ht > 0 && (sx === "male" || sx === "female") ? (sx === "male" ? 50 : 45.5) + 0.91 * (ht - 152.4) : null;
-    if (ca !== null && alb !== null)
-        add("Corrected calcium", "Ca + 0.8 × (4 − albumin). Prefer ionized calcium in critical illness.", (ca + 0.8 * (4 - alb)).toFixed(1) + " mg/dL");
-    if (na !== null && g > 0)
-        add("Sodium corrected for glucose", "Na + factor × (glucose − 100) / 100; factors 1.6 and 2.4", `${(na + 1.6 * (g - 100) / 100).toFixed(0)} / ${(na + 2.4 * (g - 100) / 100).toFixed(0)} mmol/L`);
-    if (na > 145 && w > 0 && (sx === "male" || sx === "female"))
-        add("Free water deficit (hypernatremia)", "TBW × (Na/140 − 1); TBW 0.6 × weight (male), 0.5 (female)", (w * (sx === "male" ? 0.6 : 0.5) * (na / 140 - 1)).toFixed(1) + " L");
-    const hc = n(a.HCO3), nA = n(a.Na), cl = n(a.Cl);
-    if (hc !== null && nA !== null && cl !== null && hc < 24) {
-        const dr = (nA - cl - hc - 12) / (24 - hc);
-        add("Delta ratio", "(AG − 12) / (24 − HCO₃⁻). <0.4 hyperchloremic; 0.4–0.8 mixed; 1–2 high-AG; >2 high-AG plus metabolic alkalosis", dr.toFixed(2));
-    }
-    if (ibw > 0) {
-        add("Ideal (predicted) body weight", "Devine, as used for ventilation", ibw.toFixed(1) + " kg");
-        if (w > 0) {
-            add("Adjusted body weight", "IBW + 0.4 × (actual − IBW), used for some drug doses", (ibw + 0.4 * (w - ibw)).toFixed(1) + " kg");
-            add("BMI", "weight / height²", (w / Math.pow((ht / 100), 2)).toFixed(1));
-        }
-    }
-    if (w > 0) {
-        const bmi = ibw > 0 ? w / Math.pow((ht / 100), 2) : null, nb = bmi >= 30 ? ibw + 0.25 * (w - ibw) : w, lo = n(c.kcalLo) || 20, hi = n(c.kcalHi) || 25, pr = n(c.protG) || 1.3;
-        add("Energy target (after acute phase)", `${lo}–${hi} kcal/kg × ${bmi >= 30 ? "adjusted weight (BMI ≥30)" : "actual weight"} (${nb.toFixed(0)} kg). Indirect calorimetry preferred.`, `${(nb * lo).toFixed(0)}–${(nb * hi).toFixed(0)} kcal/day`);
-        add("Early-phase energy", "ESPEN: ≤70% of estimated needs in the first days, advanced progressively (not before 48 h)", "≤" + (nb * hi * 0.7).toFixed(0) + " kcal/day");
-        add("Protein target", `${pr} g/kg delivered progressively (ESPEN 2023); ASPEN/SCCM suggests 1.2–2.0 g/kg. Avoid very high early protein.`, (nb * pr).toFixed(0) + " g/day");
-    }
-    const cg = crcl(p);
-    if (cg !== null)
-        add("Creatinine clearance", "Cockcroft–Gault, actual weight; unreliable in AKI", cg.toFixed(0) + " mL/min");
-    return R.length ? `<div class="scroll"><table><tr><th>Calculation</th><th>Result</th></tr>${R.map(r => `<tr><td><b>${r[0]}</b><div class="small">${esc(r[1])}</div></td><td><b>${esc(r[2])}</b></td></tr>`).join("")}</table></div>` : "Enter weight, height, sex, labs and ABG values to see calculations.";
+ const c=p.calc||{},selected=c.selected||"",d=CALC_DEFS[selected],vals=(c.inputs||{})[selected]||{};
+ if(!d)return `<p class="small">Choose a calculator above to enter its required values.</p>`;
+ const fields=d.fields.map(([k,l,t,opts])=>t==="select"?`<label>${l}<select data-p="calc.inputs.${selected}.${k}"><option value="">Select...</option>${opts.map(o=>`<option value="${o}"${vals[k]===o?" selected":""}>${o}</option>`).join("")}</select></label>`:`<label>${l}<input type="number" step="any" inputmode="decimal" data-p="calc.inputs.${selected}.${k}" value="${esc(vals[k]===undefined?"":vals[k])}"></label>`).join("");
+ const requiredKeys=selected==="ibw"?["sex","height"]:d.fields.map(f=>f[0]); const complete=requiredKeys.every(k=>vals[k]!==undefined&&String(vals[k]).trim()!==""); const result=complete?d.run(vals):null;
+ const box=result?`<div class="calc-result"><div class="small"><b>RESULT</b></div><div class="calc-value">${esc(result[0])}</div><div class="calc-rec"><b>Clinical interpretation / recommendation</b><br>${esc(result[1])}</div></div>`:`<p class="small">Enter all required values to calculate.</p>`;
+ return `<div class="calc-inputs">${fields}</div>${box}`;
 }
 /* ---------- import case from text (rule-based, offline) ---------- */
 const LABPAT = { "Hb": "hb|hemoglobin|haemoglobin", "WBC": "wbc|tlc|white (?:blood )?cells?", "Plts": "plts?|platelets?", "Na": "na\\+?|sodium", "K": "k\\+?|potassium", "Creat": "creat(?:inine)?|cr", "Urea": "urea", "Mg": "mg|magnesium", "Po4": "po4|phosphate|phosphorus", "Alb": "alb(?:umin)?", "Alt": "alt|sgpt", "Ast": "ast|sgot", "Bil T": "(?:total )?bilirubin|t\\.? ?bil|bil\\.? ?t", "INR": "inr", "PT": "pt", "PTT": "a?ptt", "CRP": "crp", "Ca T": "calcium|ca" };
@@ -1113,55 +1128,4 @@ function addEntry(name) {
   const p = P(); if (!p) return;
   if (name === "anticoag") { const sel = $("sel_anticoag"), drug = sel && sel.value; if (!drug) { alert("Select an anticoagulant first."); return; } p.anticoag.push({ drug, dose: "", date: "", indication: "", editing: true }); sel.value = ""; }
   else if (name === "vasoactive") { const sel = $("sel_vasoactive"), drug = sel && sel.value; if (!drug) { alert("Select a vasopressor or inotrope first."); return; } p.cardio.vasoactive.push({ drug, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", lastAdjustment: "", response: "" }); sel.value = ""; }
-  else { const L = LISTS[name]; if (!L) return; const arr = ARR(p, name); let item = {}; if (L.opts) { const sel = $("sel_" + name); item.drug = sel && sel.value; if (!item.drug) { alert("Select " + L.n.toLowerCase() + " first."); return; } sel.value = ""; } L.f.forEach(([k]) => { if (!(k in item)) item[k] = ""; }); if (["abx", "lines", "anticoag", "cultures"].includes(name)) item.editing = true; if (name === "vasoactive") item.unit = "mcg/kg/min"; arr.push(item); }
-  persist(); draw();
-}
-function handleAction(action) {
-  const p = P(); if (!p) return; const bits = action.split(":"), a = bits[0], name = bits[1], idx = Number(bits[2]);
-  if (a === "add") { addEntry(name); return; }
-  if (a === "addlab") { p.investigations.laboratory.push({ name: "Other", date: "", result: "", unit: "", trend: "", lastResult: "", last2: "", last3: "" }); }
-  else if (a === "addrad") { p.investigations.radiology.push({ name: "Other", date: "", result: "" }); }
-  else if (a === "addplan") p.plans.push({ text: "", done: false });
-  else if (a === "addmed") p.meds.push({ drug: "", dose: "", route: "", frequency: "", indication: "", editing: false });
-  else if (a === "addscore") { const n = $("scoreSel").value; if (!n) { alert("Select a score first."); return; } p.scoreList.push({ name: n, value: "", note: "", comps: {}, cman: {} }); }
-  else if (a === "del") { const arr = ARR(p, name); if (Array.isArray(arr) && arr[idx]) { toTrash({ kind: "entry", bed: p.bed, x: name, item: arr[idx] }); arr.splice(idx, 1); } }
-  else if (a === "echo") p.cardio.echo.enabled = name === "on";
-  else if (a === "ac") { p.acType = name; }
-  else if (a === "medmore") { const mi = Number(bits[1]); if (p.meds[mi]) p.meds[mi].more = !p.meds[mi].more; }
-  else if (a === "mededit") { const mi = Number(bits[1]); if (p.meds[mi]) p.meds[mi].editing = !p.meds[mi].editing; }
-  else if (a === "entryedit") { const listName = bits[1], ei = Number(bits[2]); if (Array.isArray(p[listName]) && p[listName][ei]) p[listName][ei].editing = !p[listName][ei].editing; }
-  else if (a === "resetchk") { if (confirm("Reset the daily checklist?")) p.checks = {}; }
-  else if (a === "clearplans") { p.plans.forEach(it => { it.done = false; }); }
-  else if (a === "tpl") { const t = $("tplSel").value; if (!t) { alert("Choose a template first."); return; } TPL[t].forEach(text => p.plans.push({ text, done: false })); $("tplSel").value = ""; }
-  else if (a === "snap") { p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) }); p.trend = p.trend.slice(-60); }
-  else if (a === "prevsbar") { const prev = p.history && p.history[p.history.length - 1]; $("sbar").value = prev ? prev.sbar : "No previous SBAR archived."; return; }
-  else if (a === "autosc") { const it = p.scoreList[idx]; if (it) { const d = SD[it.name]; if (d && d.c) { it.cman = {}; it.comps = {}; } else { const v = autoScore(it.name, p); if (v !== null) { it.value = String(v); it.manual = false; } } } }
-  persist(); draw(); renderList();
-}
-function toggleDark() { document.body.classList.toggle("dark"); localStorage.setItem("icu_rounds_dark", document.body.classList.contains("dark") ? "1" : "0"); }
-function fontStep(d) { const root = document.documentElement, n = parseInt(getComputedStyle(root).getPropertyValue("--fs")) || 15; root.style.setProperty("--fs", Math.max(12, Math.min(20, n + d)) + "px"); }
-
-/* Delegated listeners keep the form stable while values are entered. */
-$("cards").addEventListener("input", e => {
-  const el = e.target.closest("[data-p]"); if (!el || !P()) return;
-  const val = el.type === "checkbox" ? el.checked : el.value; setp(P(), el.dataset.p, val); persist();
-  if (["cardio.vitals.sbp", "cardio.vitals.dbp", "cardio.vitals.hr", "cardio.vitals.targetMap", "weight", "duration", "fluidOut", "fluidIn", "fio2Percent", "paO2", "setVT", "heightCm", "setPEEP", "plateauPressure", "totalPeep", "ventRate"].includes(el.dataset.p)) renderOutputs();
-});
-$("cards").addEventListener("change", e => {
-  const el = e.target.closest("[data-p]"); if (!el || !P()) return;
-  setp(P(), el.dataset.p, el.type === "checkbox" ? el.checked : el.value); persist();
-  if (["acType", "ventSex", "sepsisMarker", "cardio.echo.enabled"].includes(el.dataset.p) || el.dataset.p.startsWith("sepsisM.")) draw(); else renderOutputs();
-});
-$("cards").addEventListener("click", e => { const b = e.target.closest("[data-a]"); if (b) { e.preventDefault(); handleAction(b.dataset.a); } });
-$("cards").addEventListener("change", e => { if (e.target.id === "trSel") { window._tr = e.target.value; const o = $("trOut"); if (o && P()) o.innerHTML = trendHTML(P(), window._tr); } });
-$("imp").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; if (f) importBackupFile(f); e.target.value = ""; });
-$("bed").addEventListener("keydown", e => { if (e.key === "Enter") addPatient(); });
-
-/* Startup: migrate existing records in place; never change the storage key. */
-data.forEach(ensure);
-if (localStorage.getItem("icu_rounds_dark") === "1") document.body.classList.add("dark");
-renderList(); renderTrash();
-if (data.length) { active = 0; draw(); }
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
-</script>
-</body></html>
+  else { const L = LISTS[name]; if (!L) return; const arr = ARR(p, name); let item = {}; if (L.opts) { const sel = $("sel_" + name); item.drug = sel && sel.value; if (!item.drug) { alert("Select " + L.n.toLowerCase() + " first."); return; } sel.value = ""; } L.f.forEach(([k]) => { if (!(k in item)) item[k] = ""; }); if (["
