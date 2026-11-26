@@ -24,7 +24,7 @@ summary::-webkit-details-marker{display:none}summary::after{content:"+";margin-l
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
 @media(max-width:420px){.g2{grid-template-columns:1fr}}
 .scroll{overflow-x:auto}
-.lab{display:grid;grid-template-columns:70px 120px 90px 70px 60px 90px;gap:6px;min-width:540px;margin-bottom:6px;align-items:start}
+.lab{display:grid;grid-template-columns:64px 108px 76px 54px 46px 62px 62px 62px;gap:6px;min-width:590px;margin-bottom:6px;align-items:start}
 .rad{display:grid;grid-template-columns:70px 120px 1fr;gap:6px;min-width:380px;margin-bottom:6px}
 .lab input,.lab select,.rad input{margin:0;padding:7px 5px;font-size:12px}
 .nm{background:#ade3ff;color:#103954;font-weight:700;font-size:12px;padding:9px 6px;border-radius:7px}
@@ -56,8 +56,21 @@ body.dark input,body.dark textarea,body.dark select{background:#0f171e;color:#e6
 body.dark .out,body.dark .r{background:#212d38;color:#e6edf3}body.dark .r.a,body.dark .al{background:#3a1f1f;color:#ffb4ab}
 body.dark .nm{background:#1d4a63;color:#d6efff}body.dark .warn{background:#3b3216;color:#ffe9a8}body.dark td,body.dark th{border-color:#2f3d4a}
 body.dark .small{color:#9fb0bf}body.dark .body details.sub>summary{background:#26384a;color:#e6edf3}body.dark .pt{border-color:#2a3744}
+h4{margin:16px 0 6px;color:#123047;font-size:15px}
+section,details{box-shadow:0 1px 3px rgba(18,48,71,.08)}summary{font-size:16px}
+input:focus,textarea:focus,select:focus{outline:2px solid #5aa9d6;outline-offset:1px}
+@media(min-width:900px){main{max-width:860px}}
+.abn{color:#c62828!important;border-color:#c62828!important;background:#fdecea!important;font-weight:800}
+button.sm{min-height:34px;padding:4px 12px;margin:0}
+.med{margin:6px 0}.medr{display:flex;gap:6px;align-items:center}.medr input{margin:0}
+.chips{display:flex;flex-wrap:wrap}.chip{display:inline-flex;margin:3px 4px 3px 0}.chip input{display:none}
+.chip span{padding:7px 12px;border:1px solid #9fb3c2;border-radius:18px;font-size:13px;font-weight:600;cursor:pointer}.chip input:checked+span{background:#145b78;color:#fff;border-color:#145b78}
+.seg{display:flex;gap:6px;margin:8px 0}.seg button{flex:1;margin:0;background:#dde6ed;color:#123047}.seg button.on{background:#145b78;color:#fff}
+.acard{border:3px solid;border-radius:12px;margin:10px 0;overflow:hidden}.acname{color:#fff;font-size:20px;font-weight:800;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}.acard .g2{padding:0 12px 12px}
+.acadd{display:flex;gap:6px;align-items:center}.acadd select{margin:0}.acadd button{margin:0;white-space:nowrap}
+body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}body.dark .seg button{background:#26384a;color:#e6edf3}body.dark .seg button.on{background:#2b7a9c;color:#fff}body.dark .chip span{border-color:#46607a}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v7</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v8</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -95,7 +108,7 @@ ecg:{n:"ECG",t:"ECG",f:[["date","Date","date"],["time","Time","time"],["rate","H
 biomarkers:{n:"Biomarker",t:"Cardiac biomarkers",f:[["test","Test","sel",["","High-sensitivity Troponin I","High-sensitivity Troponin T","Troponin I","Troponin T","CK-MB","BNP","NT-proBNP","Other"]],["date","Date","date"],["time","Time","time"],["result","Result","number"],["unit","Unit"],["reference","Reference range"],["trend","Trend","sel",TR]]},
 vasoactive:{n:"Drug",t:"Vasopressors and inotropes",f:[["dose","Dose","number"],["unit","Unit","sel",["","mcg/kg/min","mcg/min","mg/hr","mcg/hr","units/min","units/hr","mg/kg/hr","Other"]],["trend","Dose trend","sel",["","Increasing","Stable","Decreasing","Stopped"]],["targetMap","Target MAP (mmHg)","number"],["lastAdjustment","Last adjustment","datetime-local"],["response","Response / reason for use","area"]]}};
 LISTS.lines={r:1,days:1,n:"Line",t:"Lines and tubes",f:[["type","Type","sel",["","CVC","Arterial line","Dialysis catheter","Urinary catheter","ETT","Tracheostomy","NG/OG tube","Chest drain","Other"]],["site","Site / size"],["date","Inserted","date"],["time","Time","time"],["note","Notes"]]};
-LISTS.abx={r:1,days:1,n:"Antibiotic",t:"Antimicrobials",f:[["drug","Antibiotic"],["dose","Dose / route / frequency"],["date","Start date","date"],["time","Start time","time"],["indication","Cause / source"],["note","Plan (stop or review date, levels)"]]};
+LISTS.abx={r:1,days:1,n:"Antibiotic",t:"Antimicrobials",f:[["drug","Antibiotic"],["dose","Dose / route / frequency"],["date","Start date","date"],["indication","Cause / source"],["note","Plan (stop or review date, levels)"]]};
 LISTS.cultures={r:1,n:"Culture",t:"Cultures",f:[["type","Specimen","sel",["","Blood","Sputum","Tracheal aspirate","BAL","Urine","Wound swab","Throat swab","Nasal / rectal screening swab","Stool","CSF","Pleural fluid","Ascitic fluid","Catheter tip","Other"]],["date","Date sent","date"],["status","Status","sel",["","Pending","No growth","Growth"]],["organism","Organism"],["susceptible","Susceptible antibiotics"]]};
 LISTS.meds={r:1,days:1,n:"Medication",t:"Medication list",f:[["drug","Drug"],["dose","Dose / route / frequency"],["date","Start date","date"],["indication","Indication"],["renal","Renal dose review","sel",["","Not needed","Needs review","Reviewed"]]]};
 LISTS.anticoag={r:1,days:1,n:"Anticoagulant",t:"Pharmacological anticoagulation",sel:"Anticoagulant",opts:["Enoxaparin","Unfractionated heparin (prophylactic)","Unfractionated heparin (infusion)","Dalteparin","Fondaparinux","Warfarin","Apixaban","Rivaroxaban","Dabigatran","Argatroban","Other"],f:[["dose","Dose / route / frequency"],["date","Start date","date"],["indication","Cause / indication"]]};
@@ -133,16 +146,14 @@ const T=(l,k,t,o)=>fld([k,l,t,o],"");
 const grid=(specs,base)=>`<div class="g2">${specs.map(s=>fld(s,base)).join("")}</div>`;
 const S=(t,h,o)=>`<details${o?" open":""}><summary>${t}</summary><div class="body">${h}</div></details>`;
 
-function labRow(it,i){const b=`investigations.laboratory.${i}.`;
- const f=(k,ph="")=>`<input data-p="${b+k}" ${k==="date"?'type="date"':'type="text"'} placeholder="${ph}" value="${esc(it[k])}" aria-label="${esc(it.name)} ${k}">`;
- return`<div class="lab"><span class="nm">${esc(it.name)}</span>${f("date")}<div><input data-p="${b}result" type="text" inputmode="decimal" placeholder="Result" value="${esc(it.result)}" style="text-align:center;font-weight:700" aria-label="${esc(it.name)} result"><span class="fl" id="lf${i}"></span></div>${f("unit","Unit")}
- <select class="trend" data-v="${it.trend}" data-p="${b}trend" aria-label="${esc(it.name)} trend">${[["","—"],["up","↑"],["down","↓"],["stable","→"]].map(([v,t])=>`<option value="${v}"${it.trend===v?" selected":""}>${t}</option>`).join("")}</select>${f("lastResult","Last")}</div>`}
+function labRow(it,i){const b=`investigations.laboratory.${i}.`,f=(k,ph="")=>`<input data-p="${b+k}" ${k==="date"?'type="date"':'type="text"'} placeholder="${ph}" value="${esc(it[k])}" aria-label="${esc(it.name)} ${k}">`;
+ return`<div class="lab"><span class="nm">${esc(it.name)}</span>${f("date")}<div><input data-p="${b}result" type="text" inputmode="decimal" placeholder="Result" value="${esc(it.result)}" style="text-align:center;font-weight:700" aria-label="${esc(it.name)} result"><span class="fl" id="lf${i}"></span></div>${f("unit","Unit")}<select class="trend" data-v="${it.trend}" data-p="${b}trend" aria-label="${esc(it.name)} trend">${[["","—"],["up","↑"],["down","↓"],["stable","→"]].map(([v,t])=>`<option value="${v}"${it.trend===v?" selected":""}>${t}</option>`).join("")}</select>${f("lastResult","Last")}${f("last2","2nd")}${f("last3","3rd")}</div>`}
 function radRow(it,i){const b=`investigations.radiology.${i}.`;
  return`<div class="rad"><span class="nm">${esc(it.name)}</span><input data-p="${b}date" type="date" value="${esc(it.date)}"><input data-p="${b}result" placeholder="Result" value="${esc(it.result)}"></div>`}
 
-function listHTML(name){const L=LISTS[name],arr=L.r?P()[name]:P().cardio[name],bs=L.r?name:"cardio."+name;
+function listHTML(name,noh){const L=LISTS[name],arr=L.r?P()[name]:P().cardio[name],bs=L.r?name:"cardio."+name;
  let top=L.opts?`<label>${L.sel}<select id="sel_${name}"><option value="">Select...</option>${L.opts.map(d=>`<option>${d}</option>`).join("")}</select></label>`:"";
- return`<h4>${L.t}</h4>${top}<button data-a="add:${name}">+ Add ${L.n}</button>`+arr.map((it,i)=>`<div class="ent"><b>${esc(it.drug||it.type||L.n+" "+(i+1))}</b>${L.days&&it.date?" · day "+dayN(it.date)+(it.time?" ("+hrs(it.date,it.time)+" h)":""):""}${grid(L.f,`${bs}.${i}`)}<button class="x" data-a="del:${name}:${i}">Remove</button></div>`).join("")}
+ return`${noh?"":`<h4>${L.t}</h4>`}${top}<button data-a="add:${name}">+ Add ${L.n}</button>`+arr.map((it,i)=>`<div class="ent"><b>${esc(it.drug||it.type||L.n+" "+(i+1))}</b>${L.days&&it.date?" · day "+dayN(it.date)+(it.time?" ("+hrs(it.date,it.time)+" h)":""):""}${grid(L.f,`${bs}.${i}`)}<button class="x" data-a="del:${name}:${i}">Remove</button></div>`).join("")}
 
 function cards(p){
  const I=p.investigations,c=p.cardio;
@@ -154,7 +165,7 @@ function cards(p){
  S("🧠 CNS",`<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE","Eye opening",["None","To pain","To voice","Spontaneous"])}${gs("gcsV","Verbal (intubated: estimate)",["None","Incomprehensible sounds","Inappropriate words","Confused","Oriented"])}${gs("gcsM","Motor",["None","Extension","Abnormal flexion","Withdrawal","Localizes","Obeys"])}</div><div id="gcsOut" class="out"></div>
  <details class="sub"><summary>Sedation and neurological status</summary><div class="g2">${fld(["sedation","Sedation agent","sel",["","None","Propofol","Midazolam","Dexmedetomidine","Ketamine","Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t=>{const v=t.split(" ")[0];return`<option value="${v}"${String(getp(p,"scores.rass"))===v?" selected":""}>${t}</option>`}).join("")}</select></label>${fld(["pupils","Pupils","sel",["","Equal and reactive","Equal, sluggish","Unequal","Fixed and dilated","Pinpoint","Other"]])}${fld(["seizures","Seizures","sel",["","None","Seizure in last 24 h","On antiepileptics, seizure-free","Status epilepticus"]])}</div></details>
  <h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>`+T("CNS notes (delirium, etc.)","cns","area")),
- S("🧪 Investigations",`<h4>Laboratory</h4><div class="scroll"><div class="lab small"><b>Test</b><b>Date</b><b>Result</b><b>Unit</b><b>Trend</b><b>Last</b></div>${I.laboratory.map(labRow).join("")}</div><button data-a="addlab">+ Add lab test</button>
+ S("🧪 Investigations",`<h4>Laboratory</h4><div class="scroll"><div class="lab small"><b>Test</b><b>Date</b><b>Result</b><b>Unit</b><b>Trend</b><b>Last 1</b><b>Last 2</b><b>Last 3</b></div>${I.laboratory.map(labRow).join("")}</div><button data-a="addlab">+ Add lab test</button>
  <h4>Arterial blood gas</h4>${`<div class="g2">${ABGF.map(([k,l,s])=>fld([k,l,"number"],"investigations.abg")).join("")}</div>`}<div id="abgOut" class="out"></div>
  <h4>Radiology</h4><div class="scroll">${I.radiology.map(radRow).join("")}</div><button data-a="addrad">+ Add radiology</button>`+T("Additional investigation notes","labs","area")),
  S("🫁 Respiratory",grid([["respSupport","Respiratory support","sel",["","Room air","Oxygen (nasal cannula / mask)","HFNC / NIV","Ventilator"]],["spo2","SpO₂ (%)","number"],["breathSounds","Breath sounds","sel",["","Normal vesicular","Wheeze","Crackles","Coarse crackles","Bronchial breathing","Diminished air entry","Absent breath sounds","Stridor","Pleural rub"]]])+T("Auscultation notes","ausc","area")+T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)","resp","area")+`<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`),
@@ -175,13 +186,17 @@ function cards(p){
  S("📄 SBAR handover",`<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:220px" placeholder="SBAR appears here..."></textarea>`)
  ];
  const ABD=S("🫃 Abdomen",grid([["palpation","Palpation","sel",["","Soft and lax","Distended","Tense","Tender","Guarding / rebound","Rigid"]],["bowelSounds","Bowel sounds","sel",["","Present","Hypoactive","Absent","Hyperactive"]],["feeding","Feeding","sel",["","Oral","Enteral (NG/OG)","Parenteral","Enteral + parenteral","Nil by mouth"]],["stool","Stool","sel",["","Passed stool","Not passed","Diarrhea","Constipated"]],["rbs","RBS (mg/dL)","number"]])+`<div id="rbsOut" class="small"></div>`+T("Abdomen notes","abdNotes","area"));
+ const EXT=S("🦵 Extremities",grid([["edema","Edema","sel",["","None","Mild pitting","Moderate pitting","Severe pitting","Generalized (anasarca)"]],["pulses","Peripheral pulses","sel",["","Present","Weak","Absent"]],["capRefill","Capillary refill","sel",["","<2 s","2–3 s",">3 s"]],["limbTemp","Skin / limb temperature","sel",["","Warm","Cool","Mottled"]],["dvtSigns","Calf swelling / tenderness","sel",["","No","Yes"]],["skin","Skin integrity","sel",["","Intact","Pressure injury","Rash","Wound"]]])+T("Extremities notes","extNotes","area"));
+ const CV=S("❤️ Cardiovascular",`<div id="cvOut" class="out"></div>`+S("Vitals and hemodynamics",grid([["sbp","SBP (mmHg)","number"],["dbp","DBP (mmHg)","number"],["hr","Heart rate (bpm)","number"],["cvp","CVP (mmHg)","number"],["targetMap","MAP target (mmHg)","number"],["rhythm","Rhythm","sel",["","Sinus rhythm","Atrial fibrillation","Atrial flutter","SVT","VT","Paced rhythm","Other"]]],"cardio.vitals"),1)+S(`Vasopressors and inotropes (${c.vasoactive.length})`,listHTML("vasoactive",1))+S(`ECG (${c.ecg.length})`,listHTML("ecg",1))+S(`Cardiac biomarkers (${c.biomarkers.length})`,listHTML("biomarkers",1))+S("Echocardiography",`<div id="invEcho" class="out"></div>`+(c.echo.enabled?`<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO,"cardio.echo")}`:`<button data-a="echo:on">+ Add echo</button>`))+`<h4>Recommendations</h4><div id="cvRec" class="out"></div>`+T("Additional cardiovascular notes","cv","area"));
+ const INF=S("🦠 Infection",grid([["temp","Temperature (°C)","number"],["sepsisTime","Sepsis recognised (date/time)","datetime-local"]])+`<h4>Sepsis markers</h4><div class="chips">${MK.map(k=>`<label class="chip"><input type="checkbox" data-p="sepsisM.${k}"${getp(p,"sepsisM."+k)||p.sepsisMarker===k?" checked":""}><span>${k}</span></label>`).join("")}</div>`+T("Marker values (e.g. PCT 4.2, CRP 180)","sepsisValue")+listHTML("abx")+listHTML("cultures")+T("Source, source control, other notes","infection","area")+`<h4>Recommendations</h4><div id="infRec" class="out"></div>`);
+ const ANTI=S("💉 Anticoagulation",acHTML(p)+`<details class="sub"><summary>Other notes (nutrition, GI, skin)</summary>${T("Notes","other","area")}</details>`);
  const w=p.wean||{};
  const WEAN=S("🫁 Weaning check",WCRIT.map((t,i)=>`<label class="chk"><input type="checkbox" data-p="wean.c${i}"${w["c"+i]?" checked":""}>${t}</label>`).join("")+grid([["rr","Spontaneous RR (/min)","number"],["vt","Spontaneous VT (mL)","number"],["sbt","SBT result","sel",["","Not done","Passed","Failed"]],["leak","Cuff leak test","sel",["","Not done","Leak present","No leak"]]],"wean")+`<div id="wnOut" class="out"></div>`);
  const keys=[...new Set([...(p.trend||[]).flatMap(e=>Object.keys(e.v)),...Object.keys(snap(p))])];
  const TREND=S("📈 Trends",`<select id="trSel">${keys.map(k=>`<option${k===(window._tr||keys[0])?" selected":""}>${esc(k)}</option>`).join("")}</select><button data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`);
- const MEDS=S("💊 Medications",listHTML("meds")+`<div id="medOut"></div>`);
+ const MEDS=S("💊 Medications",medsHTML(p)+`<div id="medOut"></div>`);
  const CALC=S("🧮 Calculators",grid([["kcalLo","kcal/kg low (default 20)","number"],["kcalHi","kcal/kg high (default 25)","number"],["protG","Protein g/kg (default 1.3)","number"]],"calc")+`<div id="calcOut"></div><p class="small">Uses data from other cards. Targets are editable; match them to your unit's protocol.</p>`);
- return[A[0],S("🩺 Examination",A[1]+A[5]+A[3]+A[4]+WEAN+ABD,1),A[7],A[13],A[2],TREND,MEDS,A[8],A[9],CALC,A[12],A[10],A[11],A[14]].join("")}
+ return[A[0],S("🩺 Examination",A[1]+CV+A[3]+A[4]+WEAN+ABD+EXT,1),INF,A[13],A[2],TREND,MEDS,ANTI,A[9],CALC,A[12],A[10],A[11],A[14]].join("")}
 
 /* ---------- calculations ---------- */
 function labFlag(it,p){
@@ -224,7 +239,7 @@ function ventCalc(p){
  if(vk>8)rec["VT / PBW"]=`Reduce VT toward 6 mL/kg PBW (${(pbw*6).toFixed(0)} mL); recheck pH and PaCO₂.`;else if(vk&&vk<4)rec["VT / PBW"]="Very low VT: confirm intent; check PaCO₂ and pH.";else if(vk>6&&ards)rec["VT / PBW"]=`ARDS: usual target 6 mL/kg (${(pbw*6).toFixed(0)} mL).`;
  if(pl>30)rec["Plateau pressure"]="Reduce VT (down to 4 mL/kg PBW) and review PEEP; exclude secretions, pneumothorax, raised abdominal pressure.";
  if(dp>15)rec["Driving pressure"]="Consider lower VT and reassessing PEEP; if ARDS with poor response, consider prone positioning.";
- if(pf!==null&&pf<150&&(ards||pf<100))rec["P/F ratio"]="Severe hypoxemia: consider prone positioning (≥12 h), PEEP optimization, neuromuscular blockade if refractory; discuss ECMO early if refractory.";else if(pf!==null&&pf<300)rec["P/F ratio"]="Optimize FiO₂ and PEEP; wean FiO₂ to SpO₂ about 92–96%.";
+ if(pf!==null&&pf<150&&(ards||pf<100))rec["P/F ratio"]="Severe hypoxemia/ARDS: prone >12 h/day; consider higher PEEP (avoid prolonged recruitment maneuvers); NMBA only in early severe ARDS; corticosteroids and VV-ECMO in selected patients (ATS/ESICM 2023).";else if(pf!==null&&pf<300)rec["P/F ratio"]="Optimize FiO₂ and PEEP; wean FiO₂ to SpO₂ about 92–96%.";
  if(tp!==null&&sp!==null&&tp-sp>0)rec["Intrinsic PEEP (est.)"]="Lengthen expiratory time (lower RR, shorter inspiratory time); treat bronchospasm and secretions.";
  if(pc>50&&ph<7.30)ov.push(ards?"Hypercapnic acidosis: raise RR (watch auto-PEEP); permissive hypercapnia is usually accepted in ARDS if pH stays above about 7.20–7.25.":"Respiratory acidosis: increase RR or VT within limits; check dead space and auto-PEEP.");
  if(pc<35&&ph>7.45)ov.push("Alkalemia with low PaCO₂: reduce RR or VT unless intentional.");
@@ -286,6 +301,14 @@ function ctLast(p,re){const a=p.investigations.radiology.filter(r=>re.test(r.nam
 const ctTxt=(p,re)=>{const r=ctLast(p,re);return r?`${r.name}${r.date?" ("+r.date+")":""}: ${r.result||"no result entered"}`:""};
 const ctBox=(p,re,l)=>{const r=ctLast(p,re);return r?`<b>${l}</b>${r.date?" · "+esc(r.date):""}<br>${esc(r.result||"No result entered")}<p class="small">Edit in Investigations.</p>`:`<span class="small">No ${l} entered in Investigations.</span>`};
 function gcsHTML(p){const g=scoreCalc(p).gcs,s=p.scores||{};return g===null?"Select eye, verbal and motor responses to calculate.":`GCS <b>${g}</b> (E${s.gcsE} V${s.gcsV} M${s.gcsM})`}
+const MK=["Procalcitonin elevated","CRP elevated","Lactate elevated","WBC high","WBC low","Markers rising","Markers falling","Normal"];
+const mkList=p=>[...Object.keys(p.sepsisM||{}).filter(k=>p.sepsisM[k]),...(p.sepsisMarker&&!(p.sepsisM||{})[p.sepsisMarker]?[p.sepsisMarker]:[])];
+const medsHTML=p=>p.meds.map((m,i)=>`<div class="med"><div class="medr"><input data-p="meds.${i}.drug" value="${esc(m.drug)}" placeholder="Medication"><button class="g sm" data-a="medmore:${i}" aria-label="Details">${m.more?"−":"+"}</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove">×</button></div>${m.more?grid(LISTS.meds.f.slice(1),"meds."+i):m.dose?`<div class="small">${esc(m.dose)}</div>`:""}</div>`).join("")+`<button data-a="addmed">+ Add medication</button>`;
+const ACC=["#0b7285","#862e9c","#c2410c","#2b8a3e","#a61e4d","#364fc7","#8a6d00"],acCol=d=>ACC[[...(d||"x")].reduce((a,c)=>a+c.charCodeAt(0),0)%ACC.length];
+function acHTML(p){const t=p.acType;let o=`<div class="seg">${["None","Mechanical","Pharmacological"].map(x=>`<button class="${t===x?"on":""}" data-a="ac:${x}">${x}</button>`).join("")}</div>`;
+ if(t==="Mechanical")o+=fld(["acMech","Method","sel",["","Intermittent pneumatic compression","Compression stockings","Both"]]);
+ if(t==="Pharmacological")o+=`<div class="acadd"><select id="sel_anticoag"><option value="">Select anticoagulant...</option>${LISTS.anticoag.opts.map(d=>`<option>${d}</option>`).join("")}</select><button data-a="add:anticoag">+ Add</button></div>`+p.anticoag.map((a,i)=>`<div class="acard" style="border-color:${acCol(a.drug)}"><div class="acname" style="background:${acCol(a.drug)}"><span>${esc(a.drug)}${a.date?" · day "+dayN(a.date):""}</span><button class="x sm" data-a="del:anticoag:${i}" aria-label="Remove">×</button></div>${grid(LISTS.anticoag.f,"anticoag."+i)}</div>`).join("");
+ return o}
 const SCORES=["SOFA","qSOFA","APACHE II","SAPS II","GCS","RASS","Shock index","CAM-ICU","CPOT","Braden","NUTRIC","CURB-65"];
 function autoScore(n,p){const g=scoreCalc(p),c=cardioCalc(p.cardio.vitals);
  if(n==="SOFA")return g.n?g.total:null;if(n==="GCS")return g.gcs;if(n==="RASS")return(p.scores||{}).rass||null;if(n==="Shock index")return c.si!==null?c.si.toFixed(2):null;return null}
@@ -293,7 +316,7 @@ const gv=(p,k)=>{const v=parseInt((p.scores||{})[k]);return isNaN(v)?null:v},V0=
 const SD={
 "SOFA":{c:["Respiratory","Coagulation","Liver","Cardiovascular","CNS","Renal"].map((l,i)=>[l,p=>scoreCalc(p).parts[i]]),i:v=>v<2?"0–1: minimal dysfunction":v<6?"2–5: mild to moderate; a rise of ≥2 with infection meets the Sepsis-3 definition":v<10?"6–9: significant organ dysfunction":"≥10: severe, high mortality"},
 "GCS":{all:1,c:[["Eye",p=>gv(p,"gcsE")],["Verbal",p=>gv(p,"gcsV")],["Motor",p=>gv(p,"gcsM")]],i:v=>v<=8?"3–8: severe impairment":v<=12?"9–12: moderate impairment":"13–15: mild or normal"},
-"qSOFA":{c:[["RR ≥22",()=>null],["SBP ≤100",p=>{const s=pos(V0(p).sbp);return s===null?null:+(s<=100)}],["Altered mentation",p=>{const g=gcsN(p);return g===null?null:+(g<15)}]],i:v=>v>=2?"≥2: higher risk of poor outcome; look for sepsis and organ dysfunction":"0–1: lower risk; does not exclude sepsis"},
+"qSOFA":{c:[["RR ≥22",()=>null],["SBP ≤100",p=>{const s=pos(V0(p).sbp);return s===null?null:+(s<=100)}],["Altered mentation",p=>{const g=gcsN(p);return g===null?null:+(g<15)}]],i:v=>v>=2?"≥2: higher risk of poor outcome; look for sepsis. SSC 2026 advises against qSOFA as a single screening tool":"0–1: lower risk; does not exclude sepsis (not a single screening tool, SSC 2026)"},
 "CURB-65":{c:[["Confusion",p=>{const g=gcsN(p);return g===null?null:+(g<15)}],["Urea >42 mg/dL (7 mmol/L)",p=>{const u=labVal(p,"urea","mg/dL");return u===null?null:+(u>42)}],["RR ≥30",()=>null],["SBP <90 or DBP ≤60",p=>{const s=pos(V0(p).sbp),d=pos(V0(p).dbp);return s&&d?+(s<90||d<=60):null}],["Age ≥65",p=>{const a=pos(p.age);return a===null?null:+(a>=65)}]],i:v=>v<=1?"0–1: low risk":v==2?"2: moderate risk":"3–5: high risk (consider ICU if 4–5)"},
 "Shock index":{f:1,c:[["HR (bpm)",p=>pos(V0(p).hr)],["SBP (mmHg)",p=>pos(V0(p).sbp)]],i:v=>v>=1?"≥1.0: marked elevation; likely significant shock or hypovolemia":v>=0.9?"0.9–1.0: elevated; suggests hemodynamic compromise":v>=0.7?"0.7–0.9: borderline":"<0.7: normal range"},
 "RASS":{i:v=>{const n=parseInt(v);return isNaN(n)?"":n>=1?"Agitated":n===0?"Alert and calm":n>=-2?"Light sedation (usual target)":n===-3?"Moderate sedation":"Deep sedation or unarousable"}},
@@ -311,7 +334,7 @@ function scoreState(p,it){const d=SD[it.name],cm=it.cman||{},cs=it.comps||{};
 function recScores(p){const c=cardioCalc(p.cardio.vitals),R=[],t=parseFloat(p.temp),a=p.investigations.abg,lac=parseFloat(a.Lactate),w=parseFloat(p.weight),o=parseFloat(p.fluidOut),h=parseFloat(p.duration),uop=w>0&&h>0&&o>=0?o/(w*h):null,sh=[];
  if(c.si!==null&&c.si>=0.9)sh.push("shock index "+c.si.toFixed(2));if(c.map!==null&&c.map<65)sh.push("MAP "+c.map.toFixed(0));if(uop!==null&&uop<0.5)sh.push("output "+uop.toFixed(2)+" mL/kg/h");if(lac>2)sh.push("lactate "+lac);
  if(sh.length)R.push(["Shock index","Possible shock: "+sh.join(", ")]);
- const inf=[];if(t>=38||t<36)inf.push("temperature "+t);if(p.abx.length)inf.push("on antibiotics");if(p.sepsisMarker&&p.sepsisMarker!=="Normal")inf.push(p.sepsisMarker.toLowerCase());
+ const inf=[];if(t>=38||t<36)inf.push("temperature "+t);if(p.abx.length)inf.push("on antibiotics");mkList(p).filter(m=>m!=="Normal").forEach(m=>inf.push(m.toLowerCase()));
  const all=inf.concat(sh,p.ventMode?["ventilated"]:[]);if(all.length)R.push(["SOFA","Organ dysfunction screen: "+all.join(", ")]);
  const sed=p.sedation&&p.sedation!=="None";if(sed||p.ventMode)R.push(["RASS","Sedation or ventilation: "+(sed?p.sedation:"ventilated")]);
  if(parseInt((p.scores||{}).rass)>=-3)R.push(["CAM-ICU","RASS ≥ −3: screen for delirium"]);
@@ -321,7 +344,7 @@ function cvRecs(p){const c=p.cardio,v=c.vitals,k=cardioCalc(v),R=[],t=parseFloat
  const ne=c.vasoactive.find(d=>/^norepi/i.test(d.drug||"")&&d.trend!=="Stopped"&&d.unit==="mcg/kg/min"),nd=ne?parseFloat(ne.dose):0,low=k.map!==null&&k.map<t;
  if(low)R.push(`MAP ${k.map.toFixed(0)} is below target ${t}: assess volume status and cause (echo, dynamic test such as passive leg raise, bleeding, sepsis, cardiac cause), then titrate vasopressor to target; norepinephrine is first-line.`);
  else if(k.map!==null&&k.map>t+15&&c.vasoactive.some(d=>d.trend!=="Stopped"&&d.dose))R.push(`MAP ${k.map.toFixed(0)} is well above target ${t} on vasoactive support: consider weaning.`);
- if(nd>=0.25)R.push("Norepinephrine ≥0.25 mcg/kg/min: consider adding vasopressin, and IV hydrocortisone if septic shock persists (Surviving Sepsis Campaign 2021).");
+ if(nd>=0.25)R.push("Escalating norepinephrine (≥0.25 mcg/kg/min): if septic shock, SSC 2026 suggests adding vasopressin as second-line (then epinephrine if MAP is still inadequate) and IV corticosteroids (hydrocortisone 200 mg/day is typical).");
  if(k.si!==null&&k.si>=0.9)R.push(`Shock index ${k.si.toFixed(2)}: look for hypovolemia, bleeding, sepsis or obstructive causes.`);
  if((ef<40||vti<18)&&low)R.push(`${ef<40?"LVEF "+ef+"%":""}${ef<40&&vti<18?" and ":""}${vti<18?"LVOT VTI "+vti+" cm":""} with low MAP: consider cardiac dysfunction or low stroke volume; consider an inotrope (e.g. dobutamine) and avoid large fluid loads.`);
  if(e.ivcVariation==="Collapsible"&&low)R.push("Collapsible IVC with low MAP: may be volume responsive; confirm with a dynamic test (IVC alone is unreliable) and give small fluid boluses with reassessment.");
@@ -330,14 +353,15 @@ function cvRecs(p){const c=p.cardio,v=c.vitals,k=cardioCalc(v),R=[],t=parseFloat
  if(hr<50)R.push("Bradycardia: review drugs (e.g. dexmedetomidine, beta-blockers); if hypotensive or unstable consider atropine or pacing.");
  const q=c.ecg.map(x=>parseFloat(x.qtc)).filter(Number.isFinite).pop();if(q>500)R.push(`QTc ${q} ms: correct K⁺/Mg²⁺/Ca²⁺, stop QT-prolonging drugs, avoid bradycardia.`);
  return R}
-function infRecs(p){const R=[],age=parseFloat(p.age),w=parseFloat(p.weight),cr=labVal(p,"creat","mg/dL"),t=parseFloat(p.temp),mk=p.sepsisMarker||"",A=p.abx.filter(a=>a.drug);
- if(p.sepsisTime){const t0=new Date(p.sepsisTime),first=A.filter(a=>a.date&&a.time).map(a=>new Date(a.date+"T"+a.time)).sort((x,y)=>x-y)[0],el=(Date.now()-t0)/6e4;R.push(`Sepsis recognised ${Math.floor(el/60)} h ${Math.floor(el%60)} min ago.`+(first?` First antibiotic ${Math.round((first-t0)/6e4)} min after recognition (target: within 1 h for septic shock or high likelihood of sepsis).`:" No antibiotic start time recorded."))}
+function infRecs(p){const R=[],age=parseFloat(p.age),w=parseFloat(p.weight),cr=labVal(p,"creat","mg/dL"),t=parseFloat(p.temp),mk=mkList(p),A=p.abx.filter(a=>a.drug);
+ if(p.sepsisTime){const el=(Date.now()-new Date(p.sepsisTime))/6e4;if(el>=0)R.push(`Sepsis recognised ${Math.floor(el/60)} h ${Math.floor(el%60)} min ago.${A.length?"":" No antibiotic listed yet."}`)}
  A.forEach(a=>{const d=dayN(a.date);if(d)R.push(`${a.drug}: day ${d}${a.time?" ("+hrs(a.date,a.time)+" h)":""}.`+(d>=7?" Define a stop date or planned duration.":d>=3?" Review cultures; consider de-escalation or stopping.":""))});
- if(!A.length&&(t>=38.3||t<36||(mk&&mk!=="Normal"&&mk!=="Markers falling")))R.push("Fever or sepsis markers but no antibiotic listed: if infection is suspected, take cultures and start antimicrobials without delay (within 1 h if septic shock or high likelihood of sepsis).");
- p.cultures.filter(c=>c.organism).forEach(c=>R.push(`${c.type||"Culture"}: ${c.organism}${c.susceptible?", susceptible to "+c.susceptible:""}. Check that current antibiotics match the susceptibilities.`));
+ if(!A.length&&(t>=38.3||t<36||mk.some(m=>m!=="Normal"&&m!=="Markers falling")))R.push("Fever or sepsis markers but no antibiotic listed: after blood cultures, give antimicrobials immediately (ideally within 1 h) if sepsis is probable or shock is present; if sepsis is only possible, investigate rapidly and treat within 3 h if infection remains likely (SSC 2026).");
+ if(A.some(a=>/meropenem|piperacillin|cefepime|ceftazidime|ceftriaxone|cefazolin|ampicillin|imipenem/i.test(a.drug)))R.push("β-lactam in use: SSC 2026 strongly recommends a prolonged (extended) infusion after the loading dose; confirm with pharmacy.");
+ p.cultures.filter(c=>c.organism).forEach(c=>R.push(`${c.type||"Culture"}: ${c.organism}${c.susceptible?", susceptible to "+c.susceptible:""}. Match antibiotics to susceptibilities and de-escalate to narrower therapy (strong recommendation, SSC 2026).`));
  if(t>=38.3)R.push(`Temperature ${t} °C: repeat cultures if not done, check lines and likely sources, review antibiotic spectrum.`);else if(t<36)R.push(`Temperature ${t} °C: hypothermia can accompany sepsis; reassess.`);
- if(mk==="Markers rising")R.push("Markers rising on treatment: reassess source control, cultures, resistance and antibiotic cover.");
- if(mk==="Markers falling"&&A.length)R.push("Markers falling: supports de-escalation or stopping once clinically improving.");
+ if(mk.includes("Markers rising"))R.push("Markers rising on treatment: reassess source control, cultures, resistance and antibiotic cover.");
+ if(mk.includes("Markers falling")&&A.length)R.push("Markers falling: supports de-escalation or stopping once clinically improving.");
  if(age>0&&w>0&&cr>0){const cg=(140-age)*w/(72*cr)*(p.ventSex==="female"?0.85:1);R.push(`Estimated CrCl ≈ ${cg.toFixed(0)} mL/min (Cockcroft–Gault, actual weight${p.ventSex?"":"; sex not set, male assumed"}).`+(A.length&&cg<50?" Check renal dose adjustment of each antibiotic with pharmacy or local guidance. In the first 24–48 h of sepsis many protocols keep full β-lactam doses; confirm locally. Consider levels for vancomycin and aminoglycosides.":""))}
  else if(A.length)R.push("For renal dose checks, enter age, weight (Fluid balance card), creatinine (mg/dL) and sex.");
  if(age>=65&&A.length)R.push("Age ≥65: creatinine can overestimate renal function; take care with nephrotoxic antibiotics.");
@@ -353,7 +377,7 @@ function infoData(p){ensure(p);const c=p.cardio,v=c.vitals,k=cardioCalc(v),s=p.s
  {t:"Cardiovascular",e:"❤️",col:"#c9474b",l:[v.sbp&&v.dbp&&`BP ${v.sbp}/${v.dbp}`,k.map!==null&&`MAP ${k.map.toFixed(0)}`,v.hr&&`HR ${v.hr}`,v.rhythm,k.si!==null&&`SI ${k.si.toFixed(2)}`,...c.vasoactive.filter(d=>d.trend!=="Stopped"&&d.drug).map(d=>`${d.drug.split(" ")[0]} ${d.dose||""}`),ct(/echo/i,"Echo")]},
  {t:"Respiratory",e:"🫁",col:"#1f9aa8",l:[p.respSupport,p.spo2&&`SpO₂ ${p.spo2}%`,p.breathSounds,p.ventMode,p.setVT&&`VT ${p.setVT}`,p.setPEEP&&`PEEP ${p.setPEEP}`,p.fio2Percent&&`FiO₂ ${p.fio2Percent}%`,pf!==null&&`P/F ${pf.toFixed(0)}`,ct(/ct\s*chest/i,"CT chest")]},
  {t:"Abdomen",e:"🫃",col:"#d4a02b",l:[p.palpation,p.bowelSounds&&`Bowel sounds ${p.bowelSounds.toLowerCase()}`,p.feeding,p.stool,p.rbs&&`RBS ${p.rbs}`]},
- {t:"Infection",e:"🦠",col:"#e07a2f",l:[p.temp&&`T ${p.temp}°C`,p.sepsisMarker&&p.sepsisMarker+(p.sepsisValue?" "+p.sepsisValue:""),...p.abx.filter(x=>x.drug).map(x=>`${x.drug}${x.date?" D"+dayN(x.date):""}`),...p.cultures.filter(x=>x.organism).map(x=>`${x.type||"Cx"}: ${x.organism}`)]},
+ {t:"Infection",e:"🦠",col:"#e07a2f",l:[p.temp&&`T ${p.temp}°C`,mkList(p).join(", ")+(p.sepsisValue?" "+p.sepsisValue:""),...p.abx.filter(x=>x.drug).map(x=>`${x.drug}${x.date?" D"+dayN(x.date):""}`),...p.cultures.filter(x=>x.organism).map(x=>`${x.type||"Cx"}: ${x.organism}`)]},
  {t:"Investigations",e:"🧪",col:"#2f6fcf",l:[...p.investigations.laboratory.map(it=>{const f=labFlag(it,p);return f[1]==="hi"||f[1]==="lo"?`${it.name} ${it.result}${f[1]==="hi"?"↑":"↓"}`:""}),a.pH&&`ABG pH ${a.pH} CO₂ ${a.PaCO2||"—"} HCO₃ ${a.HCO3||"—"}`,a.Lactate&&`Lactate ${a.Lactate}`,(n=>n&&`${n} imaging result(s)`)(p.investigations.radiology.filter(r=>r.result).length)]},
  {t:"Lines & support",e:"🔌",col:"#5c6b78",l:[...p.lines.map(x=>`${x.type||"Line"}${x.date?" D"+dayN(x.date):""}`),p.acType==="Pharmacological"?p.anticoag.map(x=>(x.drug||"").split(" ")[0]).join("/")||"Anticoagulated":p.acType==="Mechanical"?"Mechanical VTE prophylaxis":"",Number.isFinite(bal)&&`Fluid balance ${bal>0?"+":""}${bal} mL`]},
  {t:"Scores & plan",e:"📝",col:"#3a9d4a",l:[g.n>0&&`SOFA ${g.total}${g.n<6?"*":""}`,...p.scoreList.filter(x=>!["SOFA","GCS","RASS"].includes(x.name)).map(x=>`${x.name} ${scoreVal(p,x)}`),open.length&&`${open.length} open plan(s)`,...open.slice(0,2).map(x=>x.text),tk>0&&`Checklist ${tk}/${CHK.length}`]}]}
@@ -371,7 +395,7 @@ function dlInfo(share){const img=new Image(),u=URL.createObjectURL(new Blob([$("
  img.onload=()=>{const c=document.createElement("canvas");c.width=2000;c.height=2040;c.getContext("2d").drawImage(img,0,0,2000,2040);URL.revokeObjectURL(u);c.toBlob(b=>{if(share&&navigator.canShare){const f=new File([b],"infographic.png",{type:"image/png"});if(navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(()=>{});return}}const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=(P().bed||"patient")+"-infographic.png";document.body.append(a);a.click();a.remove()},"image/png")};
  img.onerror=()=>alert("Could not create the image. Use Print / PDF instead.");img.src=u}
 function printInfo(){document.body.classList.add("pinfo");window.print();setTimeout(()=>document.body.classList.remove("pinfo"),800)}
-const TPL={"Sepsis":["Cultures before antibiotics","Antibiotics started (time recorded)","Repeat lactate","Fluid resuscitation if hypotensive or lactate high","Vasopressor if MAP below target","Source control review"],
+const TPL={"Sepsis":["Blood cultures before antibiotics","Antimicrobials within 1 h if sepsis probable or shock (within 3 h if only possible sepsis)","Measure lactate","Balanced crystalloid ≥30 mL/kg in first 3 h if hypoperfusion or shock","Norepinephrine if hypotension persists after fluids","Source control (ideally within 6 h)","De-escalate when cultures and susceptibilities are known"],
 "ARDS":["Lung-protective ventilation (VT 6 mL/kg PBW)","Plateau pressure ≤30","Consider prone positioning if P/F <150","Conservative fluid strategy","Daily weaning screen"],
 "Post-operative":["Analgesia plan","Wounds and drains review","Early mobilization","VTE prophylaxis","Feeding plan"],
 "Cardiac":["ECG and troponin trend","Rhythm review","Echo review","Fluid / diuretic plan","Anticoagulation review"],
@@ -392,7 +416,7 @@ function trendHTML(p,key){const pts=(p.trend||[]).filter(e=>key in e.v).map(e=>(
  const W=320,H=130,mn=Math.min(...pts.map(x=>x.v)),mx=Math.max(...pts.map(x=>x.v)),sp=mx-mn||1,X=i=>20+i*(W-40)/(pts.length-1),Y=v=>H-28-(v-mn)/sp*(H-58);
  return`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:440px"><polyline fill="none" stroke="#145b78" stroke-width="2" points="${pts.map((x,i)=>X(i).toFixed(1)+","+Y(x.v).toFixed(1)).join(" ")}"/>${pts.map((x,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="#145b78"/><text x="${X(i).toFixed(1)}" y="${(Y(x.v)-8).toFixed(1)}" font-size="10" text-anchor="middle" fill="currentColor">${x.v}</text><text x="${X(i).toFixed(1)}" y="${H-6}" font-size="8" text-anchor="middle" fill="currentColor">${esc(x.l.slice(0,5))}</text>`).join("")}</svg>`}
 function rollDay(p){ensure(p);p.trend.push({t:new Date().toISOString().slice(0,16),v:snap(p)});p.trend=p.trend.slice(-60);p.history.push({d:new Date().toISOString().slice(0,10),sbar:sbarText(p)});p.history=p.history.slice(-7);
- p.investigations.laboratory.forEach(it=>{if(String(it.result).trim()!==""){it.lastResult=it.result;it.result="";it.date=""}});p.checks={};p.events="";p.wean={}}
+ p.investigations.laboratory.forEach(it=>{if(String(it.result).trim()!==""){it.last3=it.last2||"";it.last2=it.lastResult||"";it.lastResult=it.result;it.result="";it.date=""}});p.checks={};p.events="";p.wean={}}
 function newDay(){if(active===null||!P())return;if(!confirm("Start a new day? Today's SBAR is archived, lab results move to last result, and the checklist, 24-hour events and weaning check are cleared."))return;rollDay(P());persist();draw();renderList()}
 function newDayAll(){if(!data.length)return;if(!confirm("Start a new day for ALL beds?"))return;data.forEach(rollDay);persist();renderList();if(active!==null&&P())draw()}
 function jump(d){if(!data.length)return;openPatient((active+d+data.length)%data.length)}
@@ -403,15 +427,19 @@ const wnLine=p=>{const w=p.wean;if(!w)return"";const n=WCRIT.filter((_,i)=>w["c"
 function crcl(p){const age=parseFloat(p.age),w=parseFloat(p.weight),cr=labVal(p,"creat","mg/dL");return age>0&&w>0&&cr>0?(140-age)*w/(72*cr)*(p.ventSex==="female"?0.85:1):null}
 function medHTML(p){const cg=crcl(p),cr=labVal(p,"creat","mg/dL"),imp=(cg!==null&&cg<60)||(cr!==null&&cr>=1.5),names=[...p.meds,...p.abx,...p.anticoag].map(m=>m.drug||"").filter(n=>RENAL.test(n));
  return imp&&names.length?`<div class="al">Reduced renal function${cg!==null?" (CrCl ≈ "+cg.toFixed(0)+" mL/min)":""}: review renal dosing of ${esc([...new Set(names)].join(", "))}.</div><p class="small">Covers common renally cleared drugs only; not complete and not an interaction check.</p>`:""}
-function calcHTML(p){const n=x=>{x=parseFloat(x);return isFinite(x)?x:null},a=p.investigations.abg,c=p.calc||{},ca=labVal(p,"ca t","mg/dL"),alb=labVal(p,"alb","g/dL")??n(a.Albumin),na=labVal(p,"na","mmol/L")??n(a.Na),g=n(p.rbs),w=n(p.weight),ht=n(p.heightCm),sx=p.ventSex,R=[],add=(t,v,f)=>R.push(`<div class="r"><b>${t}:</b> ${v}<div class="small">${f}</div></div>`);
- if(ca!==null&&alb!==null)add("Corrected calcium",(ca+0.8*(4-alb)).toFixed(1)+" mg/dL","Ca + 0.8 × (4 − albumin). Unreliable in critical illness; prefer ionized calcium.");
- if(na!==null&&g>0)add("Sodium corrected for glucose",`${(na+1.6*(g-100)/100).toFixed(0)} (factor 1.6) or ${(na+2.4*(g-100)/100).toFixed(0)} (factor 2.4) mmol/L`,"Na + factor × (glucose − 100) / 100. Glucose from RBS.");
- if(na!==null&&w>0&&(sx==="male"||sx==="female")){const d=w*(sx==="male"?0.6:0.5)*(na/140-1);add("Free water "+(d>=0?"deficit":"excess"),Math.abs(d).toFixed(1)+" L","TBW × (Na/140 − 1); TBW = 0.6 × weight (male) or 0.5 (female).")}
- const hc=n(a.HCO3),nA=n(a.Na),cl=n(a.Cl);if(hc!==null&&nA!==null&&cl!==null&&hc<24){const ag=nA-cl-hc,dr=(ag-12)/(24-hc);add("Delta ratio",dr.toFixed(2),"(AG − 12) / (24 − HCO₃⁻). <0.4 hyperchloremic; 0.4–0.8 mixed; 1–2 high-AG acidosis; >2 high-AG plus metabolic alkalosis.")}
- if(ht>0&&(sx==="male"||sx==="female")){const ibw=(sx==="male"?50:45.5)+0.91*(ht-152.4);if(ibw>0){add("Ideal (predicted) body weight",ibw.toFixed(1)+" kg","Devine-based PBW as used for ventilation");if(w>0)add("Adjusted body weight",(ibw+0.4*(w-ibw)).toFixed(1)+" kg","IBW + 0.4 × (actual − IBW)")}}
- if(w>0){const lo=n(c.kcalLo)||20,hi=n(c.kcalHi)||25,pr=n(c.protG)||1.3;add("Nutrition targets",`${(w*lo).toFixed(0)}–${(w*hi).toFixed(0)} kcal/day; protein ${(w*pr).toFixed(0)} g/day`,`${lo}–${hi} kcal/kg and ${pr} g/kg of actual weight. Consider adjusted weight if obese; phase of illness matters.`)}
- const cg=crcl(p);if(cg!==null)add("Creatinine clearance",cg.toFixed(0)+" mL/min","Cockcroft–Gault, actual weight. Unreliable in AKI or unstable creatinine.");
- return R.join("")||"Enter weight, height, sex, labs and ABG values to see calculations."}
+function calcHTML(p){const n=x=>{x=parseFloat(x);return isFinite(x)?x:null},a=p.investigations.abg,c=p.calc||{},ca=labVal(p,"ca t","mg/dL"),alb=labVal(p,"alb","g/dL")??n(a.Albumin),na=labVal(p,"na","mmol/L")??n(a.Na),g=n(p.rbs),w=n(p.weight),ht=n(p.heightCm),sx=p.ventSex,R=[],add=(t,f,v)=>R.push([t,f,v]);
+ const ibw=ht>0&&(sx==="male"||sx==="female")?(sx==="male"?50:45.5)+0.91*(ht-152.4):null;
+ if(ca!==null&&alb!==null)add("Corrected calcium","Ca + 0.8 × (4 − albumin). Prefer ionized calcium in critical illness.",(ca+0.8*(4-alb)).toFixed(1)+" mg/dL");
+ if(na!==null&&g>0)add("Sodium corrected for glucose","Na + factor × (glucose − 100) / 100; factors 1.6 and 2.4",`${(na+1.6*(g-100)/100).toFixed(0)} / ${(na+2.4*(g-100)/100).toFixed(0)} mmol/L`);
+ if(na>145&&w>0&&(sx==="male"||sx==="female"))add("Free water deficit (hypernatremia)","TBW × (Na/140 − 1); TBW 0.6 × weight (male), 0.5 (female)",(w*(sx==="male"?0.6:0.5)*(na/140-1)).toFixed(1)+" L");
+ const hc=n(a.HCO3),nA=n(a.Na),cl=n(a.Cl);if(hc!==null&&nA!==null&&cl!==null&&hc<24){const dr=(nA-cl-hc-12)/(24-hc);add("Delta ratio","(AG − 12) / (24 − HCO₃⁻). <0.4 hyperchloremic; 0.4–0.8 mixed; 1–2 high-AG; >2 high-AG plus metabolic alkalosis",dr.toFixed(2))}
+ if(ibw>0){add("Ideal (predicted) body weight","Devine, as used for ventilation",ibw.toFixed(1)+" kg");if(w>0){add("Adjusted body weight","IBW + 0.4 × (actual − IBW), used for some drug doses",(ibw+0.4*(w-ibw)).toFixed(1)+" kg");add("BMI","weight / height²",(w/(ht/100)**2).toFixed(1))}}
+ if(w>0){const bmi=ibw>0?w/(ht/100)**2:null,nb=bmi>=30?ibw+0.25*(w-ibw):w,lo=n(c.kcalLo)||20,hi=n(c.kcalHi)||25,pr=n(c.protG)||1.3;
+  add("Energy target (after acute phase)",`${lo}–${hi} kcal/kg × ${bmi>=30?"adjusted weight (BMI ≥30)":"actual weight"} (${nb.toFixed(0)} kg). Indirect calorimetry preferred.`,`${(nb*lo).toFixed(0)}–${(nb*hi).toFixed(0)} kcal/day`);
+  add("Early-phase energy","ESPEN: ≤70% of estimated needs in the first days, advanced progressively (not before 48 h)","≤"+(nb*hi*0.7).toFixed(0)+" kcal/day");
+  add("Protein target",`${pr} g/kg delivered progressively (ESPEN 2023); ASPEN/SCCM suggests 1.2–2.0 g/kg. Avoid very high early protein.`,(nb*pr).toFixed(0)+" g/day")}
+ const cg=crcl(p);if(cg!==null)add("Creatinine clearance","Cockcroft–Gault, actual weight; unreliable in AKI",cg.toFixed(0)+" mL/min");
+ return R.length?`<div class="scroll"><table><tr><th>Calculation</th><th>Result</th></tr>${R.map(r=>`<tr><td><b>${r[0]}</b><div class="small">${esc(r[1])}</div></td><td><b>${esc(r[2])}</b></td></tr>`).join("")}</table></div>`:"Enter weight, height, sex, labs and ABG values to see calculations."}
 function fluidCalc(p){
  const w=parseFloat(p.weight),i=parseFloat(p.fluidIn),o=parseFloat(p.fluidOut),h=parseFloat(p.duration);
  if(!(w>0&&h>0&&i>=0&&o>=0))return"Enter weight, duration, intake and output.";
@@ -419,7 +447,8 @@ function fluidCalc(p){
 
 function upd(){
  if(active===null||!P())return;const p=P();
- p.investigations.laboratory.forEach((it,i)=>{const e=$("lf"+i);if(!e)return;const f=labFlag(it,p);e.textContent=f[0];e.className="fl "+f[1];e.title=f[2]});
+ p.investigations.laboratory.forEach((it,i)=>{const e=$("lf"+i),f=labFlag(it,p);if(e){e.textContent=f[0];e.className="fl "+f[1];e.title=f[2]}
+  [["result",it.result],["lastResult",it.lastResult],["last2",it.last2],["last3",it.last3]].forEach(([k,v])=>{const el=document.querySelector(`[data-p="investigations.laboratory.${i}.${k}"]`);if(el){const g=labFlag({name:it.name,unit:it.unit,result:v||""},p);el.classList.toggle("abn",g[1]==="hi"||g[1]==="lo")}})});
  document.querySelectorAll(".trend").forEach(s=>s.dataset.v=s.value);
  const set=(id,h)=>{const e=$(id);if(e)e.innerHTML=h};
  set("abgOut",abgCalc(p));set("scoreOut",scoreHTML(p));
@@ -448,7 +477,7 @@ function sbarText(p){
  const x=(t,s)=>s&&L.push(t+": "+s);
  L.push("SITUATION",`${p.bed||""}${p.age?", "+p.age+"y":""}${p.ventSex?" "+p.ventSex:""} — ${p.diagnosis||""}`,"","BACKGROUND",p.presentIllness||"",p.events?"Last 24 h: "+p.events:"","","ASSESSMENT");
  const g0=scoreCalc(p);x("CNS",[g0.gcs!==null&&"GCS "+g0.gcs+" (E"+p.scores.gcsE+" V"+p.scores.gcsV+" M"+p.scores.gcsM+")",p.sedation&&"Sedation: "+p.sedation,(p.scores||{}).rass&&"RASS "+p.scores.rass,p.pupils&&"Pupils: "+p.pupils,p.seizures&&"Seizures: "+p.seizures,ctTxt(p,/ct\s*brain/i),p.cns].filter(Boolean).join(" | "));x("Respiratory",[p.respSupport,p.spo2&&"SpO₂ "+p.spo2+"%",(p.breathSounds||p.ausc)&&"Auscultation: "+[p.breathSounds,p.ausc].filter(Boolean).join(", "),ctTxt(p,/ct\s*chest/i),p.resp,vent&&"Vent: "+vent].filter(Boolean).join(" | "));x("Cardiovascular",[hemo,dr.length&&"Support: "+dr.join("; "),ctTxt(p,/echo/i),p.cv].filter(Boolean).join(" | "));
- x("Renal/metabolic",p.renal);x("Infection",[p.temp&&"Temp "+p.temp+"°C",p.sepsisMarker&&p.sepsisMarker+(p.sepsisValue?" "+p.sepsisValue:""),p.infection].filter(Boolean).join(" | "));x("Weaning",wnLine(p));x("Medications",p.meds.map(m=>`${m.drug||"?"}${m.dose?" "+m.dose:""}`).join("; "));x("Cultures",p.cultures.map(c=>`${c.type||"Culture"}${c.date?" "+c.date:""}: ${c.organism||c.status||"pending"}${c.susceptible?" (susceptible: "+c.susceptible+")":""}`).join("; "));x("Abdomen",[p.palpation&&"Palpation: "+p.palpation,p.bowelSounds&&"Bowel sounds: "+p.bowelSounds,p.feeding&&"Feeding: "+p.feeding,p.stool,p.rbs&&"RBS "+p.rbs,p.abdNotes].filter(Boolean).join(" | "));x("Other",p.other);
+ x("Renal/metabolic",p.renal);x("Infection",[p.temp&&"Temp "+p.temp+"°C",mkList(p).join(", ")+(p.sepsisValue?" "+p.sepsisValue:""),p.infection].filter(Boolean).join(" | "));x("Weaning",wnLine(p));x("Medications",p.meds.map(m=>`${m.drug||"?"}${m.dose?" "+m.dose:""}`).join("; "));x("Cultures",p.cultures.map(c=>`${c.type||"Culture"}${c.date?" "+c.date:""}: ${c.organism||c.status||"pending"}${c.susceptible?" (susceptible: "+c.susceptible+")":""}`).join("; "));x("Extremities",[p.edema&&"Edema: "+p.edema,p.pulses&&"Pulses "+p.pulses.toLowerCase(),p.capRefill&&"CRT "+p.capRefill,p.limbTemp,p.dvtSigns==="Yes"&&"Calf swelling/tenderness",p.skin&&p.skin!=="Intact"&&p.skin,p.extNotes].filter(Boolean).join(" | "));x("Abdomen",[p.palpation&&"Palpation: "+p.palpation,p.bowelSounds&&"Bowel sounds: "+p.bowelSounds,p.feeding&&"Feeding: "+p.feeding,p.stool,p.rbs&&"RBS "+p.rbs,p.abdNotes].filter(Boolean).join(" | "));x("Other",p.other);
  x("Anticoagulation",p.acType==="Pharmacological"?(p.anticoag.map(a=>`${a.drug}${a.dose?" "+a.dose:""}${a.date?" D"+dayN(a.date):""}${a.indication?" ("+a.indication+")":""}`).join("; ")||"Pharmacological"):p.acType==="Mechanical"?"Mechanical"+(p.acMech?" – "+p.acMech:""):p.acType);
  {const g=scoreCalc(p),sc=p.scores||{};x("Scores",[g.gcs!==null&&"GCS "+g.gcs,sc.rass&&"RASS "+sc.rass,g.n>0&&"SOFA "+g.total+(g.n<6?" (partial "+g.n+"/6)":""),...p.scoreList.filter(it=>!["GCS","RASS","SOFA"].includes(it.name)).map(it=>{const v=scoreVal(p,it),d=SD[it.name];return it.name+" "+v+(d&&d.i&&v!==""?" — "+d.i(v):"")})].filter(Boolean).join(", "))}
  x("Lines/tubes",p.lines.map(l=>`${l.type||"Line"}${l.site?" "+l.site:""}${l.date?" D"+dayN(l.date):""}`).join("; "));
@@ -500,6 +529,9 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b
   if(LISTS[x].opts){const d=$("sel_"+x).value;if(!d){alert("Select an item first.");return}if(ARR(p,x).some(i=>i.drug===d)){alert("Already added.");return}const o=Object.fromEntries(LISTS[x].f.map(f=>[f[0],f[0]==="date"?today:""]));o.drug=d;if(x==="vasoactive"){o.trend="Stable";o.targetMap=c.vitals.targetMap||"65"}ARR(p,x).push(o)}
   else ARR(p,x).push(Object.fromEntries([...LISTS[x].f.map(f=>[f[0],f[0]==="date"?today:""])]))}
  else if(a==="del"){if(!confirm("Remove this entry?"))return;toTrash({kind:"item",bed:p.bed,x,item:ARR(p,x)[Number(y)]});ARR(p,x).splice(Number(y),1)}
+ else if(a==="ac"){p.acType=x}
+ else if(a==="addmed"){p.meds.push({drug:"",more:false})}
+ else if(a==="medmore"){p.meds[Number(x)].more=!p.meds[Number(x)].more}
  else if(a==="snap"){p.trend.push({t:new Date().toISOString().slice(0,16),v:snap(p)});p.trend=p.trend.slice(-60)}
  else if(a==="tpl"){const k=$("tplSel").value;if(!k){alert("Choose a template first.");return}TPL[k].forEach(t=>{if(!p.plans.some(i=>i.text===t))p.plans.push({text:t,done:false})})}
  else if(a==="prevsbar"){const l=(p.history||[]).slice(-1)[0];$("sbar").value=l?"Archived "+l.d+"\n\n"+l.sbar:"No archived SBAR yet. It is saved when you press New day.";return}
