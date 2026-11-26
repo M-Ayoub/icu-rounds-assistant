@@ -70,7 +70,7 @@ button.sm{min-height:34px;padding:4px 12px;margin:0}
 .acadd{display:flex;gap:6px;align-items:center}.acadd select{margin:0}.acadd button{margin:0;white-space:nowrap}
 body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}body.dark .seg button{background:#26384a;color:#e6edf3}body.dark .seg button.on{background:#2b7a9c;color:#fff}body.dark .chip span{border-color:#46607a}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v10</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v11</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -81,7 +81,7 @@ body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff
 <div id="infoBox" hidden><div id="infoSvg"></div><button onclick="dlInfo()">Download PNG</button><button onclick="dlInfo(1)">Share image</button><button class="g" onclick="printInfo()">Print / PDF</button><button class="g" onclick="$('infoBox').hidden=true">Close</button></div></section>
 <section><h3>Backup</h3>
 <button onclick="exportAll()">Export all patients</button>
-<button class="g" onclick="$('imp').click()">Import backup</button>
+<button class="g" onclick="$('imp').click()">Import backup</button><button class="g" onclick="forceUpdate()">↻ Update app (keeps your data)</button>
 <input id="imp" type="file" accept=".json,application/json" hidden>
 <p class="small">Import adds patients to the current list. Browser data can be lost if site data is cleared.</p><h4>Recently deleted</h4><div id="trashBox"></div></section>
 <section id="sheet" hidden><h3>Handover sheet</h3><button onclick="window.print()">Print / save as PDF</button><button class="g" onclick="copySheet()">Copy all</button><button class="g" onclick="shareTxt($('sheetTxt').textContent)">Share</button><button class="g" onclick="$('sheet').hidden=true">Close</button><pre id="sheetTxt"></pre></section>
@@ -581,6 +581,4 @@ function showSheet(){if(!data.length){alert("No patients.");return}
  $("sheetTxt").textContent="ICU handover — "+new Date().toLocaleDateString()+"\n\n"+data.map(p=>"=== "+(p.bed||"Bed")+" ===\n"+sbarText(p)).join("\n\n");$("sheet").hidden=false;$("sheet").scrollIntoView()}
 function copySheet(){if(navigator.clipboard)navigator.clipboard.writeText($("sheetTxt").textContent).then(()=>alert("Copied."),()=>alert("Copy failed."));else alert("Copy not available; use Print.")}
 function copySBAR(){const t=$("sbar").value;if(!t){alert("Generate the SBAR first.");return}
- if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert("Copied."),()=>alert("Copy failed. Select the text and copy manually."));else{$("sbar").select();alert("Select all and copy manually.")}}
-
-/* ---------- patien
+ if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert("Copied."),()=>alert("Copy failed. Select the text and copy manually."));else{
