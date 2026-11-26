@@ -22,6 +22,8 @@ summary{list-style:none;padding:14px;background:#123047;color:#fff;font-weight:7
 summary::-webkit-details-marker{display:none}summary::after{content:"+";margin-left:auto}details[open] summary::after{content:"−"}
 .body{padding:4px 14px 14px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.abg-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 8px}.abg-grid label{font-size:11px;min-width:0}.abg-grid input{font-size:12px;padding:6px 5px;margin-top:2px;min-width:0}
+.med-row{border:1px solid #dce6ed;border-radius:8px;padding:8px;margin:7px 0;background:#f7fafc}.med-summary{display:flex;align-items:center;gap:7px;min-width:0}.med-summary .med-name{font-weight:700;min-width:70px;flex:0 1 30%;overflow-wrap:anywhere}.med-summary .med-details{font-size:12px;color:#526879;flex:1;min-width:0;overflow-wrap:anywhere}.med-summary button{flex:none}.med-edit{border-top:1px solid #dce6ed;margin-top:8px;padding-top:6px}.med-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}.med-grid label{min-width:0}.med-grid input{padding:7px;font-size:13px}.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:7px 9px;margin:5px 0;background:#eaf5fb;border-radius:7px;font-size:12px;color:#103954}.abx-copy-row b{overflow-wrap:anywhere}.abx-copy-row span{overflow-wrap:anywhere}
 @media(max-width:420px){.g2{grid-template-columns:1fr}}
 .scroll{overflow-x:auto}
 .lab{display:grid;grid-template-columns:64px 108px 76px 54px 46px 62px 62px 62px;gap:6px;min-width:590px;margin-bottom:6px;align-items:start}
@@ -54,7 +56,7 @@ header button{min-height:36px;margin:0 0 0 4px;padding:6px 10px}
 body.dark{background:#10161c;color:#e6edf3}body.dark section,body.dark details,body.dark .ent,body.dark table,body.dark #navRow{background:#1a232c;color:#e6edf3;border-color:#2a3744}
 body.dark input,body.dark textarea,body.dark select{background:#0f171e;color:#e6edf3;border-color:#33424f}
 body.dark .out,body.dark .r{background:#212d38;color:#e6edf3}body.dark .r.a,body.dark .al{background:#3a1f1f;color:#ffb4ab}
-body.dark .nm{background:#1d4a63;color:#d6efff}body.dark .warn{background:#3b3216;color:#ffe9a8}body.dark td,body.dark th{border-color:#2f3d4a}
+body.dark .nm{background:#1d4a63;color:#d6efff}body.dark .med-row{background:#202d38;border-color:#3b4c5b}body.dark .med-summary .med-details{color:#b5c5d1}body.dark .med-edit{border-color:#3b4c5b}body.dark .abx-copy-row{background:#18394b;color:#d6efff}body.dark .warn{background:#3b3216;color:#ffe9a8}body.dark td,body.dark th{border-color:#2f3d4a}
 body.dark .small{color:#9fb0bf}body.dark .body details.sub>summary{background:#26384a;color:#e6edf3}body.dark .pt{border-color:#2a3744}
 h4{margin:16px 0 6px;color:#123047;font-size:15px}
 section,details{box-shadow:0 1px 3px rgba(18,48,71,.08)}summary{font-size:16px}
@@ -70,7 +72,7 @@ button.sm{min-height:34px;padding:4px 12px;margin:0}
 .acadd{display:flex;gap:6px;align-items:center}.acadd select{margin:0}.acadd button{margin:0;white-space:nowrap}
 body.dark h4{color:#9fd3f0}body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}body.dark .seg button{background:#26384a;color:#e6edf3}body.dark .seg button.on{background:#2b7a9c;color:#fff}body.dark .chip span{border-color:#46607a}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v13</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v14</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -191,6 +193,8 @@ function ensure(p) {
         p.cultures = [];
     if (!Array.isArray(p.meds))
         p.meds = [];
+    if (p.pastMedicalHistory === undefined) p.pastMedicalHistory = "";
+    p.meds.forEach(m => { if (!m || typeof m !== "object") return; if (m.route === undefined) m.route = ""; if (m.frequency === undefined) m.frequency = ""; if (m.indication === undefined) m.indication = ""; if (m.editing === undefined) m.editing = false; });
     if (!Array.isArray(p.trend))
         p.trend = [];
     if (!Array.isArray(p.history))
@@ -240,12 +244,12 @@ function cards(p) {
     const gs = (k, l, a) => `<label>${l}<select data-p="scores.${k}"><option value=""></option>${a.map((t, i) => `<option value="${i + 1}"${sv(k, String(i + 1))}>${i + 1} – ${t}</option>`).join("")}</select></label>`;
     const RS = ["+4 Combative", "+3 Very agitated", "+2 Agitated", "+1 Restless", "0 Alert and calm", "-1 Drowsy", "-2 Light sedation", "-3 Moderate sedation", "-4 Deep sedation", "-5 Unarousable"];
     const A = [
-        S("📋 Diagnosis and daily events", grid([["age", "Age (years)", "number"], ["ventSex", "Sex", "sel", ["", "male", "female"]]]) + T("Date of admission", "admissionDate", "date") + T("Working diagnosis", "diagnosis", "area") + T("Present illness (HPI)", "presentIllness", "area") + T("Events in last 24 hours", "events", "area"), 1),
+        S("📋 Diagnosis and daily events", grid([["age", "Age (years)", "number"], ["ventSex", "Sex", "sel", ["", "male", "female"]]]) + T("Date of admission", "admissionDate", "date") + T("Working diagnosis", "diagnosis", "area") + T("Past medical history (PMH)", "pastMedicalHistory", "area") + T("History of present illness (HPI)", "presentIllness", "area") + T("Events in last 24 hours", "events", "area"), 1),
         S("🧠 CNS", `<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE", "Eye opening", ["None", "To pain", "To voice", "Spontaneous"])}${gs("gcsV", "Verbal (intubated: estimate)", ["None", "Incomprehensible sounds", "Inappropriate words", "Confused", "Oriented"])}${gs("gcsM", "Motor", ["None", "Extension", "Abnormal flexion", "Withdrawal", "Localizes", "Obeys"])}</div><div id="gcsOut" class="out"></div>
  <details class="sub"><summary>Sedation and neurological status</summary><div class="g2">${fld(["sedation", "Sedation agent", "sel", ["", "None", "Propofol", "Midazolam", "Dexmedetomidine", "Ketamine", "Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t => { const v = t.split(" ")[0]; return `<option value="${v}"${String(getp(p, "scores.rass")) === v ? " selected" : ""}>${t}</option>`; }).join("")}</select></label>${fld(["pupils", "Pupils", "sel", ["", "Equal and reactive", "Equal, sluggish", "Unequal", "Fixed and dilated", "Pinpoint", "Other"]])}${fld(["seizures", "Seizures", "sel", ["", "None", "Seizure in last 24 h", "On antiepileptics, seizure-free", "Status epilepticus"]])}</div></details>
  <h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>` + T("CNS notes (delirium, etc.)", "cns", "area")),
         S("🧪 Investigations", `<h4>Laboratory</h4><div class="scroll"><div class="lab small"><b>Test</b><b>Date</b><b>Result</b><b>Unit</b><b>Trend</b><b>Last 1</b><b>Last 2</b><b>Last 3</b></div>${I.laboratory.map(labRow).join("")}</div><button data-a="addlab">+ Add lab test</button>
- <h4>Arterial blood gas</h4>${`<div class="g2">${ABGF.map(([k, l, s]) => fld([k, l, "number"], "investigations.abg")).join("")}</div>`}<div id="abgOut" class="out"></div>
+ <h4>Arterial blood gas</h4>${`<div class="abg-grid">${ABGF.map(([k, l, s]) => fld([k, l, "number"], "investigations.abg")).join("")}</div>`}<div id="abgOut" class="out"></div>
  <h4>Radiology</h4><div class="scroll">${I.radiology.map(radRow).join("")}</div><button data-a="addrad">+ Add radiology</button>` + T("Additional investigation notes", "labs", "area")),
         S("🫁 Respiratory", grid([["respSupport", "Respiratory support", "sel", ["", "Room air", "Oxygen (nasal cannula / mask)", "HFNC / NIV", "Ventilator"]], ["spo2", "SpO₂ (%)", "number"], ["breathSounds", "Breath sounds", "sel", ["", "Normal vesicular", "Wheeze", "Crackles", "Coarse crackles", "Bronchial breathing", "Diminished air entry", "Absent breath sounds", "Stridor", "Pleural rub"]]]) + T("Auscultation notes", "ausc", "area") + T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)", "resp", "area") + `<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`),
         S("🫁 Ventilator monitoring", T("Ventilator mode", "ventMode", "sel", ["", "VC", "PC", "SIMV-VC", "SIMV-PC", "PSV", "CPAP", "APRV", "Other"]) +
@@ -535,7 +539,16 @@ const ctBox = (p, re, l) => { const r = ctLast(p, re); return r ? `<b>${l}</b>${
 function gcsHTML(p) { const g = scoreCalc(p).gcs, s = p.scores || {}; return g === null ? "Select eye, verbal and motor responses to calculate." : `GCS <b>${g}</b> (E${s.gcsE} V${s.gcsV} M${s.gcsM})`; }
 const MK = ["Procalcitonin elevated", "CRP elevated", "Lactate elevated", "WBC high", "WBC low", "Markers rising", "Markers falling", "Normal"];
 const mkList = p => [...Object.keys(p.sepsisM || {}).filter(k => p.sepsisM[k]), ...(p.sepsisMarker && !(p.sepsisM || {})[p.sepsisMarker] ? [p.sepsisMarker] : [])];
-const medsHTML = p => p.meds.map((m, i) => `<div class="med"><div class="medr"><input data-p="meds.${i}.drug" value="${esc(m.drug)}" placeholder="Medication"><button class="g sm" data-a="medmore:${i}" aria-label="Details">${m.more ? "−" : "+"}</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove">×</button></div>${m.more ? grid(LISTS.meds.f.slice(1), "meds." + i) : m.dose ? `<div class="small">${esc(m.dose)}</div>` : ""}</div>`).join("") + `<button data-a="addmed">+ Add medication</button>`;
+const medsHTML = p => {
+    const antibiotics = (p.abx || []).filter(x => x.drug || x.date || x.dose);
+    const abxHTML = `<h4>Antibiotics from Infection card</h4><p class="small">Read-only copy. Edit antibiotic details in the Infection card.</p>${antibiotics.length ? antibiotics.map(x => `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}</b><span>${esc(x.date || "Start date not entered")}</span><span>${esc(x.dose || "Dose not entered")}</span></div>`).join("") : `<p class="small">No antibiotics entered in the Infection card.</p>`}`;
+    const meds = (p.meds || []).map((m, i) => {
+        const details = [m.dose, m.route, m.frequency, m.indication].filter(Boolean).map(esc).join(" · ");
+        const editor = m.editing ? `<div class="med-edit"><div class="med-grid">${[["drug", "Medication name"], ["dose", "Dose"], ["route", "Route"], ["frequency", "Frequency"], ["indication", "Indication (optional)"]].map(([k, l]) => fld([k, l], "meds." + i)).join("")}</div><button class="g sm" data-a="mededit:${i}">Done</button></div>` : "";
+        return `<div class="med-row"><div class="med-summary"><span class="med-name">${esc(m.drug || "New medication")}</span><span class="med-details">${details || "Details not entered"}</span><button class="g sm" data-a="mededit:${i}">Edit</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove medication">×</button></div>${editor}</div>`;
+    }).join("");
+    return abxHTML + `<h4>Other medications</h4>${meds}<button data-a="addmed">+ Add medication</button>`;
+};
 const ACC = ["#0b7285", "#862e9c", "#c2410c", "#2b8a3e", "#a61e4d", "#364fc7", "#8a6d00"], acCol = d => ACC[[...(d || "x")].reduce((a, c) => a + c.charCodeAt(0), 0) % ACC.length];
 function acHTML(p) {
     const t = p.acType;
@@ -923,8 +936,10 @@ function parseCase(src) {
   if (ht > 100 && ht < 230) add("Height " + ht + " cm", [["heightCm", String(ht)]]);
   let m = T.match(/(?:dx|diagnosis|diagnoses|impression)\s*[:\-]\s*([^\n]+)/i);
   if (m) add("Diagnosis: " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
-  m = T.match(/(?:hpi|history|presented with|presenting with|c\/o|complaining of|admitted (?:with|for))\s*[:\-]?\s*([^\n]+)/i);
-  if (m) add("Present illness: " + m[1].slice(0, 60), [["presentIllness", m[0].trim().slice(0, 500)]]);
+  m = T.match(/(?:past medical history|past history|\bPMH\b|comorbidities)\s*[:\-]?\s*([^\n]+)/i);
+  if (m) add("Past medical history: " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
+  m = T.match(/(?:history of present illness|\bHPI\b|presented with|presenting with|chief complaint|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([^\n]+)/i);
+  if (m) add("History of present illness: " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
   m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^\n]+)/i);
   if (m) add("Events: " + m[1].slice(0, 60), [["events", m[1].trim()]]);
   m = T.match(/admi\w+\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2})/i);
@@ -1004,7 +1019,7 @@ function parseCase(src) {
 
 /* ---------- patient data and rendering ---------- */
 function blankPatient(bed) {
-  return { bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", presentIllness: "", events: "", sedation: "", pupils: "", seizures: "", cns: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "", ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "", pressureSupport: "", peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "", ieRatio: "", temp: "", sepsisTime: "", sepsisMarker: "", sepsisValue: "", infection: "", acType: "", acMech: "", other: "", weight: "", duration: "", fluidIn: "", fluidOut: "", plan: "", renal: "", labs: "", palpation: "", bowelSounds: "", feeding: "", stool: "", rbs: "", abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "", skin: "", extNotes: "", checks: {}, scores: {}, sepsisM: {}, wean: {}, calc: {}, investigations: { laboratory: LAB.map(([name, unit]) => ({ name, date: "", result: "", unit, trend: "", lastResult: "", last2: "", last3: "" })), radiology: RAD.map(name => ({ name, date: "", result: "" })), abg: {} }, cardio: { vitals: { targetMap: "65" }, vasoactive: [], ecg: [], biomarkers: [], echo: { enabled: false } }, lines: [], abx: [], anticoag: [], cultures: [], meds: [], plans: [], scoreList: [], trend: [], history: [] };
+  return { bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", pastMedicalHistory: "", presentIllness: "", events: "", sedation: "", pupils: "", seizures: "", cns: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "", ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "", pressureSupport: "", peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "", ieRatio: "", temp: "", sepsisTime: "", sepsisMarker: "", sepsisValue: "", infection: "", acType: "", acMech: "", other: "", weight: "", duration: "", fluidIn: "", fluidOut: "", plan: "", renal: "", labs: "", palpation: "", bowelSounds: "", feeding: "", stool: "", rbs: "", abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "", skin: "", extNotes: "", checks: {}, scores: {}, sepsisM: {}, wean: {}, calc: {}, investigations: { laboratory: LAB.map(([name, unit]) => ({ name, date: "", result: "", unit, trend: "", lastResult: "", last2: "", last3: "" })), radiology: RAD.map(name => ({ name, date: "", result: "" })), abg: {} }, cardio: { vitals: { targetMap: "65" }, vasoactive: [], ecg: [], biomarkers: [], echo: { enabled: false } }, lines: [], abx: [], anticoag: [], cultures: [], meds: [], plans: [], scoreList: [], trend: [], history: [] };
 }
 function renderList() {
   const el = $("list"); if (!el) return;
@@ -1021,10 +1036,15 @@ function renderOutputs() {
   p.investigations.laboratory.forEach((it, i) => { const e = $("lf" + i); if (e) { const f = labFlag(it, p); e.textContent = f[0]; e.className = "fl " + f[1]; e.title = f[2]; } });
 }
 function draw() {
+  const savedScrollY = window.scrollY;
+  const openDetails = [...$("cards").querySelectorAll("details")].map(d => d.open);
   if (active === null || !P()) { $("rec").hidden = true; return; }
   const p = P(); ensure(p); $("rec").hidden = false; $("heading").textContent = p.bed || "Patient";
   $("jumpSel").innerHTML = data.map((q, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(q.bed || "Bed " + (i + 1))}</option>`).join("");
-  $("cards").innerHTML = cards(p); renderOutputs();
+  $("cards").innerHTML = cards(p);
+  [...$("cards").querySelectorAll("details")].forEach((d, i) => { if (openDetails[i] !== undefined) d.open = openDetails[i]; });
+  renderOutputs();
+  requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
 }
 function openPatient(i) { if (!Number.isInteger(i) || i < 0 || i >= data.length) return; active = i; draw(); renderList(); persist(); }
 function addPatient() {
@@ -1040,7 +1060,7 @@ function delPatient() {
 }
 function sbarText(p) {
   ensure(p); const c = p.cardio, v = c.vitals, k = cardioCalc(v), pf = pfOf(p), bal = parseFloat(p.fluidIn) - parseFloat(p.fluidOut);
-  const lines = [`ICU SBAR — ${p.bed} — ${new Date().toLocaleString()}`, "", "S — SITUATION", p.diagnosis || "Diagnosis not entered", p.events ? "Events: " + p.events : "", "", "B — BACKGROUND", [p.age && p.age + " years", p.ventSex, p.admissionDate && "Admitted " + p.admissionDate, p.presentIllness].filter(Boolean).join(" · "), "", "A — ASSESSMENT", `BP ${v.sbp || "—"}/${v.dbp || "—"} · MAP ${k.map === null ? "—" : k.map.toFixed(0)} · HR ${v.hr || "—"} · Rhythm ${v.rhythm || "—"} · CVP ${v.cvp || "—"}`, `Respiratory: ${p.respSupport || "—"}; SpO₂ ${p.spo2 || "—"}; mode ${p.ventMode || "—"}; FiO₂ ${p.fio2Percent || "—"}; PEEP ${p.setPEEP || "—"}; P/F ${pf === null ? "—" : pf.toFixed(0)}`, `Fluid balance ${Number.isFinite(bal) ? bal : "—"} mL; weight ${p.weight || "—"} kg`, `ABG: pH ${p.investigations.abg.pH || "—"}, PaCO₂ ${p.investigations.abg.PaCO2 || "—"}, HCO₃ ${p.investigations.abg.HCO3 || "—"}, lactate ${p.investigations.abg.Lactate || "—"}`, `Vasoactive: ${c.vasoactive.filter(x => x.trend !== "Stopped").map(x => `${x.drug} ${x.dose || ""} ${x.unit || ""}`).join("; ") || "None entered"}`, `Antibiotics: ${p.abx.map(x => x.drug + (x.dose ? " " + x.dose : "")).join("; ") || "None entered"}`, "", "R — RECOMMENDATION / PLAN", p.plan || "No plan entered", ...(p.plans || []).filter(x => x.text).map(x => `${x.done ? "[x]" : "[ ]"} ${x.text}`), "", "Verify all information against the clinical chart."];
+  const lines = [`ICU SBAR — ${p.bed} — ${new Date().toLocaleString()}`, "", "S — SITUATION", p.diagnosis || "Diagnosis not entered", p.events ? "Events: " + p.events : "", "", "B — BACKGROUND", [p.age && p.age + " years", p.ventSex, p.admissionDate && "Admitted " + p.admissionDate, p.pastMedicalHistory && "PMH: " + p.pastMedicalHistory, p.presentIllness].filter(Boolean).join(" · "), "", "A — ASSESSMENT", `BP ${v.sbp || "—"}/${v.dbp || "—"} · MAP ${k.map === null ? "—" : k.map.toFixed(0)} · HR ${v.hr || "—"} · Rhythm ${v.rhythm || "—"} · CVP ${v.cvp || "—"}`, `Respiratory: ${p.respSupport || "—"}; SpO₂ ${p.spo2 || "—"}; mode ${p.ventMode || "—"}; FiO₂ ${p.fio2Percent || "—"}; PEEP ${p.setPEEP || "—"}; P/F ${pf === null ? "—" : pf.toFixed(0)}`, `Fluid balance ${Number.isFinite(bal) ? bal : "—"} mL; weight ${p.weight || "—"} kg`, `ABG: pH ${p.investigations.abg.pH || "—"}, PaCO₂ ${p.investigations.abg.PaCO2 || "—"}, HCO₃ ${p.investigations.abg.HCO3 || "—"}, lactate ${p.investigations.abg.Lactate || "—"}`, `Vasoactive: ${c.vasoactive.filter(x => x.trend !== "Stopped").map(x => `${x.drug} ${x.dose || ""} ${x.unit || ""}`).join("; ") || "None entered"}`, `Antibiotics: ${p.abx.map(x => x.drug + (x.dose ? " " + x.dose : "")).join("; ") || "None entered"}`, "", "R — RECOMMENDATION / PLAN", p.plan || "No plan entered", ...(p.plans || []).filter(x => x.text).map(x => `${x.done ? "[x]" : "[ ]"} ${x.text}`), "", "Verify all information against the clinical chart."];
   return lines.filter((x, i) => x !== "" || lines[i - 1] !== "").join("\n");
 }
 function makeSBAR() { if (!P()) return; $("sbar").value = sbarText(P()); persist(); }
@@ -1049,8 +1069,8 @@ function copyText(t) { if (navigator.clipboard && window.isSecureContext) naviga
 function showSheet() { $("sheetTxt").textContent = data.map(p => sbarText(p)).join("\n\n" + "—".repeat(24) + "\n\n"); $("sheet").hidden = false; }
 function copySheet() { copyText($("sheetTxt").textContent); }
 function downloadJSON(obj, name) { const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }), u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000); }
-function exportOne() { if (P()) downloadJSON({ version: 13, exportedAt: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + "-icu-backup.json"); }
-function exportAll() { downloadJSON({ version: 13, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
+function exportOne() { if (P()) downloadJSON({ version: 14, exportedAt: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + "-icu-backup.json"); }
+function exportAll() { downloadJSON({ version: 14, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
 function importBackupFile(file) {
   const reader = new FileReader(); reader.onload = () => { try { const raw = JSON.parse(reader.result), incoming = Array.isArray(raw) ? raw : raw.patients; if (!Array.isArray(incoming)) throw new Error("No patient array found."); let count = 0; incoming.forEach((p, i) => { if (!p || typeof p !== "object") return; ensure(p); let bed = p.bed || "Imported " + (i + 1); if (data.some(q => q.bed === bed)) bed += " (imported " + (count + 1) + ")"; p.bed = bed; data.push(p); count++; }); persist(); active = data.length ? data.length - 1 : null; renderList(); draw(); alert(count + " patient record(s) imported."); } catch (e) { alert("Import failed: " + e.message); } }; reader.readAsText(file); }
 function forceUpdate() { if (!confirm("Refresh the app and check for the latest published version? Your saved data in this browser will be kept.")) return; if ("serviceWorker" in navigator) navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.update().catch(() => {})))).finally(() => location.reload()); else location.reload(); }
@@ -1083,12 +1103,13 @@ function handleAction(action) {
   if (a === "addlab") { p.investigations.laboratory.push({ name: "Other", date: "", result: "", unit: "", trend: "", lastResult: "", last2: "", last3: "" }); }
   else if (a === "addrad") { p.investigations.radiology.push({ name: "Other", date: "", result: "" }); }
   else if (a === "addplan") p.plans.push({ text: "", done: false });
-  else if (a === "addmed") p.meds.push({ drug: "", dose: "", date: "", indication: "", renal: "", more: true });
+  else if (a === "addmed") p.meds.push({ drug: "", dose: "", route: "", frequency: "", indication: "", editing: false });
   else if (a === "addscore") { const n = $("scoreSel").value; if (!n) { alert("Select a score first."); return; } p.scoreList.push({ name: n, value: "", note: "", comps: {}, cman: {} }); }
   else if (a === "del") { const arr = ARR(p, name); if (Array.isArray(arr) && arr[idx]) { toTrash({ kind: "entry", bed: p.bed, x: name, item: arr[idx] }); arr.splice(idx, 1); } }
   else if (a === "echo") p.cardio.echo.enabled = name === "on";
   else if (a === "ac") { p.acType = name; }
-  else if (a === "medmore") { p.meds[idx].more = !p.meds[idx].more; }
+  else if (a === "medmore") { const mi = Number(bits[1]); if (p.meds[mi]) p.meds[mi].more = !p.meds[mi].more; }
+  else if (a === "mededit") { const mi = Number(bits[1]); if (p.meds[mi]) p.meds[mi].editing = !p.meds[mi].editing; }
   else if (a === "resetchk") { if (confirm("Reset the daily checklist?")) p.checks = {}; }
   else if (a === "tpl") { const t = $("tplSel").value; if (!t) { alert("Choose a template first."); return; } TPL[t].forEach(text => p.plans.push({ text, done: false })); $("tplSel").value = ""; }
   else if (a === "snap") { p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) }); p.trend = p.trend.slice(-60); }
