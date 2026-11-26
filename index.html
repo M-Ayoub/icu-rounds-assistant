@@ -196,8 +196,10 @@ window.addEventListener("error", function(e) {
   var d = document.createElement("div");
   d.style.cssText = "background:#fde8e7;color:#a3211b;padding:10px;font-size:13px;word-break:break-word;white-space:pre-wrap";
   var m = "Page error: " + e.message + " (" + String(e.filename || "").split("/").pop() + " line " + e.lineno + ":" + e.colno + ")";
-  try { if (e.error && e.error.stack) m += "\n" + String(e.error.stack).slice(0, 400); } catch (x) {}
-  d.textContent = m + "\n";
+  try { if (e.error && e.error.stack) m += "
+" + String(e.error.stack).slice(0, 400); } catch (x) {}
+  d.textContent = m + "
+";
   var b = document.createElement("button");
   b.textContent = "Save a copy of stored data";
   b.onclick = function() {
@@ -1486,4 +1488,1133 @@ const CALC_DEFS = {
   delta: { label: "Delta ratio", fields: [["na", "Sodium (mmol/L)"], ["cl", "Chloride (mmol/L)"], ["hco3", "Bicarbonate (mmol/L)"]], run: v => { const n = +v.na, c = +v.cl, b = +v.hco3; if (!(n > 0 && c >= 0 && b > 0 && b < 24)) return null; const ag = n - c - b, x = (ag - 12) / (24 - b); return [x.toFixed(2), x < .4 ? "Pattern may suggest additional normal-anion-gap metabolic acidosis." : x < .8 ? "May indicate mixed high-anion-gap and normal-anion-gap metabolic acidosis." : x <= 2 ? "Compatible with a predominantly high-anion-gap metabolic acidosis." : "May suggest concurrent metabolic alkalosis; interpret cautiously and use albumin-corrected gap when appropriate."]; } },
   water: { label: "Free water deficit (hypernatremia)", fields: [["na", "Serum sodium (mmol/L)"], ["weight", "Weight (kg)"], ["sex", "Sex", "select", ["male", "female"]]], run: v => { const n = +v.na, w = +v.weight; if (!(n > 140 && w > 0 && v.sex)) return null; const x = w * (v.sex === "male" ? .6 : .5) * (n / 140 - 1); return [x.toFixed(2) + " L", "Estimate only. Plan correction rate and fluid choice according to acuity, volume status, ongoing losses and comorbidities; monitor sodium frequently."]; } },
   bmi: { label: "Body mass index (BMI)", fields: [["weight", "Weight (kg)"], ["height", "Height (cm)"]], run: v => { const w = +v.weight, h = +v.height; if (!(w > 0 && h > 0)) return null; const x = w / Math.pow(h / 100, 2); return [x.toFixed(1) + " kg/m²", x < 18.5 ? "Below the usual adult reference range." : x < 25 ? "Within the usual adult reference range." : x < 30 ? "Overweight range by standard adult BMI categories." : "Obesity range by standard adult BMI categories; BMI has limitations in critical illness and altered fluid status."]; } },
-  uo: { label: "Urine output rate", fields: [["urine", "Urine output (mL)"], ["duration", "Duration (hours)"], ["weight", "Weight (kg)"]], run: v => { const u = +v.urine, d = +v.duration, w = +v.weight; if (!(u >= 0 && d > 0 && w > 0)) return null;
+  uo: { label: "Urine output rate", fields: [["urine", "Urine output (mL)"], ["duration", "Duration (hours)"], ["weight", "Weight (kg)"]], run: v => { const u = +v.urine, d = +v.duration, w = +v.weight; if (!(u >= 0 && d > 0 && w > 0)) return null; const x = u / (d * w); return [x.toFixed(2) + " mL/kg/h", x < .5 ? "Below 0.5 mL/kg/h; assess duration, volume status, obstruction and kidney function." : "At or above 0.5 mL/kg/h; interpret with trends and the overall clinical picture."]; } },
+  fluid: { label: "Fluid balance", fields: [["input", "Total intake (mL)"], ["output", "Total output (mL)"]], run: v => { const i = +v.input, o = +v.output; if (!(i >= 0 && o >= 0)) return null; const x = i - o; return [(x > 0 ? "+" : "") + x.toFixed(0) + " mL", x > 0 ? "Positive balance; assess whether fluid administration remains indicated and review cumulative balance." : x < 0 ? "Negative balance; assess perfusion, volume status and ongoing losses." : "Net balance is zero for the entered interval."]; } },
+  rsbi: { label: "Rapid shallow breathing index (RSBI)", fields: [["rr", "Respiratory rate (breaths/min)"], ["vt", "Tidal volume (L)"]], run: v => { const r = +v.rr, t = +v.vt; if (!(r > 0 && t > 0)) return null; const x = r / t; return [x.toFixed(1) + " breaths/min/L", x < 105 ? "Below the traditional 105 threshold; RSBI alone does not establish readiness for extubation." : "At or above the traditional 105 threshold; reassess clinical readiness and reversible causes."]; } },
+  osm: { label: "Effective serum osmolality (tonicity)", fields: [["na", "Sodium (mmol/L)"], ["glucose", "Glucose (mg/dL)"]], run: v => { const n = +v.na, g = +v.glucose; if (!(n > 0 && g >= 0)) return null; const x = 2 * n + g / 18; return [x.toFixed(1) + " mOsm/kg", "Calculated effective osmolality excludes urea; interpret with measured osmolality, neurologic status and the clinical context."]; } },
+  bsa: { label: "Body surface area (Mosteller)", fields: [["weight", "Weight (kg)"], ["height", "Height (cm)"]], run: v => { const w = +v.weight, h = +v.height; if (!(w > 0 && h > 0)) return null; const x = Math.sqrt(w * h / 3600); return [x.toFixed(2) + " m²", "Estimate only; verify whether the relevant medication or protocol uses actual, ideal or another dosing weight."]; } },
+  qtc: { label: "Corrected QT (Bazett)", fields: [["qt", "QT interval (ms)"], ["hr", "Heart rate (beats/min)"]], run: v => { const q = +v.qt, h = +v.hr; if (!(q > 0 && h > 0)) return null; const x = q / Math.sqrt(60 / h); return [x.toFixed(0) + " ms", "Bazett correction may overcorrect at high heart rates and undercorrect at low rates; manually verify QT and consider Fridericia correction when appropriate."]; } }
+};
+
+function calcHTML(p) {
+  const c = p.calc || {}, selected = c.selected || "", d = CALC_DEFS[selected], vals = (c.inputs || {})[selected] || {};
+  if (!d) return `<p class="small">Choose a calculator above to enter its required values.</p>`;
+  const fields = d.fields.map(([k, l, t, opts]) => t === "select"
+    ? `<label>${esc(l)}<select data-p="calc.inputs.${selected}.${k}"><option value="">Select...</option>${opts.map(o => `<option value="${esc(o)}"${vals[k] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`
+    : `<label>${esc(l)}<input type="number" step="any" inputmode="decimal" data-p="calc.inputs.${selected}.${k}" value="${esc(vals[k] === undefined ? "" : vals[k])}"></label>`).join("");
+  const requiredKeys = selected === "ibw" ? ["sex", "height"] : d.fields.map(f => f[0]);
+  const complete = requiredKeys.every(k => vals[k] !== undefined && String(vals[k]).trim() !== "");
+  const result = complete ? d.run(vals) : null;
+  const box = result
+    ? `<div class="calc-result"><div class="small"><b>RESULT</b></div><div class="calc-value">${esc(result[0])}</div><div class="calc-rec"><b>Clinical interpretation / recommendation</b><br>${esc(result[1])}</div></div>`
+    : `<p class="small">Enter all required values to calculate.</p>`;
+  return `<div class="calc-inputs">${fields}</div>${box}`;
+}
+
+/* ---------- Import case from text (specific boxes) ---------- */
+const LABPAT = {
+  "Hb": "hb|hemoglobin|haemoglobin", "WBC": "wbc|tlc|white (?:blood )?cells?", "Plts": "plts?|platelets?",
+  "Na": "na\+?|sodium", "K": "k\+?|potassium", "Creat": "creat(?:inine)?|cr", "Urea": "urea|bun",
+  "Ca I": "(?:ionized|ionised)\s*(?:ca|calcium)|ica|ca\s*i", "Ca T": "(?:total\s*)?calcium|ca(?!\s*i)",
+  "Mg": "mg|magnesium", "Po4": "po4|phos(?:phate|phorus)?", "Alb": "alb(?:umin)?",
+  "Alt": "alt|sgpt", "Ast": "ast|sgot", "Bil D": "(?:direct|conj(?:ugated)?)\s*bil(?:irubin)?|bil\.?\s*d",
+  "Bil T": "(?:total\s*)?bilirubin|t\.?\s*bil|bil\.?\s*t",
+  "INR": "inr", "PT": "pt(?!t)", "PTT": "a?ptt", "CRP": "crp", "Tgen": "troponin|trop|tgen|hs-?tni|hs-?tnt"
+};
+const LCONV = {
+  Creat: v => v > 20 ? [v / 88.4, "from µmol/L"] : null,
+  "Bil T": v => v > 30 ? [v / 17.1, "from µmol/L"] : null,
+  "Bil D": v => v > 15 ? [v / 17.1, "from µmol/L"] : null,
+  Alb: v => v > 10 ? [v / 10, "from g/L"] : null,
+  Hb: v => v > 25 ? [v / 10, "from g/L"] : null,
+  "Ca T": v => v < 5 ? [v * 4.008, "from mmol/L"] : null,
+  Plts: v => v > 2000 ? [v / 1000, "÷1000"] : null,
+  WBC: v => v > 100 ? [v / 1000, "÷1000"] : null
+};
+const ABXL = [
+  ["meropenem", "Meropenem"], ["piperacillin|tazocin|pip[-/ ]?taz|zosyn", "Piperacillin-tazobactam"],
+  ["ceftriaxone", "Ceftriaxone"], ["cefepime", "Cefepime"], ["ceftazidime", "Ceftazidime"],
+  ["cefazolin", "Cefazolin"], ["vancomycin", "Vancomycin"], ["linezolid", "Linezolid"],
+  ["colistin", "Colistin"], ["amikacin", "Amikacin"], ["gentamicin", "Gentamicin"],
+  ["azithromycin", "Azithromycin"], ["levofloxacin", "Levofloxacin"], ["ciprofloxacin", "Ciprofloxacin"],
+  ["metronidazole", "Metronidazole"], ["clindamycin", "Clindamycin"],
+  ["augmentin|amoxicillin[- ]clav\w*", "Amoxicillin-clavulanate"], ["ampicillin", "Ampicillin"],
+  ["imipenem", "Imipenem"], ["tigecycline", "Tigecycline"], ["fluconazole", "Fluconazole"],
+  ["caspofungin|micafungin", "Echinocandin"], ["acyclovir", "Acyclovir"],
+  ["doxycycline", "Doxycycline"], ["cotrimoxazole|bactrim", "Co-trimoxazole"]
+];
+const ACL = [
+  ["enoxaparin|clexane|lovenox", "Enoxaparin"],
+  ["heparin (?:infusion|drip)", "Unfractionated heparin (infusion)"],
+  ["heparin", "Unfractionated heparin (prophylactic)"],
+  ["dalteparin", "Dalteparin"], ["fondaparinux", "Fondaparinux"], ["warfarin", "Warfarin"],
+  ["apixaban", "Apixaban"], ["rivaroxaban", "Rivaroxaban"], ["dabigatran", "Dabigatran"], ["argatroban", "Argatroban"]
+];
+const PRL = [
+  ["norepinephrine|noradrenaline|noradrenalin|levophed", "Norepinephrine (Noradrenaline)"],
+  ["\bepinephrine|\badrenaline", "Epinephrine (Adrenaline)"], ["vasopressin", "Vasopressin"],
+  ["dobutamine", "Dobutamine"], ["dopamine", "Dopamine"], ["phenylephrine", "Phenylephrine"], ["milrinone", "Milrinone"]
+];
+const LNL = [
+  [/central (?:venous )?(?:line|catheter)| CVC | CVL /i, "CVC"],
+  [/arterial line| a-?line /i, "Arterial line"],
+  [/dialysis catheter|permcath/i, "Dialysis catheter"],
+  [/foley|urinary catheter| IDC /i, "Urinary catheter"],
+  [/ ETT |endotracheal tube/i, "ETT"],
+  [/tracheostomy/i, "Tracheostomy"],
+  [/ NGT | OGT |nasogastric|orogastric| ng tube /i, "NG/OG tube"],
+  [/chest drain|chest tube/i, "Chest drain"]
+];
+const ORGX = /(klebsiella(?:\s+pneumoniae)?|e\.?\s*coli|escherichia\s+coli|pseudomonas(?:\s+aeruginosa)?|acinetobacter(?:\s+baumannii)?| mrsa |staph(?:ylococcus)?\s+aureus|enterococcus(?:\s+faecalis|\s+faecium)?| vre |streptococcus\s+\w+|candida(?:\s+\w+)?|enterobacter|proteus|stenotrophomonas|serratia|citrobacter)/i;
+const SPEC = [
+  [/blood cult(?:ure)?s?|blood cx| BC /i, "Blood"], [/sputum/i, "Sputum"],
+  [/tracheal aspirate/i, "Tracheal aspirate"], [/ BAL |bronchoalveolar/i, "BAL"],
+  [/urine cult(?:ure)?|urine cx/i, "Urine"], [/wound swab/i, "Wound swab"],
+  [/ CSF /i, "CSF"], [/catheter tip/i, "Catheter tip"]
+];
+
+function parseCase(src) {
+  const T = String(src || "").replace(/
+/g, "").replace(/[–—]/g, "-"), I = [];
+  const num = (re, t = T) => { const m = t.match(re); return m ? parseFloat(m[1]) : null; };
+  const add = (label, fields = [], apply = null) => I.push({ label, fields, apply });
+  const pick = (a, t = T) => { for (const [re, v] of a) if (re.test(t)) return v; return null; };
+
+  /* 1. Patient name & bed name */
+  const bedM = T.match(/ bed\s*[:#-]?\s*([A-Za-z0-9-]+)/i);
+  const nameM = T.match(/(?:patient\s*name|pt\s*name|patient|pt|name)\s*[:\-]\s*([A-Za-z][A-Za-z .'-]{1,40}?)(?=\s*(?:,|
+|\d{1,3}\s*(?:y\/o|yo|yrs?|years?)| (?:male|female|[MF]) | (?:age|sex|gender|dx|diagnosis|pmh|hpi|bp|hr|temp|abg|exam) |$))/i);
+  const parsedBed = bedM ? "Bed " + bedM[1].trim() : "";
+  const parsedName = nameM ? nameM[1].trim().replace(/[,.-]+$/, "") : "";
+  const combinedBed = [parsedBed, parsedName].filter(Boolean).join(" - ");
+  if (combinedBed) {
+    add("Bed / Name -> " + combinedBed, [], (p, over) => {
+      if (over || !p.bed || /^Bed \d+$/i.test(p.bed)) p.bed = combinedBed;
+    });
+  }
+
+  /* 2. Age -> specific box */
+  const age = num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)? /i) ?? num(/ age\s*[:=]?\s*(\d{1,3}) /i);
+  if (age > 0 && age < 120) add("Age -> " + age + " y", [["age", String(age)]]);
+
+  /* 3. Gender -> specific box */
+  let sx = (T.match(/ (?:gender|sex)\s*[:=]?\s*(male|female|woman|man|[MF]) /i) || T.match(/ (male|female|woman|man) /i) || [])[1];
+  if (!sx) {
+    const m = T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF]) /);
+    sx = m && (m[1].toUpperCase() === "M" ? "male" : "female");
+  }
+  if (sx) {
+    sx = /^(male|man|m)$/i.test(sx) ? "male" : "female";
+    add("Gender -> " + sx, [["ventSex", sx]]);
+  }
+
+  const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg /i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm /i);
+  if (wt > 30 && wt < 300) add("Weight -> " + wt + " kg", [["weight", String(wt)]]);
+  if (ht > 100 && ht < 230) add("Height -> " + ht + " cm", [["heightCm", String(ht)]]);
+
+  let m = T.match(/(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Diagnosis -> " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
+  else {
+    const firstLine = (T.split("
+").map(x => x.trim()).find(Boolean) || "");
+    const afterDemo = firstLine.replace(/^(?:(?:bed|pt|patient|name)\s*[:#-]?\s*[A-Za-z0-9 .'-]+\s*[,;-]?\s*)*\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
+    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 140 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc) /i.test(afterDemo)) {
+      add("Diagnosis -> " + afterDemo.slice(0, 60), [["diagnosis", afterDemo]]);
+    }
+  }
+
+  m = T.match(/(?:past medical history|past history| PMH |comorbidities|known case of| KCO )\s*[:\-]?\s*([^
+]+)/i);
+  if (m) add("Past history -> " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
+  m = T.match(/(?:history of (?:present )?illness| HPI |presented with|presenting with|chief complaint| c\/o |complaining of|admitted (?:with|for))\s*[:\-]?\s*([^
+]+)/i);
+  if (m) add("HPI -> " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
+  m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Events -> " + m[1].slice(0, 60), [["events", m[1].trim()]]);
+  m = T.match(/(?:admi\w+|DOA)\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2}|\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/i);
+  if (m) {
+    let dStr = m[1];
+    const dm = dStr.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+    if (dm) {
+      const yr = dm[3].length === 2 ? "20" + dm[3] : dm[3];
+      dStr = `${yr}-${dm[2].padStart(2, "0")}-${dm[1].padStart(2, "0")}`;
+    }
+    add("Admission -> " + dStr, [["admissionDate", dStr]]);
+  }
+
+  /* 4. Examination & vitals -> specific boxes */
+  m = T.match(/(?: bp |blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
+  if (m) add(`BP -> ${m[1]}/${m[2]}`, [["cardio.vitals.sbp", m[1]], ["cardio.vitals.dbp", m[2]]]);
+  let v = num(/(?: hr |heart rate|pulse)\s*[:=]?\s*(\d{2,3})/i);
+  if (v > 20 && v < 250) add("HR -> " + v, [["cardio.vitals.hr", String(v)]]);
+  v = num(/(?:temp(?:erature)?| T)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i);
+  if (v >= 95 && v <= 108) add("Temp -> " + ((v - 32) * 5 / 9).toFixed(1) + " °C", [["temp", String(Math.round((v - 32) * 5 / 9 * 10) / 10)]]);
+  else if (v >= 30 && v <= 43) add("Temp -> " + v + " °C", [["temp", String(v)]]);
+  v = num(/(?:spo2|spo₂| sats? |saturation|o2 sat)\s*[:=]?\s*(\d{2,3})/i);
+  if (v >= 50 && v <= 100) add("SpO₂ -> " + v + "%", [["spo2", String(v)]]);
+  v = num(/ cvp\s*[:=]?\s*(\d{1,2})/i);
+  if (v !== null && v >= 0 && v < 40) add("CVP -> " + v, [["cardio.vitals.cvp", String(v)]]);
+
+  const rh = pick([
+    [/atrial fibrillation| AF |afib/i, "Atrial fibrillation"],
+    [/atrial flutter/i, "Atrial flutter"],
+    [/ SVT /i, "SVT"],
+    [/ventricular tachycardia/i, "VT"],
+    [/sinus rhythm| NSR /i, "Sinus rhythm"]
+  ]);
+  if (rh) add("Rhythm -> " + rh, [["cardio.vitals.rhythm", rh]]);
+
+  const vent = /intubat|ventilat| ETT | PEEP | SIMV | PSV /i.test(T);
+  const rs = vent && /intubat|mechanically ventilated|on ventilator|invasive ventilation| ETT /i.test(T)
+    ? "Ventilator"
+    : pick([
+        [/ HFNC |high[- ]flow| NIV | BiPAP /i, "HFNC / NIV"],
+        [/nasal cannula|face ?mask| NRB |non[- ]rebreather|venturi/i, "Oxygen (nasal cannula / mask)"],
+        [/room air| on RA /i, "Room air"]
+      ]);
+  if (rs) add("Resp support -> " + rs, [["respSupport", rs]]);
+
+  const bs = pick([
+    [/wheez/i, "Wheeze"], [/crackles|crepitations|crepts/i, "Crackles"],
+    [/bronchial breath/i, "Bronchial breathing"],
+    [/(?:diminished|reduced) air entry/i, "Diminished air entry"],
+    [/absent breath sounds|no air entry/i, "Absent breath sounds"],
+    [/clear chest|vesicular|bilateral equal air entry|normal breath sounds/i, "Normal vesicular"]
+  ]);
+  if (bs) add("Breath sounds -> " + bs, [["breathSounds", bs]]);
+
+  m = T.match(/(?:auscultation|chest exam)\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Auscultation -> " + m[1].slice(0, 50), [["ausc", m[1].trim()]]);
+  m = T.match(/(?:resp(?:iratory)? exam(?:ination)?|chest)\s*[:\-]\s*([^
+]+)/i);
+  if (m && !/ct\s*chest/i.test(m[1])) add("Resp exam -> " + m[1].slice(0, 50), [["resp", m[1].trim()]]);
+
+  if (vent) {
+    const md = pick([
+      [/ SIMV[- ]?PC /i, "SIMV-PC"], [/ SIMV /i, "SIMV-VC"], [/ PSV |pressure support/i, "PSV"],
+      [/ CPAP /i, "CPAP"], [/ APRV /i, "APRV"],
+      [/ PC(?:V)? |pressure control/i, "PC"], [/ VC(?:V)? |volume control/i, "VC"]
+    ]);
+    if (md) add("Vent mode -> " + md, [["ventMode", md]]);
+    const S = (label, key, re, lo, hi) => {
+      const x = num(re);
+      if (x !== null && x >= lo && x <= hi) add(label + " -> " + x, [[key, String(x)]]);
+    };
+    S("VT", "setVT", /(?: VT|tidal volume)\s*[:=]?\s*(\d{3}) /i, 150, 1000);
+    S("PEEP", "setPEEP", / peep\s*[:=]?\s*(\d{1,2}) /i, 0, 30);
+    S("Set RR", "ventRate", / (?:set\s*)?RR\s*[:=]?\s*(\d{1,2}) /i, 6, 40);
+    S("Pplat", "plateauPressure", /(?:pplat|plateau(?: pressure)?)\s*[:=]?\s*(\d{1,2})/i, 5, 60);
+    S("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?| PIP )\s*[:=]?\s*(\d{1,2})/i, 5, 80);
+    S("Pressure support", "pressureSupport", /(?: PS|pressure support)\s*[:=]?\s*(\d{1,2}) /i, 0, 30);
+    m = T.match(/ I\s*:\s*E\s*[:=]?\s*(1\s*:\s*\d+(?:\.\d)?)/i);
+    if (m) add("I:E -> " + m[1].replace(/\s+/g, ""), [["ieRatio", m[1].replace(/\s+/g, "")]]);
+  }
+
+  let f2 = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
+  if (f2 > 0) {
+    if (f2 <= 1) f2 *= 100;
+    if (f2 >= 21 && f2 <= 100) add("FiO₂ -> " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
+  }
+
+  /* 5. ABG -> specific ABG area */
+  const A = (label, key, re, lo, hi) => {
+    const x = num(re);
+    if (x !== null && x >= lo && x <= hi) add("ABG " + label + " -> " + x, [["investigations.abg." + key, String(x)]]);
+  };
+  A("pH", "pH", / pH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
+  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 10, 150);
+  A("HCO₃⁻", "HCO3", /hco3-?\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
+  A("PaO₂", "PaO2", /(?:^|[^a-z])(?:pao2|po2|pao₂|po₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 20, 600);
+  A("Lactate", "Lactate", /lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
+  A("Cl⁻", "Cl", / cl-?\s*[:=]?\s*(\d{2,3}) /i, 70, 140);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu) (?!\/\s*d?l )/gi, " ");
+  for (const [name, pat] of Object.entries(LABPAT)) {
+    const mm = cleanedLabs.match(new RegExp("(?:^|[^a-z])(?:" + pat + ")(?:\s*[:=]?\s*)(\d+(?:\.\d+)?)", "i"));
+    if (!mm) continue;
+    let x = parseFloat(mm[1]), note = "";
+    const cv = LCONV[name] && LCONV[name](x);
+    if (cv) { x = Math.round(cv[0] * 100) / 100; note = " (" + cv[1] + ")"; }
+    const value = x;
+    add(`${name} -> ${x}${note}`, [], (p, over) => {
+      const r = p.investigations.laboratory.find(q => q.name === name);
+      if (r && (over || String(r.result).trim() === "")) {
+        r.result = String(value);
+        if (!r.date) r.date = today;
+      }
+      if (name === "Na" && (over || !p.investigations.abg.Na)) p.investigations.abg.Na = String(value);
+      if (name === "WBC") {
+        if (value > 11) setp(p, "sepsisM.WBC high", true);
+        else if (value < 4.5) setp(p, "sepsisM.WBC low", true);
+      }
+      if (name === "CRP" && value > 5) {
+        setp(p, "sepsisM.CRP elevated", true);
+        setp(p, "sepsisMarkerValues.1", String(value));
+      }
+    });
+  }
+
+  const lacVal = num(/lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i);
+  if (lacVal !== null && lacVal > 2) {
+    add("Sepsis marker: Lactate elevated (" + lacVal + ")", [["sepsisM.Lactate elevated", true], ["sepsisMarkerValues.2", String(lacVal)]]);
+  }
+
+  v = num(/(?:pct|procalcitonin)\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
+  if (v > 0) add("Procalcitonin -> " + v, [["sepsisM.Procalcitonin elevated", true], ["sepsisMarkerValues.0", String(v)]]);
+
+  /* CNS & Sedation examination boxes */
+  m = T.match(/E\s*([1-4])\s*[,\/ ]?\s*V\s*([1-5])\s*[,\/ ]?\s*M\s*([1-6])/i);
+  if (m) add(`GCS -> E${m[1]} V${m[2]} M${m[3]}`, [["scores.gcsE", m[1]], ["scores.gcsV", m[2]], ["scores.gcsM", m[3]]]);
+  else {
+    v = num(/GCS\s*[:=\/]?\s*(\d{1,2}) /i);
+    if (v >= 3 && v <= 15) add("GCS -> " + v + " (CNS notes)", [["cns", "GCS " + v]]);
+  }
+  v = num(/RASS\s*[:=]?\s*([+-]?\d)/i);
+  if (v !== null && v >= -5 && v <= 4) add("RASS -> " + v, [["scores.rass", String(v)]]);
+
+  const sed = [
+    [/propofol/i, "Propofol"], [/midazolam/i, "Midazolam"],
+    [/dexmedetomidine|precedex/i, "Dexmedetomidine"], [/ketamine/i, "Ketamine"]
+  ].filter(([r]) => r.test(T)).map(x => x[1]);
+  if (sed.length) add("Sedation -> " + sed.join(" + "), [["sedation", sed.length > 1 ? "Other / combination" : sed[0]]]);
+
+  const pu = /pupils?|perr?l/i.test(T) ? pick([
+    [/fixed.{0,15}dilated|dilated.{0,15}fixed/i, "Fixed and dilated"],
+    [/pinpoint/i, "Pinpoint"], [/unequal|anisocoria/i, "Unequal"],
+    [/sluggish/i, "Equal, sluggish"], [/equal| perr?l/i, "Equal and reactive"]
+  ]) : null;
+  if (pu) add("Pupils -> " + pu, [["pupils", pu]]);
+
+  const sz = pick([
+    [/status epilepticus/i, "Status epilepticus"],
+    [/(?:no|nil|denies)\s+(?:\w+\s)?seizures?/i, "None"],
+    [/seizure/i, "Seizure in last 24 h"]
+  ]);
+  if (sz) add("Seizures -> " + sz, [["seizures", sz]]);
+
+  m = T.match(/(?:cns|neuro(?:logical)?)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("CNS exam -> " + m[1].slice(0, 50), [["cns", m[1].trim()]]);
+
+  /* Radiology */
+  const rad = (name, re) => {
+    const mm = T.match(re);
+    if (mm) add(`${name} -> ${mm[1].slice(0, 60)}`, [], (p, over) => {
+      let r = p.investigations.radiology.find(q => q.name.toLowerCase() === name.toLowerCase());
+      if (!r) { r = { name, date: today, result: "" }; p.investigations.radiology.push(r); }
+      if (over || !r.result) { r.result = mm[1].trim(); if (!r.date) r.date = today; }
+    });
+  };
+  rad("CT brain", /ct\s*(?:brain|head)\s*[:\-]\s*([^
+]+)/i);
+  rad("CT chest", /ct\s*(?:chest|thorax)\s*[:\-]\s*([^
+]+)/i);
+  rad("Echo", /echo(?:cardiogram)?\s*[:\-]\s*([^
+]+)/i);
+  rad("U/S", /(?:u\/s|ultrasound|usg)\s*[:\-]\s*([^
+]+)/i);
+  rad("CXR", /(?:cxr|chest x-?ray)\s*[:\-]\s*([^
+]+)/i);
+
+  v = num(/ (?:lv)?ef\s*[:=]?\s*(\d{2})\s*%/i);
+  if (v >= 5 && v <= 80) add("LVEF -> " + v + "%", [["cardio.echo.ef", String(v)], ["cardio.echo.enabled", true]]);
+
+  /* Abdomen & Extremities examination boxes */
+  const abdomen = pick([
+    [/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"],
+    [/^(?![\s\S]*non[- ]tender)[\s\S]* tender/i, "Tender"],
+    [/distend|distension/i, "Distended"], [/soft and lax|soft abdomen/i, "Soft and lax"]
+  ]);
+  if (abdomen) add("Abdomen palpation -> " + abdomen, [["palpation", abdomen]]);
+
+  const bsAb = pick([
+    [/absent bowel sounds|no bowel sounds/i, "Absent"],
+    [/hypoactive bowel sounds|sluggish bowel sounds/i, "Hypoactive"],
+    [/hyperactive bowel sounds/i, "Hyperactive"],
+    [/normal bowel sounds|bowel sounds present| \+ve\s*BS /i, "Present"]
+  ]);
+  if (bsAb) add("Bowel sounds -> " + bsAb, [["bowelSounds", bsAb]]);
+
+  const rbsVal = num(/ (?:rbs|blood glucose|bg)\s*[:=]?\s*(\d{2,3}) /i);
+  if (rbsVal > 20 && rbsVal < 900) add("RBS -> " + rbsVal, [["rbs", String(rbsVal)]]);
+
+  m = T.match(/(?:abdomen|abd)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Abdomen notes -> " + m[1].slice(0, 50), [["abdNotes", m[1].trim()]]);
+
+  const ext = pick([
+    [/anasarca|generalized edema/i, "Generalized (anasarca)"],
+    [/severe edema/i, "Severe pitting"], [/moderate edema/i, "Moderate pitting"],
+    [/mild edema|pedal edema/i, "Mild pitting"], [/no edema|without edema/i, "None"]
+  ]);
+  if (ext) add("Edema -> " + ext, [["edema", ext]]);
+
+  m = T.match(/(?:extremities|limbs)(?:\s+exam(?:ination)?)?\s*[:\-]\s*([^
+]+)/i);
+  if (m) add("Extremities notes -> " + m[1].slice(0, 50), [["extNotes", m[1].trim()]]);
+
+  /* Antibiotics with dose, route, frequency & indication/cause */
+  for (const [re, drug] of ABXL) {
+    const am = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
+    if (!am) continue;
+    const tail = am[1] || "";
+    const dm = tail.match(/ (\d+(?:\.\d+)?\s*(?:g|mg|mcg|units?|iu)) /i);
+    const rm = tail.match(/ (IV|PO|IM|SC|inhaled) /i);
+    const fm = tail.match(/ (q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|stat) /i);
+    const im = tail.match(/(?:for|indication|cause|source)\s+([A-Za-z0-9 /-]+)/i);
+    const dose = dm ? dm[1] : "", route = rm ? rm[1].toUpperCase() : "", frequency = fm ? fm[1] : "";
+    const indication = im ? im[1].trim() : "";
+    add(`Antibiotic -> ${drug}${dose ? " " + dose : ""}${frequency ? " " + frequency : ""}`, [], p => {
+      if (!p.abx.some(x => (x.drug || "").toLowerCase() === drug.toLowerCase())) {
+        p.abx.push({ drug, dose, route, frequency, date: today, indication, note: "", editing: false });
+      }
+    });
+  }
+
+  /* Anticoagulation */
+  for (const [re, drug] of ACL) {
+    const acm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
+    if (!acm) continue;
+    const tail = acm[1] || "";
+    const dm = tail.match(/ (\d+(?:\.\d+)?\s*(?:mg|units?|iu)) /i);
+    const rm = tail.match(/ (SC|IV|PO) /i);
+    const fm = tail.match(/ (OD|BD|q12h|q24h|daily|twice daily) /i);
+    add("Anticoagulant -> " + drug, [], p => {
+      p.acType = "Pharmacological";
+      if (!p.anticoag.some(x => x.drug === drug)) {
+        p.anticoag.push({ drug, dose: dm ? dm[1] : "", route: rm ? rm[1].toUpperCase() : "", frequency: fm ? fm[1] : "", date: today, indication: "", editing: false });
+      }
+    });
+  }
+
+  /* Vasopressors */
+  for (const [re, drug] of PRL) {
+    const pm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\b([^\n.;,]*)", "i"));
+    if (!pm) continue;
+    const tail = pm[1] || "";
+    const dm = tail.match(/(\d+(?:\.\d+)?)\s*(mcg\/kg\/min|mcg\/min|mg\/hr|mcg\/hr|units\/min|units\/hr)?/i);
+    const dose = dm ? dm[1] : "";
+    const unit = dm && dm[2] ? dm[2].toLowerCase() : "mcg/kg/min";
+    add(`Vasoactive -> ${drug}${dose ? " " + dose + " " + unit : ""}`, [], p => {
+      if (!p.cardio.vasoactive.some(x => x.drug === drug)) {
+        p.cardio.vasoactive.push({ drug, dose, unit, trend: "Stable", targetMap: "", response: "" });
+      }
+    });
+  }
+
+  for (const [re, type] of LNL) if (re.test(T)) add("Line / tube -> " + type, [], p => {
+    if (!p.lines.some(x => x.type === type)) {
+      p.lines.push({ type, site: "", size: "", date: today, time: "", note: "", editing: false });
+    }
+  });
+
+  for (const [re, type] of SPEC) {
+    const sm = T.match(new RegExp("(?:^|[^a-z])(" + re.source + ")([^\n.;]*)", "i"));
+    if (!sm) continue;
+    const tail = sm[2] || "";
+    const om = tail.match(ORGX);
+    const organism = om ? om[1].trim() : "";
+    const status = organism ? "Growth" : /no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending";
+    add(`Culture -> ${type}${organism ? " (" + organism + ")" : ""}`, [], p => {
+      if (!p.cultures.some(x => x.type === type && x.organism === organism)) {
+        p.cultures.push({ type, date: today, status, organism, susceptible: "", editing: false });
+      }
+    });
+  }
+
+  const planMatch = T.match(/(?:^|
+)\s*(?:plan|recommendations?|management)\s*[:\-]\s*([\s\S]+)$/i);
+  if (planMatch) {
+    const rawItems = planMatch[1].split(/
++/).map(x => x.replace(/^[-*•\d.)\s]+/, "").trim()).filter(Boolean).slice(0, 10);
+    if (rawItems.length) {
+      add(`Plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
+        rawItems.forEach(text => {
+          if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
+        });
+      });
+    }
+  }
+
+  return I;
+}
+
+/* ---------- Patient data, rendering & interactive actions ---------- */
+function blankPatient(bed) {
+  return {
+    bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", pastMedicalHistory: "", presentIllness: "", events: "",
+    sedation: "", pupils: "", seizures: "", cns: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "",
+    ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "", pressureSupport: "",
+    peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "", ieRatio: "", temp: "", sepsisTime: "",
+    sepsisMarker: "", sepsisValue: "", infection: "", acType: "", acMech: "", other: "", weight: "", duration: "",
+    fluidIn: "", fluidOut: "", plan: "", renal: "", labs: "", palpation: "", bowelSounds: "", feeding: "", stool: "",
+    rbs: "", abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "", skin: "", extNotes: "",
+    checks: {}, scores: {}, sepsisM: {}, sepsisMarkerValues: {}, wean: {}, calc: { inputs: {} },
+    investigations: {
+      laboratory: LAB.map(([name, unit]) => ({ name, date: "", result: "", unit, trend: "", lastResult: "", last2: "", last3: "" })),
+      radiology: RAD.map(name => ({ name, date: "", result: "" })),
+      abg: {}
+    },
+    cardio: { vitals: { targetMap: "65" }, vasoactive: [], ecg: [], biomarkers: [], echo: { enabled: false } },
+    lines: [], abx: [], anticoag: [], cultures: [], meds: [], plans: [], scoreList: [], trend: [], history: []
+  };
+}
+
+function renderList() {
+  const el = $("list");
+  if (!el) return;
+  el.innerHTML = data.length
+    ? data.map((p, i) => `<div class="pt"><button class="g" style="flex:1;text-align:left" onclick="openPatient(${i})">${esc(p.bed || "Bed")}${i === active ? " ✓" : ""}</button></div>`).join("")
+    : '<p class="small">No patients yet. Enter a non-identifying bed label and tap Add patient.</p>';
+}
+
+function renderOutputs() {
+  const p = P();
+  if (!p) return;
+  ensure(p);
+  const put = (id, html) => { const e = $(id); if (e) e.innerHTML = html; };
+
+  put("gcsOut", gcsHTML(p));
+  put("ctBrain", ctBox(p, /ct\s*brain/i, "Last CT brain"));
+  put("ctChest", ctBox(p, /ct\s*chest/i, "Last CT chest"));
+  put("invEcho", ctBox(p, /echo/i, "Last Echo (from Investigations)"));
+  put("abgOut", abgCalc(p));
+  put("ventOut", ventCalc(p));
+  put("cvOut", (() => {
+    const k = cardioCalc(p.cardio.vitals);
+    return `<b>Calculated hemodynamics</b><div class="r">MAP: <b>${k.map === null ? "—" : k.map.toFixed(1) + " mmHg"}</b> · Pulse pressure: <b>${k.pp === null ? "—" : k.pp.toFixed(0) + " mmHg"}</b> · Shock index: <b>${k.si === null ? "—" : k.si.toFixed(2)}</b></div>${k.al.map(x => `<div class="r a">⚠ ${esc(x)}</div>`).join("")}`;
+  })());
+  put("cvRec", recList(cvRecs(p)));
+  put("infRec", recList(infRecs(p)));
+  put("rbsOut", esc(rbsTxt(p)));
+  put("fluidOut2", (() => {
+    const w = parseFloat(p.weight), h = parseFloat(p.duration), out = parseFloat(p.fluidOut), inn = parseFloat(p.fluidIn);
+    const rate = w > 0 && h > 0 && out >= 0 ? out / (w * h) : null;
+    const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
+    return `<div class="r">Fluid balance: <b>${bal === null ? "—" : (bal > 0 ? "+" : "") + bal.toFixed(0) + " mL"}</b></div><div class="r">Urine output rate: <b>${rate === null ? "—" : rate.toFixed(2) + " mL/kg/h"}</b>${rate !== null && rate < 0.5 ? " · <span class='hi'>Below 0.5 mL/kg/h</span>" : ""}</div>`;
+  })());
+  put("scoreOut", scoreHTML(p));
+  put("recScores", recList(recScores(p).map(x => x[0] + ": " + x[1])));
+  put("wnOut", wnHTML(p));
+  put("calcOut", calcHTML(p));
+  put("medOut", medHTML(p));
+
+  const tsel = $("trSel");
+  if (tsel) {
+    if (!window._tr) window._tr = tsel.value;
+    put("trOut", trendHTML(p, tsel.value || window._tr));
+  }
+
+  p.investigations.laboratory.forEach((it, i) => {
+    const e = $("lf" + i);
+    if (e) {
+      const f = labFlag(it, p);
+      e.textContent = f[0];
+      e.className = "fl " + f[1];
+      e.title = f[2];
+    }
+  });
+
+  (p.scoreList || []).forEach((it, i) => {
+    const d = SD[it.name];
+    const st = $("st" + i), si = $("si" + i), sa = $("sa" + i);
+    let val = scoreVal(p, it);
+    if (d && d.c) {
+      const state = scoreState(p, it);
+      val = state.val;
+      if (st) st.textContent = val !== null && val !== "" ? val : "—";
+      if (sa) sa.textContent = `(${state.n}/${d.c.length} components)`;
+    }
+    if (si && d && d.i && val !== null && String(val).trim() !== "") {
+      const msg = d.i(val);
+      si.textContent = msg;
+      si.hidden = !msg;
+    } else if (si) {
+      si.hidden = true;
+    }
+  });
+}
+
+function draw() {
+  const savedScrollY = window.scrollY;
+  const openDetails = [...$("cards").querySelectorAll("details")].map(d => d.open);
+  if (active === null || !P()) {
+    $("rec").hidden = true;
+    return;
+  }
+  const p = P();
+  ensure(p);
+  $("rec").hidden = false;
+  $("heading").textContent = p.bed || "Patient";
+  $("jumpSel").innerHTML = data.map((q, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(q.bed || "Bed " + (i + 1))}</option>`).join("");
+  $("cards").innerHTML = cards(p);
+  [...$("cards").querySelectorAll("details")].forEach((d, i) => {
+    if (openDetails[i] !== undefined) d.open = openDetails[i];
+  });
+  renderOutputs();
+  requestAnimationFrame(() => window.scrollTo(0, savedScrollY));
+}
+
+function openPatient(i) {
+  if (!Number.isInteger(i) || i < 0 || i >= data.length) return;
+  active = i;
+  draw();
+  renderList();
+  persist();
+}
+
+function addPatient() {
+  const input = $("bed"), bed = input.value.trim();
+  if (!bed) { alert("Enter a non-identifying bed label, such as Bed 01."); input.focus(); return; }
+  if (data.some(p => String(p.bed).toLowerCase() === bed.toLowerCase())) { alert("That bed label already exists."); return; }
+  const p = blankPatient(bed);
+  ensure(p);
+  data.push(p);
+  active = data.length - 1;
+  input.value = "";
+  persist();
+  draw();
+  renderList();
+}
+
+function delPatient() {
+  if (active === null || !P()) return;
+  if (!confirm("Delete " + P().bed + "? You can restore it from Recently deleted.")) return;
+  const p = data[active];
+  toTrash({ kind: "patient", bed: p.bed, item: p });
+  data.splice(active, 1);
+  active = data.length ? Math.min(active, data.length - 1) : null;
+  persist();
+  renderList();
+  draw();
+}
+
+/* ---------- SBAR Handover in Exact Requested Order ---------- */
+function sbarText(p) {
+  ensure(p);
+  const c = p.cardio, v = c.vitals, k = cardioCalc(v), pf = pfOf(p), g = scoreCalc(p), s = p.scores || {};
+  const icuDay = dayN(p.admissionDate);
+
+  const headerBits = [
+    p.bed || "Bed",
+    p.age ? `${p.age}y` : "",
+    p.ventSex || "",
+    p.admissionDate ? `Admission: ${p.admissionDate}${icuDay > 0 ? " (Day " + icuDay + ")" : ""}` : ""
+  ].filter(Boolean).join(" | ");
+
+  const vitalsStr = [
+    (v.sbp || v.dbp) && `BP ${v.sbp || "?"}/${v.dbp || "?"}`,
+    k.map !== null && `MAP ${k.map.toFixed(0)}`,
+    v.hr && `HR ${v.hr}`,
+    p.temp && `Temp ${p.temp}°C`,
+    p.spo2 && `SpO₂ ${p.spo2}%`,
+    v.cvp && `CVP ${v.cvp}`,
+    v.rhythm
+  ].filter(Boolean).join(" · ");
+
+  const activePressors = c.vasoactive
+    .filter(x => x.trend !== "Stopped" && x.drug)
+    .map(x => `${x.drug}${x.dose ? " " + x.dose + " " + (x.unit || "") : ""}`);
+
+  const examParts = [
+    vitalsStr && `Vital signs: ${vitalsStr}`,
+    (g.gcs !== null || s.rass || p.sedation || p.pupils || p.seizures || p.cns) && `CNS: ${[
+      g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,
+      s.rass && `RASS ${s.rass}`,
+      p.sedation && p.sedation !== "None" && `Sedation ${p.sedation}`,
+      p.pupils && `Pupils ${p.pupils}`,
+      p.seizures && p.seizures !== "None" && p.seizures,
+      p.cns
+    ].filter(Boolean).join(", ")}`,
+    (activePressors.length || p.cv) && `CVS: ${[activePressors.join(", "), p.cv].filter(Boolean).join(" · ")}`,
+    (p.respSupport || p.breathSounds || p.ventMode || p.ausc || p.resp || pf !== null) && `Resp: ${[
+      p.respSupport,
+      p.breathSounds,
+      p.ventMode && `${p.ventMode}${p.setVT ? " VT " + p.setVT : ""}${p.setPEEP ? " PEEP " + p.setPEEP : ""}${p.fio2Percent ? " FiO₂ " + p.fio2Percent + "%" : ""}`,
+      pf !== null && `P/F ${pf.toFixed(0)}`,
+      p.ausc,
+      p.resp
+    ].filter(Boolean).join(" · ")}`,
+    (p.palpation || p.bowelSounds || p.feeding || p.stool || p.rbs || p.abdNotes) && `Abdomen: ${[
+      p.palpation,
+      p.bowelSounds && `BS ${p.bowelSounds}`,
+      p.feeding,
+      p.stool,
+      p.rbs && `RBS ${p.rbs}`,
+      p.abdNotes
+    ].filter(Boolean).join(" · ")}`,
+    (p.edema || p.pulses || p.capRefill || p.limbTemp || p.dvtSigns || p.skin || p.extNotes) && `Extremities: ${[
+      p.edema && `Edema ${p.edema}`,
+      p.pulses && `Pulses ${p.pulses}`,
+      p.capRefill && `Cap refill ${p.capRefill}`,
+      p.limbTemp && `Temp ${p.limbTemp}`,
+      p.dvtSigns === "Yes" && "DVT signs +",
+      p.skin,
+      p.extNotes
+    ].filter(Boolean).join(" · ")}`
+  ].filter(Boolean);
+
+  const radItems = p.investigations.radiology
+    .filter(r => r.result || r.date)
+    .map(r => `${r.name}${r.date ? " (" + r.date + ")" : ""}: ${r.result || "done"}`);
+
+  const a = p.investigations.abg;
+  const abgBits = [
+    a.pH && `pH ${a.pH}`,
+    a.PaCO2 && `PaCO₂ ${a.PaCO2}`,
+    a.HCO3 && `HCO₃⁻ ${a.HCO3}`,
+    a.PaO2 && `PaO₂ ${a.PaO2}`,
+    a.Lactate && `Lactate ${a.Lactate}`
+  ].filter(Boolean);
+
+  const labBits = p.investigations.laboratory
+    .filter(it => String(it.result).trim() !== "")
+    .map(it => {
+      const f = labFlag(it, p);
+      const flag = f[1] === "hi" ? "↑" : f[1] === "lo" ? "↓" : "";
+      return `${it.name} ${it.result}${flag}${it.unit ? " " + it.unit : ""}`;
+    });
+
+  const labLines = [];
+  if (labBits.length) labLines.push(labBits.join(", "));
+  if (abgBits.length) labLines.push(`ABG: ${abgBits.join(" · ")}`);
+  if (p.labs) labLines.push(p.labs);
+
+  const abxLines = (p.abx || [])
+    .filter(x => x.drug || x.date || x.dose || x.indication)
+    .map(x => {
+      const meta = [
+        x.date && `Start: ${x.date}`,
+        [x.dose, x.route, x.frequency].filter(Boolean).join(" ") && `Dose: ${[x.dose, x.route, x.frequency].filter(Boolean).join(" ")}`,
+        x.indication && `Cause: ${x.indication}`
+      ].filter(Boolean).join(" | ");
+      return `  - ${x.drug || "Antibiotic"}${meta ? " (" + meta + ")" : ""}`;
+    });
+
+  const acLines = p.acType === "Pharmacological"
+    ? (p.anticoag || []).map(x => {
+        const meta = [
+          x.date && `Start: ${x.date}`,
+          [x.dose, x.route, x.frequency].filter(Boolean).join(" "),
+          x.indication
+        ].filter(Boolean).join(" | ");
+        return `  - ${x.drug || "Anticoagulant"}${meta ? " (" + meta + ")" : ""}`;
+      })
+    : p.acType === "Mechanical"
+      ? [`  - Mechanical (${p.acMech || "unspecified"})`]
+      : [];
+
+  const otherMedLines = (p.meds || [])
+    .filter(m => m.drug || m.dose || m.route || m.frequency || m.indication)
+    .map(m => {
+      const meta = [
+        [m.dose, m.route, m.frequency].filter(Boolean).join(" "),
+        m.date && `Start: ${m.date}`,
+        m.indication
+      ].filter(Boolean).join(" | ");
+      return `  - ${m.drug || "Medication"}${meta ? " (" + meta + ")" : ""}`;
+    });
+
+  const medBlock = [];
+  if (abxLines.length) medBlock.push(`Antibiotics:
+${abxLines.join("
+")}`);
+  if (acLines.length) medBlock.push(`Anticoagulation:
+${acLines.join("
+")}`);
+  if (otherMedLines.length) medBlock.push(`Other medications:
+${otherMedLines.join("
+")}`);
+
+  const fineDivider = "────────────────────";
+  const planSegments = [];
+  if (p.plan) planSegments.push(`Notes: ${p.plan}`);
+  (p.plans || []).filter(x => x.text).forEach(x => {
+    planSegments.push(`${x.done ? "[✓]" : "[ ]"} ${x.text}`);
+  });
+
+  return [
+    `════════════════════════════════════════`,
+    headerBits,
+    `════════════════════════════════════════`,
+    `Past History: ${p.pastMedicalHistory || "Not entered"}`,
+    `Diagnosis: ${p.diagnosis || "Not entered"}`,
+    `History of Illness: ${p.presentIllness || "Not entered"}`,
+    `Events: ${p.events || "Not entered"}`,
+    `Examination & Vital Signs:
+${examParts.length ? examParts.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Radiology:
+${radItems.length ? radItems.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Labs:
+${labLines.length ? labLines.map(x => "• " + x).join("
+") : "• Not entered"}`,
+    `Medications:
+${medBlock.length ? medBlock.join("
+") : "• Not entered"}`,
+    `Plans:
+${planSegments.length ? planSegments.join(`
+${fineDivider}
+`) : "• Not entered"}`
+  ].join("
+
+");
+}
+
+function makeSBAR() { if (!P()) return; $("sbar").value = sbarText(P()); persist(); }
+function copySBAR() { const t = $("sbar").value || (P() ? sbarText(P()) : ""); copyText(t); }
+function copyText(t) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(t).then(() => alert("Copied."), () => shareTxt(t));
+  } else {
+    const a = document.createElement("textarea");
+    a.value = t;
+    document.body.appendChild(a);
+    a.select();
+    try { document.execCommand("copy"); alert("Copied."); } catch (e) { alert("Copy unavailable. Use Share instead."); }
+    a.remove();
+  }
+}
+
+function showSheet() {
+  $("sheetTxt").textContent = data.map(p => sbarText(p)).join("
+
+
+");
+  $("sheet").hidden = false;
+  $("sheet").scrollIntoView();
+}
+function copySheet() { copyText($("sheetTxt").textContent); }
+
+function downloadJSON(obj, name) {
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  const u = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = u;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 1000);
+}
+function exportOne() { if (P()) downloadJSON({ version: 19, exportedAt: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + "-icu-backup.json"); }
+function exportAll() { downloadJSON({ version: 19, exportedAt: new Date().toISOString(), patients: data }, "icu-rounds-backup.json"); }
+
+function importBackupFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const raw = JSON.parse(reader.result);
+      const incoming = Array.isArray(raw) ? raw : raw.patients;
+      if (!Array.isArray(incoming)) throw new Error("No patient array found.");
+      let count = 0;
+      incoming.forEach((p, i) => {
+        if (!p || typeof p !== "object") return;
+        ensure(p);
+        let bed = p.bed || "Imported " + (i + 1);
+        if (data.some(q => q.bed === bed)) bed += " (imported " + (count + 1) + ")";
+        p.bed = bed;
+        data.push(p);
+        count++;
+      });
+      persist();
+      active = data.length ? data.length - 1 : null;
+      renderList();
+      draw();
+      alert(count + " patient record(s) imported.");
+    } catch (e) {
+      alert("Import failed: " + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function forceUpdate() {
+  if (!confirm("Refresh the app and remove its offline cache? Saved patient data in this browser will be kept.")) return;
+  const clearCaches = "caches" in window ? caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))) : Promise.resolve();
+  const removeWorkers = "serviceWorker" in navigator ? navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))) : Promise.resolve();
+  Promise.all([clearCaches, removeWorkers]).finally(() => {
+    const u = new URL(location.href);
+    u.searchParams.set("refresh", String(Date.now()));
+    location.replace(u.href);
+  });
+}
+
+function applyParsedItems(p, items, overwrite) {
+  items.forEach(it => {
+    if (it.fields) {
+      it.fields.forEach(([path, value]) => {
+        const old = getp(p, path);
+        if (overwrite || old === undefined || old === null || old === "") setp(p, path, value);
+      });
+    }
+    if (typeof it.apply === "function") it.apply(p, overwrite);
+  });
+}
+
+function autoImportCase(asNew) {
+  const src = $("caseTxt").value.trim();
+  if (!src) { alert("Paste case text first."); return; }
+  if (!asNew && !P()) { alert("Open a patient first, or choose Auto-import as new bed."); return; }
+
+  const items = parseCase(src);
+  if (!items.length) {
+    alert("No recognizable clinical data found in the pasted text.");
+    return;
+  }
+
+  let p;
+  if (asNew) {
+    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
+      bed += " (" + (data.length + 1) + ")";
+    }
+    p = blankPatient(bed);
+    data.push(p);
+    active = data.length - 1;
+    $("bed").value = "";
+  } else {
+    p = P();
+  }
+
+  ensure(p);
+  applyParsedItems(p, items, true);
+  persist();
+  $("importOut").innerHTML = `<div class="out"><b class="gd">✓ Automatically imported ${items.length} item(s) into ${esc(p.bed)}:</b><div class="small" style="margin-top:4px">${items.map(x => esc(x.label)).join(" · ")}</div></div>`;
+  draw();
+  renderList();
+}
+
+function importPreview(asNew) {
+  const src = $("caseTxt").value.trim();
+  if (!src) { alert("Paste case text first."); return; }
+  if (!asNew && !P()) { alert("Open a patient first, or choose Preview as new bed."); return; }
+  const items = parseCase(src);
+  window._importPreview = { items, asNew: !!asNew };
+  $("importOut").innerHTML = `<div class="out"><b>${items.length} suggested item(s)</b><p class="small">Review each suggestion. Values are not applied until you confirm.</p>${items.map((x, i) => `<label class="chk"><input type="checkbox" data-import="${i}" checked><span>${esc(x.label)}</span></label>`).join("")}<button onclick="applyImportPreview()">Apply selected items</button><button class="g" onclick="$('importOut').innerHTML=''">Cancel</button></div>`;
+}
+
+function applyImportPreview() {
+  const st = window._importPreview;
+  if (!st) return;
+  let p;
+  if (st.asNew) {
+    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
+      bed += " (" + (data.length + 1) + ")";
+    }
+    p = blankPatient(bed);
+    data.push(p);
+    active = data.length - 1;
+    $("bed").value = "";
+  } else {
+    p = P();
+  }
+  ensure(p);
+  const overwrite = confirm("Overwrite existing non-empty fields when the imported case contains a value? Choose Cancel to fill only empty fields.");
+  const selected = st.items.filter((_, i) => {
+    const cb = document.querySelector(`[data-import='${i}']`);
+    return cb && cb.checked;
+  });
+  applyParsedItems(p, selected, overwrite);
+  persist();
+  $("importOut").innerHTML = "<p class='gd'>Selected suggestions applied. Review every imported value against the clinical chart.</p>";
+  draw();
+  renderList();
+}
+
+function addEntry(name) {
+  const p = P();
+  if (!p) return;
+  if (name === "anticoag") {
+    const sel = $("sel_anticoag"), drug = sel && sel.value;
+    if (!drug) { alert("Select an anticoagulant first."); return; }
+    p.anticoag.push({ drug, dose: "", route: "", frequency: "", date: "", indication: "", editing: true });
+    sel.value = "";
+  } else if (name === "vasoactive") {
+    const sel = $("sel_vasoactive"), drug = sel && sel.value;
+    if (!drug) { alert("Select a vasoactive drug first."); return; }
+    p.cardio.vasoactive.push({ drug, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", lastAdjustment: "", response: "" });
+    sel.value = "";
+  } else if (name === "abx") {
+    p.abx.push({ drug: "", dose: "", route: "", frequency: "", date: "", indication: "", note: "", editing: true });
+  } else if (name === "lines") {
+    p.lines.push({ type: "", site: "", size: "", date: "", time: "", note: "", editing: true });
+  } else if (name === "cultures") {
+    p.cultures.push({ type: "", date: "", status: "Pending", organism: "", susceptible: "", editing: true });
+  } else if (name === "ecg") {
+    p.cardio.ecg.push({ date: "", time: "", rate: "", pr: "", qrs: "", qtc: "", stt: "", interpretation: "" });
+  } else if (name === "biomarkers") {
+    p.cardio.biomarkers.push({ test: "", date: "", time: "", result: "", unit: "", reference: "", trend: "" });
+  }
+  persist();
+  draw();
+}
+
+/* ---------- Delegated input & click listeners ---------- */
+document.addEventListener("input", e => {
+  const el = e.target;
+  if (!el || !el.dataset || !el.dataset.p || !P()) return;
+  if (el.type === "checkbox" || el.tagName === "SELECT") return;
+  setp(P(), el.dataset.p, el.value);
+  persist();
+  renderOutputs();
+});
+
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (!el) return;
+  if (el.id === "imp" && el.files && el.files[0]) {
+    importBackupFile(el.files[0]);
+    el.value = "";
+    return;
+  }
+  if (el.id === "trSel" && P()) {
+    window._tr = el.value;
+    $("trOut").innerHTML = trendHTML(P(), el.value);
+    return;
+  }
+  if (!el.dataset || !el.dataset.p || !P()) return;
+  const path = el.dataset.p;
+  if (el.type === "checkbox") {
+    setp(P(), path, el.checked);
+    persist();
+    if (path.startsWith("sepsisM.") || path.startsWith("plans.")) draw();
+    else renderOutputs();
+  } else {
+    setp(P(), path, el.value);
+    persist();
+    if (path === "calc.selected" || path === "ventSex") draw();
+    else renderOutputs();
+  }
+});
+
+document.addEventListener("click", e => {
+  const btn = e.target.closest("[data-a]");
+  if (!btn || !P()) return;
+  const p = P();
+  const [act, a1, a2] = btn.dataset.a.split(":");
+
+  if (act === "add") {
+    addEntry(a1);
+  } else if (act === "del") {
+    const idx = parseInt(a2, 10);
+    const arr = ARR(p, a1);
+    if (arr && arr[idx] !== undefined) {
+      const [removed] = arr.splice(idx, 1);
+      toTrash({ kind: "item", bed: p.bed, x: a1, item: removed });
+      persist();
+      draw();
+    }
+  } else if (act === "entryedit") {
+    const idx = parseInt(a2, 10);
+    const arr = p[a1];
+    if (arr && arr[idx]) {
+      arr[idx].editing = !arr[idx].editing;
+      persist();
+      draw();
+    }
+  } else if (act === "mededit") {
+    const idx = parseInt(a1, 10);
+    if (p.meds && p.meds[idx]) {
+      p.meds[idx].editing = !p.meds[idx].editing;
+      persist();
+      draw();
+    }
+  } else if (act === "addmed") {
+    p.meds.push({ drug: "", dose: "", route: "", frequency: "", date: "", indication: "", renal: "", editing: true });
+    persist();
+    draw();
+  } else if (act === "addlab") {
+    const name = prompt("Laboratory test name:");
+    if (!name || !name.trim()) return;
+    const unit = prompt("Unit (optional):") || "";
+    p.investigations.laboratory.push({ name: name.trim(), date: "", result: "", unit: unit.trim(), trend: "", lastResult: "", last2: "", last3: "" });
+    persist();
+    draw();
+  } else if (act === "addrad") {
+    const name = prompt("Imaging / radiology study name:");
+    if (!name || !name.trim()) return;
+    p.investigations.radiology.push({ name: name.trim(), date: "", result: "" });
+    persist();
+    draw();
+  } else if (act === "echo") {
+    p.cardio.echo.enabled = (a1 === "on");
+    persist();
+    draw();
+  } else if (act === "ac") {
+    p.acType = a1;
+    persist();
+    draw();
+  } else if (act === "addplan") {
+    p.plans.push({ text: "", done: false });
+    persist();
+    draw();
+  } else if (act === "clearplans") {
+    if (!p.plans.length || !confirm("Remove all plan items?")) return;
+    p.plans = [];
+    persist();
+    draw();
+  } else if (act === "tpl") {
+    const sel = $("tplSel"), k = sel && sel.value;
+    if (!k || !TPL[k]) { alert("Select a template first."); return; }
+    TPL[k].forEach(text => {
+      if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
+    });
+    sel.value = "";
+    persist();
+    draw();
+  } else if (act === "resetchk") {
+    if (!confirm("Uncheck all daily checklist items?")) return;
+    p.checks = {};
+    persist();
+    draw();
+  } else if (act === "addscore") {
+    const sel = $("scoreSel"), name = sel && sel.value;
+    if (!name) { alert("Select a score first."); return; }
+    p.scoreList.push({ name, value: "", comps: {}, note: "" });
+    sel.value = "";
+    persist();
+    draw();
+  } else if (act === "autosc") {
+    const idx = parseInt(a1, 10), it = p.scoreList[idx];
+    if (!it) return;
+    const d = SD[it.name];
+    if (d && d.c) {
+      it.comps = {};
+      d.c.forEach(([, f], j) => {
+        const v = f(p);
+        if (v !== null) it.comps[j] = String(v);
+      });
+    } else {
+      const v = autoScore(it.name, p);
+      if (v !== null) it.value = String(v);
+    }
+    persist();
+    draw();
+  } else if (act === "snap") {
+    p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
+    p.trend = p.trend.slice(-60);
+    persist();
+    draw();
+  } else if (act === "prevsbar") {
+    const last = (p.history || [])[p.history.length - 1];
+    if (!last) { alert("No archived SBAR yet. Use New day to archive today's SBAR."); return; }
+    $("sbar").value = `Archived (${last.d}):
+
+${last.sbar}`;
+  }
+});
+
+/* ---------- Startup ---------- */
+renderList();
+renderTrash();
+if (data.length) openPatient(0);
+</script>
+</body>
+</html>
