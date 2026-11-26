@@ -93,7 +93,7 @@ body.dark .calc-result{background:#1b3342;border-color:#34566b}
 body.dark .calc-result .calc-value{color:#b8e4ff}
 @media(max-width:420px){.calc-inputs{grid-template-columns:1fr}}
 </style></head><body>
-<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v17</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
+<header style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><h2>ICU Rounds Assistant</h2><small>Offline organizer for rounds · v18.1</small></div><div><button class="g" onclick="toggleDark()" aria-label="Dark mode">🌓</button><button class="g" onclick="fontStep(-1)">A−</button><button class="g" onclick="fontStep(1)">A+</button></div></header>
 <main>
 <p class="warn"><b>Prototype.</b> Not a validated medical record. Do not enter identifiable patient information. Data stays on this device, unencrypted. Export backups regularly.</p>
 <section><h3>Patients / beds</h3><div id="list"></div>
@@ -1128,4 +1128,4 @@ function addEntry(name) {
   const p = P(); if (!p) return;
   if (name === "anticoag") { const sel = $("sel_anticoag"), drug = sel && sel.value; if (!drug) { alert("Select an anticoagulant first."); return; } p.anticoag.push({ drug, dose: "", date: "", indication: "", editing: true }); sel.value = ""; }
   else if (name === "vasoactive") { const sel = $("sel_vasoactive"), drug = sel && sel.value; if (!drug) { alert("Select a vasopressor or inotrope first."); return; } p.cardio.vasoactive.push({ drug, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", lastAdjustment: "", response: "" }); sel.value = ""; }
-  else { const L = LISTS[name]; if (!L) return; const arr = ARR(p, name); let item = {}; if (L.opts) { const sel = $("sel_" + name); item.drug = sel && sel.value; if (!item.drug) { alert("Select " + L.n.toLowerCase() + " first."); return; } sel.value = ""; } L.f.forEach(([k]) => { if (!(k in item)) item[k] = ""; }); if (["
+  else { const L = LISTS[name]; if (!L) return; const arr = ARR(p, name); let item = {}; if (L.opts) { const sel = $("sel_" + name); item.drug = sel && sel.value; if (!item.drug) { alert("Select " + L.n.toLowerCase() + " first."); return; } sel.value = ""; } L.f.forEach(([k]) => { if (!(k in item)) item[k] = ""; }); if (
