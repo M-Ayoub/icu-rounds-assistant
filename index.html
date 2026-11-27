@@ -1655,27 +1655,62 @@ function parseCase(src) {
     add("Sex: " + sx, [["ventSex", sx]]);
   }
 
+  // Helper to capture multi-line sections until the next recognized clinical header
+  const secStop = "(?=\n\s*(?:bed(?:\s*(?:no|number|label|#))?|patient(?:\s*name)?|name|pt|age|sex|gender|doa|date\s*of\s*admission|admitted|working\s*diagnosis|dx|diagnosis|diagnoses|impression|assessment|past\s*medical\s*history|past\s*history|pmh|comorbidities|known\s*case\s*of|kco|history\s*of\s*(?:present\s*)?illness|hpi|presenting\s*(?:history|illness)|chief\s*complaint|events?|icu\s*course|last\s*24\s*h(?:ours)?|overnight|exam(?:ination)?|vitals?|cns|neuro|cvs|cardio(?:vascular)?|resp(?:iratory)?|vent(?:ilator)?|abdomen|abd|extremities|infection|sepsis|lines?|tubes?|investigations?|labs?|abg|arterial\s*blood\s*gas|radiology|imaging|cxr|ct|echo|medications?|meds|antibiotics?|abx|anticoag(?:ulation)?|cultures?|fluid\s*balance|plan|daily\s*plan|recommendations?|management)\s*[:\-]|$)";
+  const secVal = (hdrRe) => {
+    const rx = new RegExp("(?:^|\n|\|)\s*(?:" + hdrRe + ")\s*[:\-]\s*([\s\S]+?)" + secStop, "i");
+    const mm = T.match(rx);
+    return mm ? mm[1].trim() : "";
+  };
+
+  // Extract patient name and/or bed label to populate bed name
+  let m = T.match(/(?:^|\n|\|)\s*(?:patient\s*name|pt\s*name|name|pt)\s*[:\-]\s*([^\n|]+)/i);
+  let ptName = m ? m[1].trim() : "";
+  if (!ptName) {
+    const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
+    const leadName = firstLine.match(/^(?:bed\s*[\w-]+\s*[:\-|]\s*)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})(?=\s*[,|\-\(]|\s+\d{1,3}\s*(?:y\/o|yo|yrs?|years?|M\b|F\b|male|female))/);
+    if (leadName && !/^(working|past|history|diagnosis|patient|admitted|sepsis|acute|chronic|severe|icu|bed)\b/i.test(leadName[1])) {
+      ptName = leadName[1].trim();
+    }
+  }
+  const bedRaw = T.match(/(?:^|\n|\|)\s*(?:bed(?:\s*(?:no|number|label|#))?|icu\s*bed)\s*[:\-]\s*([^\n|]+)/i);
+  const bedTag = bedRaw ? bedRaw[1].trim() : "";
+  const combinedBed = ptName && bedTag && !ptName.toLowerCase().includes(bedTag.toLowerCase())
+    ? `${bedTag} - ${ptName}`
+    : (ptName || bedTag);
+  if (combinedBed) {
+    I.detectedBed = combinedBed;
+    add("Bed / Patient name: " + combinedBed, [["bed", combinedBed]]);
+  }
+
   const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg\b/i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm\b/i);
   if (wt > 30 && wt < 300) add("Weight " + wt + " kg", [["weight", String(wt)]]);
   if (ht > 100 && ht < 230) add("Height " + ht + " cm", [["heightCm", String(ht)]]);
 
-  let m = T.match(/(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)\s*[:\-]\s*([^\n]+)/i);
-  if (m) add("Diagnosis: " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
+  const dxFull = secVal("(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)");
+  if (dxFull) add("Diagnosis: " + dxFull.replace(/\s+/g, " ").slice(0, 70), [["diagnosis", dxFull]]);
   else {
     const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
-    const afterDemo = firstLine.replace(/^(?:bed\s*\w+\s*[:\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
-    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 140 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
-      add("Diagnosis (from summary): " + afterDemo.slice(0, 60), [["diagnosis", afterDemo]]);
+    const afterDemo = firstLine.replace(/^(?:bed\s*[\w-]+\s*[:\-|]?\s*)?(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\s*[,|\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
+    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 180 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
+      add("Diagnosis (from summary): " + afterDemo.slice(0, 70), [["diagnosis", afterDemo]]);
     }
   }
 
-  m = T.match(/(?:past medical history|past history|\bPMH\b|comorbidities|known case of|\bKCO\b)\s*[:\-]?\s*([^\n]+)/i);
-  if (m) add("Past medical history: " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
-  m = T.match(/(?:history of present illness|\bHPI\b|presented with|presenting with|chief complaint|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([^\n]+)/i);
-  if (m) add("History of present illness: " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
-  m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^\n]+)/i);
-  if (m) add("Events: " + m[1].slice(0, 60), [["events", m[1].trim()]]);
-  m = T.match(/admi\w+\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2})/i);
+  const pmhFull = secVal("(?:past\s*medical\s*history|past\s*history|\bPMH\b|comorbidities|known\s*case\s*of|\bKCO\b)");
+  if (pmhFull) add("Past medical history: " + pmhFull.replace(/\s+/g, " ").slice(0, 70), [["pastMedicalHistory", pmhFull.slice(0, 2000)]]);
+
+  let hpiFull = secVal("(?:history\s*of\s*(?:present\s*)?illness|\bHPI\b|presenting\s*(?:history|illness)|chief\s*complaint)");
+  if (!hpiFull) {
+    m = T.match(/(?:presented with|presenting with|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([\s\S]+?)(?=\n\s*[A-Za-z][A-Za-z /]{1,30}\s*[:\-]|$)/i);
+    if (m) hpiFull = m[0].trim();
+  }
+  if (hpiFull) add("History of present illness: " + hpiFull.replace(/\s+/g, " ").slice(0, 70), [["presentIllness", hpiFull.slice(0, 3000)]]);
+
+  const evFull = secVal("(?:events?(?:\s*in\s*(?:the\s*)?last\s*24\s*h(?:ours)?)?|icu\s*course|last\s*24\s*h(?:ours)?|overnight)");
+  if (evFull) add("Events: " + evFull.replace(/\s+/g, " ").slice(0, 70), [["events", evFull.slice(0, 2000)]]);
+
+  m = T.match(/(?:admi\w+|\bDOA\b)\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2})/i);
   if (m) add("Admission " + m[1], [["admissionDate", m[1]]]);
 
   m = T.match(/(?:\bbp\b|blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
@@ -1745,16 +1780,22 @@ function parseCase(src) {
     if (f2 >= 21 && f2 <= 100) add("FiO₂ " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
   }
 
+  const abgSec = secVal("(?:abg|arterial\s*blood\s*gas)") || T;
   const A = (label, key, re, lo, hi) => {
-    const x = num(re);
-    if (x !== null && x >= lo && x <= hi) add(label + " " + x, [["investigations.abg." + key, String(x)]]);
+    const x = num(re, abgSec) ?? num(re, T);
+    if (x !== null && x >= lo && x <= hi) add("ABG " + label + " " + x, [["investigations.abg." + key, String(x)]]);
   };
   A("pH", "pH", /\bpH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
-  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 10, 150);
-  A("HCO₃⁻", "HCO3", /hco3-?\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
+  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{1,3}(?:\.\d)?)/i, 10, 150);
+  A("HCO₃⁻", "HCO3", /(?:hco3-?|bicarb(?:onate)?)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
   A("PaO₂", "PaO2", /(?:^|[^a-z])(?:pao2|po2|pao₂|po₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 20, 600);
-  A("Lactate", "Lactate", /lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
+  A("Lactate", "Lactate", /(?:lactate|lac)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
   A("Cl⁻", "Cl", /\bcl-?\s*[:=]?\s*(\d{2,3})\b/i, 70, 140);
+  let abgFi = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i, abgSec);
+  if (abgFi > 0) {
+    if (abgFi <= 1) abgFi *= 100;
+    if (abgFi >= 21 && abgFi <= 100) add("ABG FiO₂ " + abgFi + "%", [["investigations.abg.FiO2", String(abgFi)]]);
+  }
 
   const today = new Date().toISOString().slice(0, 10);
   const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu)\b(?!\/\s*d?l\b)/gi, " ");
@@ -1907,13 +1948,19 @@ function parseCase(src) {
     });
   }
 
-  const planMatch = T.match(/(?:^|\n)\s*(?:plan|recommendations?|management)\s*[:\-]\s*([\s\S]+)$/i);
-  if (planMatch) {
-    const rawItems = planMatch[1].split(/\n+/).map(x => x.replace(/^[-*•\d.)\s]+/, "").trim()).filter(Boolean).slice(0, 10);
+  const planFull = secVal("(?:daily\s*plans?|plans?|recommendations?|management)");
+  if (planFull) {
+    const rawItems = planFull
+      .split(/\n+|(?<=\.)\s+(?=[A-Z0-9•\-*])|;\s+/)
+      .map(x => x.replace(/^[-*•\d.)\s]+/, "").trim())
+      .filter(Boolean)
+      .slice(0, 20);
     if (rawItems.length) {
-      add(`Plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
+      add(`Daily plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
         rawItems.forEach(text => {
-          if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
+          if (!p.plans.some(x => x.text.toLowerCase() === text.toLowerCase())) {
+            p.plans.push({ text, done: false });
+          }
         });
       });
     }
@@ -2314,6 +2361,14 @@ function applyParsedItems(p, items, overwrite) {
   });
 }
 
+function resolveUniqueBed(baseName, excludeIdx = -1) {
+  let bed = String(baseName || "").trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
+  if (data.some((q, idx) => idx !== excludeIdx && String(q.bed).toLowerCase() === bed.toLowerCase())) {
+    bed += " (" + (data.length + 1) + ")";
+  }
+  return bed;
+}
+
 function autoImportCase(asNew) {
   const src = $("caseTxt").value.trim();
   if (!src) { alert("Paste case text first."); return; }
@@ -2327,11 +2382,8 @@ function autoImportCase(asNew) {
 
   let p;
   if (asNew) {
-    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
-      bed += " (" + (data.length + 1) + ")";
-    }
-    p = blankPatient(bed);
+    const preferredBed = $("bed").value.trim() || items.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    p = blankPatient(resolveUniqueBed(preferredBed));
     data.push(p);
     active = data.length - 1;
     $("bed").value = "";
@@ -2341,6 +2393,9 @@ function autoImportCase(asNew) {
 
   ensure(p);
   applyParsedItems(p, items, true);
+  if (items.detectedBed) {
+    p.bed = resolveUniqueBed(items.detectedBed, active);
+  }
   persist();
   $("importOut").innerHTML = `<div class="out"><b class="gd">✓ Automatically imported ${items.length} item(s) into ${esc(p.bed)}:</b><div class="small" style="margin-top:4px">${items.map(x => esc(x.label)).join(" · ")}</div></div>`;
   draw();
@@ -2359,13 +2414,17 @@ function importPreview(asNew) {
 function applyImportPreview() {
   const st = window._importPreview;
   if (!st) return;
+  const selected = st.items.filter((_, i) => {
+    const cb = document.querySelector(`[data-import='${i}']`);
+    return cb && cb.checked;
+  });
+  const bedItem = selected.find(x => x.fields && x.fields.some(f => f[0] === "bed"));
+  const chosenBed = bedItem ? bedItem.fields.find(f => f[0] === "bed")[1] : "";
+
   let p;
   if (st.asNew) {
-    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
-      bed += " (" + (data.length + 1) + ")";
-    }
-    p = blankPatient(bed);
+    const preferredBed = $("bed").value.trim() || chosenBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    p = blankPatient(resolveUniqueBed(preferredBed));
     data.push(p);
     active = data.length - 1;
     $("bed").value = "";
@@ -2374,11 +2433,10 @@ function applyImportPreview() {
   }
   ensure(p);
   const overwrite = confirm("Overwrite existing non-empty fields when the imported case contains a value? Choose Cancel to fill only empty fields.");
-  const selected = st.items.filter((_, i) => {
-    const cb = document.querySelector(`[data-import='${i}']`);
-    return cb && cb.checked;
-  });
   applyParsedItems(p, selected, overwrite);
+  if (chosenBed && (overwrite || !p.bed)) {
+    p.bed = resolveUniqueBed(chosenBed, active);
+  }
   persist();
   $("importOut").innerHTML = "<p class='gd'>Selected suggestions applied. Review every imported value against the clinical chart.</p>";
   draw();
