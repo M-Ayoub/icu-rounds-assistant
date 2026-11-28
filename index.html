@@ -176,7 +176,7 @@ body.dark .med-details .entry-value{color:#b8e4ff}
 <header>
   <div>
     <h2>ICU Rounds Assistant</h2>
-    <small>Offline organizer for rounds · v19</small>
+    <small>Offline organizer for rounds · v18.4</small>
   </div>
   <div>
     <button class="g" onclick="toggleDark()" aria-label="Toggle dark mode">🌓</button>
@@ -1642,125 +1642,41 @@ function parseCase(src) {
   const add = (label, fields = [], apply = null) => I.push({ label, fields, apply });
   const pick = (a, t = T) => { for (const [re, v] of a) if (re.test(t)) return v; return null; };
 
-  // Normalize dates like YYYY-MM-DD, DD/MM/YYYY, MM/DD/YYYY, or "Nov 20, 2026" to YYYY-MM-DD
-  const MONTHS = {
-    jan: "01", january: "01", feb: "02", february: "02", mar: "03", march: "03",
-    apr: "04", april: "04", may: "05", jun: "06", june: "06", jul: "07", july: "07",
-    aug: "08", august: "08", sep: "09", sept: "09", september: "09",
-    oct: "10", october: "10", nov: "11", november: "11", dec: "12", december: "12"
-  };
-  const normDate = (raw) => {
-    if (!raw) return "";
-    const s = String(raw).trim();
-    let m = s.match(/\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/);
-    if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
-    m = s.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
-    if (m) {
-      let a = parseInt(m[1], 10), b = parseInt(m[2], 10), yr = parseInt(m[3], 10);
-      if (yr < 100) yr += 2000;
-      let day = a, mon = b;
-      if (b > 12 && a <= 12) { mon = a; day = b; }
-      else if (a > 12 && b <= 12) { day = a; mon = b; }
-      if (mon >= 1 && mon <= 12 && day >= 1 && day <= 31) {
-        return `${yr}-${String(mon).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-      }
-    }
-    m = s.match(/\b([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/);
-    if (m && MONTHS[m[1].toLowerCase()]) {
-      return `${m[3]}-${MONTHS[m[1].toLowerCase()]}-${m[2].padStart(2, "0")}`;
-    }
-    m = s.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+),?\s+(\d{4})\b/);
-    if (m && MONTHS[m[2].toLowerCase()]) {
-      return `${m[3]}-${MONTHS[m[2].toLowerCase()]}-${m[1].padStart(2, "0")}`;
-    }
-    return "";
-  };
-
-  // Capture multi-line sections until the next recognized clinical header
-  const secStop = "(?=\\n\\s*(?:bed(?:\\s*(?:no|number|label|#))?|patient(?:\\s*name)?|name|pt|age|sex|gender|doa|date\\s*of\\s*admission|adm(?:ission)?\\s*date|admitted|working\\s*diagnosis|dx|diagnosis|diagnoses|impression|assessment|past\\s*medical\\s*history|past\\s*history|pmh|comorbidities|known\\s*case\\s*of|kco|history\\s*of\\s*(?:present\\s*)?illness|hpi|presenting\\s*(?:history|illness)|chief\\s*complaint|events?|icu\\s*course|last\\s*24\\s*h(?:ours)?|overnight|physical\\s*exam(?:ination)?|exam(?:ination)?|vitals?|cns|neuro(?:logical)?|cvs|cardio(?:vascular)?|resp(?:iratory)?|vent(?:ilator)?|abdomen|abd|extremities|infection|sepsis|lines?|tubes?|investigations?|labs?|abg|arterial\\s*blood\\s*gas|radiology|imaging|cxr|ct|echo|medications?|meds|antibiotics?|abx|anticoag(?:ulation)?|cultures?|microbiology|fluid\\s*balance|plan|daily\\s*plan|recommendations?|management)\\s*[:\\-]|$)";
-  const secVal = (hdrRe) => {
-    const rx = new RegExp("(?:^|\\n|\\|)\\s*(?:" + hdrRe + ")\\s*[:\\-]\\s*([\\s\\S]+?)" + secStop, "i");
-    const mm = T.match(rx);
-    return mm ? mm[1].trim() : "";
-  };
-
-  // 1. Patient name & bed name
-  let m = T.match(/(?:^|\n|\|)\s*(?:patient\s*name|pt\s*name|name|pt)\s*[:\-]\s*([^\n|]+)/i);
-  let ptName = m ? m[1].replace(/\s*(?:,|age\b|\d{1,3}\s*(?:y\/o|yo|yrs?|years?|M\b|F\b)).*$/i, "").trim() : "";
-  if (!ptName) {
-    const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
-    const leadName = firstLine.match(/^(?:bed\s*[\w-]+\s*[:\-|]\s*)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})(?=\s*[,|\-\(]|\s+\d{1,3}\s*(?:y\/o|yo|yrs?|years?|M\b|F\b|male|female))/);
-    if (leadName && !/^(working|past|history|diagnosis|patient|admitted|sepsis|acute|chronic|severe|icu|bed|age|sex|date|exam|plan|labs|abg)\b/i.test(leadName[1])) {
-      ptName = leadName[1].trim();
-    }
-  }
-  const bedRaw = T.match(/(?:^|\n|\|)\s*(?:bed(?:\\s*(?:no|number|label|#))?|icu\\s*bed)\s*[:\\-]\\s*([^\n|]+)/i);
-  const bedTag = bedRaw ? bedRaw[1].trim() : "";
-  const combinedBed = ptName && bedTag && !ptName.toLowerCase().includes(bedTag.toLowerCase())
-    ? `${bedTag} - ${ptName}`
-    : (ptName || bedTag);
-  if (combinedBed) {
-    I.detectedBed = combinedBed;
-    add("Bed / Patient name: " + combinedBed, [["bed", combinedBed]]);
-  }
-
-  // 2. Age & Sex
-  const ageVal = secVal("age") || ((T.match(/(?:^|\n|\|)\s*age\s*[:\-]\s*([^\n|]+)/i) || [])[1] || "");
-  const age = num(/\b(\d{1,3})\s*(?:[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b)?/i, ageVal)
-    ?? num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b/i)
-    ?? num(/\bage\s*[:=]?\s*(\d{1,3})\b/i);
+  const age = num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b/i) ?? num(/\bage\s*[:=]?\s*(\d{1,3})\b/i);
   if (age > 0 && age < 120) add("Age " + age + " y", [["age", String(age)]]);
 
   let sx = (T.match(/\b(male|female|woman|man)\b/i) || [])[1];
   if (!sx) {
-    const sm = T.match(/(?:sex|gender)\s*[:\-]?\s*(male|female|woman|man|\b[MF]\b)/i) || T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF])\b/);
-    sx = sm && (sm[1].toUpperCase() === "M" ? "male" : sm[1].toUpperCase() === "F" ? "female" : sm[1]);
+    const m = T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF])\b/);
+    sx = m && (m[1].toUpperCase() === "M" ? "male" : "female");
   }
   if (sx) {
     sx = /^(male|man)$/i.test(sx) ? "male" : "female";
     add("Sex: " + sx, [["ventSex", sx]]);
   }
 
-  // 3. Date of admission
-  const admSec = secVal("(?:date\\s*of\\s*admission|adm(?:ission)?\\s*date|\\bDOA\\b|admitted(?:\\s*on|\\s*date)?)");
-  let admDate = normDate(admSec);
-  if (!admDate) {
-    const admMatch = T.match(/(?:date\s*of\s*admission|adm(?:ission)?\s*date|\bDOA\b|admitted\s*(?:on|date)?)\s*[:\-]?\s*([A-Za-z0-9\/\-\s,]{6,25})/i);
-    if (admMatch) admDate = normDate(admMatch[1]);
-  }
-  if (admDate) add("Admission " + admDate, [["admissionDate", admDate]]);
-
   const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg\b/i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm\b/i);
   if (wt > 30 && wt < 300) add("Weight " + wt + " kg", [["weight", String(wt)]]);
   if (ht > 100 && ht < 230) add("Height " + ht + " cm", [["heightCm", String(ht)]]);
 
-  // 4. Diagnosis, PMH, HPI, Events
-  const dxFull = secVal("(?:working\\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)");
-  if (dxFull) add("Diagnosis: " + dxFull.replace(/\s+/g, " ").slice(0, 70), [["diagnosis", dxFull]]);
+  let m = T.match(/(?:working\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)\s*[:\-]\s*([^\n]+)/i);
+  if (m) add("Diagnosis: " + m[1].slice(0, 60), [["diagnosis", m[1].trim()]]);
   else {
     const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
-    const afterDemo = firstLine.replace(/^(?:bed\s*[\w-]+\s*[:\-|]?\s*)?(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\s*[,|\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
-    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 180 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
-      add("Diagnosis (from summary): " + afterDemo.slice(0, 70), [["diagnosis", afterDemo]]);
+    const afterDemo = firstLine.replace(/^(?:bed\s*\w+\s*[:\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
+    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 140 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
+      add("Diagnosis (from summary): " + afterDemo.slice(0, 60), [["diagnosis", afterDemo]]);
     }
   }
 
-  const pmhFull = secVal("(?:past\\s*medical\\s*history|past\\s*history|\\bPMH\\b|comorbidities|known\\s*case\\s*of|\\bKCO\\b)");
-  if (pmhFull) add("Past medical history: " + pmhFull.replace(/\s+/g, " ").slice(0, 70), [["pastMedicalHistory", pmhFull.slice(0, 2000)]]);
-
-  let hpiFull = secVal("(?:history\\s*of\\s*(?:present\\s*)?illness|\\bHPI\\b|presenting\\s*(?:history|illness)|chief\\s*complaint)");
-  if (!hpiFull) {
-    m = T.match(/(?:presented with|presenting with|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([\s\S]+?)(?=\n\s*[A-Za-z][A-Za-z /]{1,30}\s*[:\-]|$)/i);
-    if (m) hpiFull = m[0].trim();
-  }
-  if (hpiFull) add("History of present illness: " + hpiFull.replace(/\s+/g, " ").slice(0, 70), [["presentIllness", hpiFull.slice(0, 3000)]]);
-
-  const evFull = secVal("(?:events?(?:\\s*in\\s*(?:the\\s*)?last\\s*24\\s*h(?:ours)?)?|icu\\s*course|last\\s*24\\s*h(?:ours)?|overnight)");
-  if (evFull) add("Events: " + evFull.replace(/\s+/g, " ").slice(0, 70), [["events", evFull.slice(0, 2000)]]);
-
-  // 5. Examination section & system-specific placement
-  const examSec = secVal("(?:physical\\s*exam(?:ination)?|exam(?:ination)?|vitals?|cns|neuro(?:logical)?|cvs|cardio(?:vascular)?|resp(?:iratory)?|abdomen|abd|extremities)");
-  const examPool = examSec || T;
+  m = T.match(/(?:past medical history|past history|\bPMH\b|comorbidities|known case of|\bKCO\b)\s*[:\-]?\s*([^\n]+)/i);
+  if (m) add("Past medical history: " + m[1].slice(0, 60), [["pastMedicalHistory", m[1].trim().slice(0, 1000)]]);
+  m = T.match(/(?:history of present illness|\bHPI\b|presented with|presenting with|chief complaint|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([^\n]+)/i);
+  if (m) add("History of present illness: " + m[1].slice(0, 60), [["presentIllness", m[1].trim().slice(0, 1500)]]);
+  m = T.match(/(?:events?(?: in (?:the )?last 24 ?h(?:ours)?)?|last 24 ?h(?:ours)?|overnight)\s*[:\-]\s*([^\n]+)/i);
+  if (m) add("Events: " + m[1].slice(0, 60), [["events", m[1].trim()]]);
+  m = T.match(/admi\w+\s*(?:on|date)?\s*[:\-]?\s*(\d{4}-\d{2}-\d{2})/i);
+  if (m) add("Admission " + m[1], [["admissionDate", m[1]]]);
 
   m = T.match(/(?:\bbp\b|blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
   if (m) add(`BP ${m[1]}/${m[2]}`, [["cardio.vitals.sbp", m[1]], ["cardio.vitals.dbp", m[2]]]);
@@ -1780,29 +1696,8 @@ function parseCase(src) {
     [/\bSVT\b/i, "SVT"],
     [/ventricular tachycardia/i, "VT"],
     [/sinus rhythm|\bNSR\b/i, "Sinus rhythm"]
-  ], examPool);
+  ]);
   if (rh) add("Rhythm: " + rh, [["cardio.vitals.rhythm", rh]]);
-
-  const cnsSec = secVal("(?:cns|neuro(?:logical)?)");
-  if (cnsSec) add("CNS exam: " + cnsSec.replace(/\s+/g, " ").slice(0, 60), [["cns", cnsSec.slice(0, 1500)]]);
-
-  const cvsSec = secVal("(?:cvs|cardio(?:vascular)?)");
-  if (cvsSec) add("CVS exam: " + cvsSec.replace(/\s+/g, " ").slice(0, 60), [["cv", cvsSec.slice(0, 1500)]]);
-
-  const respSec = secVal("(?:resp(?:iratory)?|chest\\s*exam)");
-  if (respSec) add("Resp exam: " + respSec.replace(/\s+/g, " ").slice(0, 60), [["resp", respSec.slice(0, 1500)]]);
-
-  const abdSec = secVal("(?:abdomen|abd)");
-  if (abdSec) add("Abdomen exam: " + abdSec.replace(/\s+/g, " ").slice(0, 60), [["abdNotes", abdSec.slice(0, 1500)]]);
-
-  const extSec = secVal("extremities");
-  if (extSec) add("Extremities exam: " + extSec.replace(/\s+/g, " ").slice(0, 60), [["extNotes", extSec.slice(0, 1500)]]);
-
-  if (!cnsSec && !cvsSec && !respSec && !abdSec && !extSec && examSec) {
-    add("Examination notes: " + examSec.replace(/\s+/g, " ").slice(0, 60), [], (p, over) => {
-      if (over || !p.resp) p.resp = examSec.slice(0, 1500);
-    });
-  }
 
   const vent = /intubat|ventilat|\bETT\b|\bPEEP\b|\bSIMV\b|\bPSV\b/i.test(T);
   const rs = vent && /intubat|mechanically ventilated|on ventilator|invasive ventilation|\bETT\b/i.test(T)
@@ -1820,7 +1715,7 @@ function parseCase(src) {
     [/(?:diminished|reduced) air entry/i, "Diminished air entry"],
     [/absent breath sounds|no air entry/i, "Absent breath sounds"],
     [/clear chest|vesicular|bilateral equal air entry|normal breath sounds/i, "Normal vesicular"]
-  ], examPool);
+  ]);
   if (bs) add("Breath sounds: " + bs, [["breathSounds", bs]]);
 
   if (vent) {
@@ -1850,22 +1745,16 @@ function parseCase(src) {
     if (f2 >= 21 && f2 <= 100) add("FiO₂ " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
   }
 
-  const abgSec = secVal("(?:abg|arterial\\s*blood\\s*gas)") || T;
   const A = (label, key, re, lo, hi) => {
-    const x = num(re, abgSec) ?? num(re, T);
-    if (x !== null && x >= lo && x <= hi) add("ABG " + label + " " + x, [["investigations.abg." + key, String(x)]]);
+    const x = num(re);
+    if (x !== null && x >= lo && x <= hi) add(label + " " + x, [["investigations.abg." + key, String(x)]]);
   };
   A("pH", "pH", /\bpH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
-  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{1,3}(?:\.\d)?)/i, 10, 150);
-  A("HCO₃⁻", "HCO3", /(?:hco3-?|bicarb(?:onate)?)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
+  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 10, 150);
+  A("HCO₃⁻", "HCO3", /hco3-?\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
   A("PaO₂", "PaO2", /(?:^|[^a-z])(?:pao2|po2|pao₂|po₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 20, 600);
-  A("Lactate", "Lactate", /(?:lactate|lac)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
+  A("Lactate", "Lactate", /lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
   A("Cl⁻", "Cl", /\bcl-?\s*[:=]?\s*(\d{2,3})\b/i, 70, 140);
-  let abgFi = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i, abgSec);
-  if (abgFi > 0) {
-    if (abgFi <= 1) abgFi *= 100;
-    if (abgFi >= 21 && abgFi <= 100) add("ABG FiO₂ " + abgFi + "%", [["investigations.abg.FiO2", String(abgFi)]]);
-  }
 
   const today = new Date().toISOString().slice(0, 10);
   const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu)\b(?!\/\s*d?l\b)/gi, " ");
@@ -1952,46 +1841,27 @@ function parseCase(src) {
     [/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"],
     [/^(?![\s\S]*non[- ]tender)[\s\S]*\btender/i, "Tender"],
     [/distend|distension/i, "Distended"], [/soft and lax|soft abdomen/i, "Soft and lax"]
-  ], examPool);
+  ]);
   if (abdomen) add("Abdomen: " + abdomen, [["palpation", abdomen]]);
 
   const ext = pick([
     [/anasarca|generalized edema/i, "Generalized (anasarca)"],
     [/severe edema/i, "Severe pitting"], [/moderate edema/i, "Moderate pitting"],
     [/mild edema|pedal edema/i, "Mild pitting"], [/no edema|without edema/i, "None"]
-  ], examPool);
+  ]);
   if (ext) add("Edema: " + ext, [["edema", ext]]);
 
-  // 6. Antibiotics with starting date extraction (explicit date or "day X" / "since ...")
-  const abxSec = secVal("(?:antibiotics?|antimicrobials?|\\babx\\b)");
-  const abxPool = abxSec || T;
-  const extractAbxDate = (snippet) => {
-    const dt = normDate(snippet);
-    if (dt) return dt;
-    const dayRel = snippet.match(/\b(?:day|d)\s*(\d{1,2})\b/i) || snippet.match(/\bfor\s+(\d{1,2})\s*(?:days?|d)\b/i);
-    if (dayRel) {
-      const dNum = Math.max(1, parseInt(dayRel[1], 10));
-      const dObj = new Date(Date.now() - (dNum - 1) * 86400000);
-      return dObj.toISOString().slice(0, 10);
-    }
-    return today;
-  };
-
   for (const [re, drug] of ABXL) {
-    const am = abxPool.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n;]*)", "i"));
+    const am = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n.;,]*)", "i"));
     if (!am) continue;
     const tail = am[1] || "";
     const dm = tail.match(/\b(\d+(?:\.\d+)?\s*(?:g|mg|mcg|units?|iu))\b/i);
     const rm = tail.match(/\b(IV|PO|IM|SC|inhaled)\b/i);
     const fm = tail.match(/\b(q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|stat)\b/i);
-    const startDate = extractAbxDate(tail) || extractAbxDate(am[0]);
     const dose = dm ? dm[1] : "", route = rm ? rm[1].toUpperCase() : "", frequency = fm ? fm[1] : "";
-    add(`Antibiotic: ${drug}${dose ? " " + dose : ""}${startDate ? " (start " + startDate + ")" : ""}`, [], (p, over) => {
-      const existing = p.abx.find(x => (x.drug || "").toLowerCase() === drug.toLowerCase());
-      if (!existing) {
-        p.abx.push({ drug, dose, route, frequency, date: startDate, indication: "", note: "", editing: false });
-      } else if (over && startDate) {
-        existing.date = startDate;
+    add(`Antibiotic: ${drug}${dose ? " " + dose : ""}${frequency ? " " + frequency : ""}`, [], p => {
+      if (!p.abx.some(x => (x.drug || "").toLowerCase() === drug.toLowerCase())) {
+        p.abx.push({ drug, dose, route, frequency, date: today, indication: "", note: "", editing: false });
       }
     });
   }
@@ -2023,48 +1893,27 @@ function parseCase(src) {
     }
   });
 
-  // 7. Cultures with organism, status, date, and susceptibilities
-  const cxSec = secVal("(?:cultures?|microbiology)");
-  const cxPool = cxSec ? (cxSec + "\n" + T) : T;
   for (const [re, type] of SPEC) {
-    const sm = cxPool.match(new RegExp("(?:^|[^a-z])(" + re.source + ")\\s*[:\\-]?\\s*([^\\n;]*)", "i"));
+    const sm = T.match(new RegExp("(?:^|[^a-z])(" + re.source + ")([^\\n.;]*)", "i"));
     if (!sm) continue;
-    const tail = (sm[2] || "").trim();
+    const tail = sm[2] || "";
     const om = tail.match(ORGX);
-    let organism = om ? om[1].trim() : "";
-    if (!organism && tail && !/^(?:pending|no growth|negative|sterile|sent|ordered|awaiting)/i.test(tail)) {
-      organism = tail.split(/[,|(]/)[0].trim().slice(0, 60);
-    }
+    const organism = om ? om[1].trim() : "";
     const status = organism ? "Growth" : /no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending";
-    const cxDate = normDate(tail) || today;
-    const suscMatch = tail.match(/(?:sens(?:itive)?|susc(?:eptible)?|s)\s*[:\-]\s*([^;\n]+)/i);
-    const susceptible = suscMatch ? suscMatch[1].trim().slice(0, 80) : "";
-    add(`Culture: ${type}${organism ? " (" + organism + ")" : " [" + status + "]"}`, [], (p, over) => {
-      const ex = p.cultures.find(x => x.type === type);
-      if (!ex) {
-        p.cultures.push({ type, date: cxDate, status, organism, susceptible, editing: false });
-      } else if (over) {
-        if (organism) ex.organism = organism;
-        ex.status = status;
-        if (cxDate) ex.date = cxDate;
-        if (susceptible) ex.susceptible = susceptible;
+    add(`Culture: ${type}${organism ? " (" + organism + ")" : ""}`, [], p => {
+      if (!p.cultures.some(x => x.type === type && x.organism === organism)) {
+        p.cultures.push({ type, date: today, status, organism, susceptible: "", editing: false });
       }
     });
   }
 
-  const planFull = secVal("(?:daily\\s*plans?|plans?|recommendations?|management)");
-  if (planFull) {
-    const rawItems = planFull
-      .split(/\n+|(?<=\.)\s+(?=[A-Z0-9•\-*])|;\s+/)
-      .map(x => x.replace(/^[-*•\d.)\s]+/, "").trim())
-      .filter(Boolean)
-      .slice(0, 20);
+  const planMatch = T.match(/(?:^|\n)\s*(?:plan|recommendations?|management)\s*[:\-]\s*([\s\S]+)$/i);
+  if (planMatch) {
+    const rawItems = planMatch[1].split(/\n+/).map(x => x.replace(/^[-*•\d.)\s]+/, "").trim()).filter(Boolean).slice(0, 10);
     if (rawItems.length) {
-      add(`Daily plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
+      add(`Plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
         rawItems.forEach(text => {
-          if (!p.plans.some(x => x.text.toLowerCase() === text.toLowerCase())) {
-            p.plans.push({ text, done: false });
-          }
+          if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
         });
       });
     }
@@ -2465,14 +2314,6 @@ function applyParsedItems(p, items, overwrite) {
   });
 }
 
-function resolveUniqueBed(baseName, excludeIdx = -1) {
-  let bed = String(baseName || "").trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
-  if (data.some((q, idx) => idx !== excludeIdx && String(q.bed).toLowerCase() === bed.toLowerCase())) {
-    bed += " (" + (data.length + 1) + ")";
-  }
-  return bed;
-}
-
 function autoImportCase(asNew) {
   const src = $("caseTxt").value.trim();
   if (!src) { alert("Paste case text first."); return; }
@@ -2486,8 +2327,11 @@ function autoImportCase(asNew) {
 
   let p;
   if (asNew) {
-    const preferredBed = $("bed").value.trim() || items.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    p = blankPatient(resolveUniqueBed(preferredBed));
+    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
+      bed += " (" + (data.length + 1) + ")";
+    }
+    p = blankPatient(bed);
     data.push(p);
     active = data.length - 1;
     $("bed").value = "";
@@ -2497,9 +2341,6 @@ function autoImportCase(asNew) {
 
   ensure(p);
   applyParsedItems(p, items, true);
-  if (items.detectedBed) {
-    p.bed = resolveUniqueBed(items.detectedBed, active);
-  }
   persist();
   $("importOut").innerHTML = `<div class="out"><b class="gd">✓ Automatically imported ${items.length} item(s) into ${esc(p.bed)}:</b><div class="small" style="margin-top:4px">${items.map(x => esc(x.label)).join(" · ")}</div></div>`;
   draw();
@@ -2518,17 +2359,13 @@ function importPreview(asNew) {
 function applyImportPreview() {
   const st = window._importPreview;
   if (!st) return;
-  const selected = st.items.filter((_, i) => {
-    const cb = document.querySelector(`[data-import='${i}']`);
-    return cb && cb.checked;
-  });
-  const bedItem = selected.find(x => x.fields && x.fields.some(f => f[0] === "bed"));
-  const chosenBed = bedItem ? bedItem.fields.find(f => f[0] === "bed")[1] : "";
-
   let p;
   if (st.asNew) {
-    const preferredBed = $("bed").value.trim() || chosenBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    p = blankPatient(resolveUniqueBed(preferredBed));
+    let bed = $("bed").value.trim() || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    if (data.some(q => String(q.bed).toLowerCase() === bed.toLowerCase())) {
+      bed += " (" + (data.length + 1) + ")";
+    }
+    p = blankPatient(bed);
     data.push(p);
     active = data.length - 1;
     $("bed").value = "";
@@ -2537,10 +2374,11 @@ function applyImportPreview() {
   }
   ensure(p);
   const overwrite = confirm("Overwrite existing non-empty fields when the imported case contains a value? Choose Cancel to fill only empty fields.");
+  const selected = st.items.filter((_, i) => {
+    const cb = document.querySelector(`[data-import='${i}']`);
+    return cb && cb.checked;
+  });
   applyParsedItems(p, selected, overwrite);
-  if (chosenBed && (overwrite || !p.bed)) {
-    p.bed = resolveUniqueBed(chosenBed, active);
-  }
   persist();
   $("importOut").innerHTML = "<p class='gd'>Selected suggestions applied. Review every imported value against the clinical chart.</p>";
   draw();
