@@ -645,6 +645,210 @@ body.dark button.x:hover{
   color:#ffffff;
   border-color:#ff8a80;
 }
+
+/* ---------- Mist (Light Theme) Overrides ---------- */
+:root{
+  --fs:15px;
+  --bg:#E3E6EC;
+  --surface:#F5F7FA;
+  --surface-alt:#F5F7FA;
+  --ink:#1E2530;
+  --muted:#6B7585;
+  --accent:#3B6291;
+  --accent-deep:#3B6291;
+  --border:#D8DDE6;
+  --shadow:0 6px 18px rgba(30,37,48,.06);
+}
+body:not(.dark){
+  background:#E3E6EC !important;
+  color:#1E2530 !important;
+}
+body:not(.dark) header{
+  background:#F5F7FA !important;
+  color:#1E2530 !important;
+  border-bottom:1px solid #D8DDE6 !important;
+  box-shadow:none !important;
+}
+body:not(.dark) header small{color:#6B7585 !important;opacity:1}
+body:not(.dark) header button{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+  border:1px solid #3B6291 !important;
+}
+body:not(.dark) section,
+body:not(.dark) #rec,
+body:not(.dark) details,
+body:not(.dark) .ent,
+body:not(.dark) .med-row,
+body:not(.dark) .exam-detail-pane,
+body:not(.dark) .floating-card,
+body:not(.dark) #navRow,
+body:not(.dark) table{
+  background:#F5F7FA !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+  box-shadow:0 4px 14px rgba(30,37,48,.05) !important;
+}
+body:not(.dark) .exam-sub-bar,
+body:not(.dark) .out,
+body:not(.dark) .r,
+body:not(.dark) .med-group-head,
+body:not(.dark) .abx-copy-row,
+body:not(.dark) .calc-result{
+  background:#E3E6EC !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+}
+body:not(.dark) .med-card,
+body:not(.dark) .exam-sub-card{
+  background:#F5F7FA !important;
+  border:1px solid #D8DDE6 !important;
+  box-shadow:0 6px 16px rgba(30,37,48,.06) !important;
+}
+body:not(.dark) .med-card::before{display:none}
+body:not(.dark) .med-card:hover,
+body:not(.dark) .med-card:focus-visible,
+body:not(.dark) .med-card.is-featured,
+body:not(.dark) .exam-sub-card:hover,
+body:not(.dark) .exam-sub-card.is-active{
+  background:#3B6291 !important;
+  border-color:#3B6291 !important;
+}
+body:not(.dark) .med-card-title,
+body:not(.dark) .exam-sub-title,
+body:not(.dark) h3,
+body:not(.dark) h4,
+body:not(.dark) .bed-hero h3,
+body:not(.dark) .med-summary .med-name,
+body:not(.dark) .med-details .entry-value,
+body:not(.dark) .exam-detail-head h4{
+  color:#1E2530 !important;
+}
+body:not(.dark) .med-card-kicker,
+body:not(.dark) .med-card-meta,
+body:not(.dark) .exam-sub-meta,
+body:not(.dark) .bed-sub,
+body:not(.dark) .slider-hint,
+body:not(.dark) .med-summary .med-details,
+body:not(.dark) .small,
+body:not(.dark) label{
+  color:#6B7585 !important;
+}
+body:not(.dark) .med-card:hover .med-card-title,
+body:not(.dark) .med-card.is-featured .med-card-title,
+body:not(.dark) .exam-sub-card:hover .exam-sub-title,
+body:not(.dark) .exam-sub-card.is-active .exam-sub-title{
+  color:#FFFFFF !important;
+}
+body:not(.dark) .med-card:hover .med-card-kicker,
+body:not(.dark) .med-card.is-featured .med-card-kicker,
+body:not(.dark) .med-card:hover .med-card-meta,
+body:not(.dark) .med-card.is-featured .med-card-meta,
+body:not(.dark) .exam-sub-card:hover .exam-sub-meta,
+body:not(.dark) .exam-sub-card.is-active .exam-sub-meta{
+  color:#E3E6EC !important;
+}
+body:not(.dark) .status-orb{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+  box-shadow:none !important;
+}
+body:not(.dark) .status-orb.warn{
+  background:#C0392B !important;
+  color:#FFFFFF !important;
+}
+body:not(.dark) .med-card:hover .status-orb,
+body:not(.dark) .med-card.is-featured .status-orb,
+body:not(.dark) .exam-sub-card:hover .status-orb,
+body:not(.dark) .exam-sub-card.is-active .status-orb{
+  background:#FFFFFF !important;
+  color:#3B6291 !important;
+}
+body:not(.dark) button,
+body:not(.dark) button.pri,
+body:not(.dark) button.g,
+body:not(.dark) .seg button.on{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+  border:1px solid #3B6291 !important;
+  box-shadow:none !important;
+}
+body:not(.dark) button:hover{
+  background:#2E4E75 !important;
+  color:#FFFFFF !important;
+  border-color:#2E4E75 !important;
+}
+body:not(.dark) .seg button:not(.on){
+  background:#E3E6EC !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+}
+body:not(.dark) button.x{
+  background:#FDECEC !important;
+  color:#B71C1C !important;
+  border:1px solid #F2B8B5 !important;
+}
+body:not(.dark) button.x:hover{
+  background:#C62828 !important;
+  color:#FFFFFF !important;
+}
+body:not(.dark) details>summary{
+  background:#F5F7FA !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+}
+body:not(.dark) details>summary:hover,
+body:not(.dark) details[open]>summary{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+  border-color:#3B6291 !important;
+}
+body:not(.dark) .floating-head{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+}
+body:not(.dark) input,
+body:not(.dark) textarea,
+body:not(.dark) select{
+  background:#FFFFFF !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+}
+body:not(.dark) input:focus,
+body:not(.dark) textarea:focus,
+body:not(.dark) select:focus{
+  border-color:#3B6291 !important;
+  box-shadow:0 0 0 2px rgba(59,98,145,.18) !important;
+}
+body:not(.dark) th{
+  background:#3B6291 !important;
+  color:#FFFFFF !important;
+}
+body:not(.dark) td,
+body:not(.dark) th,
+body:not(.dark) .pt,
+body:not(.dark) .med-edit,
+body:not(.dark) .bed-actions-bar,
+body:not(.dark) .exam-detail-head{
+  border-color:#D8DDE6 !important;
+}
+body:not(.dark) .nm,
+body:not(.dark) .abg-name,
+body:not(.dark) .med-cat-pill{
+  background:#E3E6EC !important;
+  color:#1E2530 !important;
+  border:1px solid #D8DDE6 !important;
+}
+.mist-dot{
+  display:inline-block;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#3B6291;
+  margin-right:7px;
+  vertical-align:middle;
+}
+
 </style>
 </head>
 <body>
@@ -1143,6 +1347,7 @@ function ensure(p) {
   if (c.vitals.targetMap === undefined) c.vitals.targetMap = "65";
   for (const k of ["ecg", "biomarkers", "vasoactive"]) if (!Array.isArray(c[k])) c[k] = [];
   if (!c.echo || typeof c.echo !== "object") c.echo = { enabled: false };
+  if (!p._syncing) { p._syncing = true; try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; } }
 }
 
 /* ---------- Field builders ---------- */
@@ -1505,13 +1710,14 @@ function getCardModules(p) {
     },
     {
       id: "anti",
-      kicker: "Prophylaxis",
+      kicker: "Prophylaxis & Safety",
       title: "Anticoagulation & Other",
-      meta: p.acType ? `${p.acType}${p.anticoag.length ? " (" + p.anticoag.length + ")" : ""}` : "VTE prophylaxis, renal & other notes",
-      status: p.acType ? "ok" : "idle",
-      badge: p.acType ? "✓" : "+",
+      meta: p.acType ? `${p.acType}${p.anticoag.length ? " (" + p.anticoag.length + ")" : ""}` : "VTE prophylaxis, CrCl & INR check",
+      status: (labVal(p, "inr", "ratio") >= 3 || (crcl(p) !== null && crcl(p) < 30 && p.anticoag.length)) ? "warn" : (p.acType ? "ok" : "idle"),
+      badge: (labVal(p, "inr", "ratio") >= 3 || (crcl(p) !== null && crcl(p) < 30 && p.anticoag.length)) ? "!" : (p.acType ? "✓" : "+"),
       render: () =>
         acHTML(p) +
+        `<h4><span class="mist-dot"></span>Anticoagulation CrCl &amp; INR Recommendations</h4><div id="acRec" class="out"></div>` +
         `<details class="sub" open><summary>Other notes (nutrition, GI, skin, renal)</summary><div class="body">${T("Renal and metabolic notes", "renal", "area")}${T("Other systems notes", "other", "area")}</div></details>`
     },
     {
@@ -1678,6 +1884,201 @@ function renderModalContent() {
   });
   renderOutputs();
   body.scrollTop = savedScroll;
+}
+
+
+const ABX_SYNC_RE = /meropenem|imipenem|ertapenem|piperacillin|tazobactam|zosyn|vancomycin|teicoplanin|linezolid|daptomycin|ceftriaxone|cefepime|ceftazidime|cefotaxime|cefazolin|ampicillin|amoxicillin|augmentin|levofloxacin|ciprofloxacin|moxifloxacin|azithromycin|clarithromycin|metronidazole|flagyl|clindamycin|colistin|polymyxin|tigecycline|gentamicin|amikacin|doxycycline|fluconazole|caspofungin|micafungin|voriconazole|amphotericin|acyclovir|cotrimoxazole|bactrim/i;
+const AC_SYNC_RE = /enoxaparin|clexane|lovenox|heparin|dalteparin|tinzaparin|fondaparinux|warfarin|coumadin|apixaban|eliquis|rivaroxaban|xarelto|dabigatran|edoxaban|argatroban|bivalirudin/i;
+
+function syncMedicationsAcrossCards(p) {
+  if (!p) return;
+  ensure(p);
+  const today = new Date().toISOString().slice(0, 10);
+
+  // 1. Sync Medications -> Antibiotics, Anticoagulation, Daily Plan
+  (p.meds || []).forEach(m => {
+    const nm = (m.drug || "").trim();
+    if (!nm) return;
+    const isAbx = m.category === "Antibiotics / Antimicrobials" || ABX_SYNC_RE.test(nm);
+    const isAc = m.category === "Anticoagulation / VTE" || AC_SYNC_RE.test(nm);
+
+    if (isAbx) {
+      if (m.category !== "Antibiotics / Antimicrobials") m.category = "Antibiotics / Antimicrobials";
+      const ex = p.abx.find(a => (a.drug || "").trim().toLowerCase() === nm.toLowerCase());
+      if (!ex) {
+        p.abx.push({
+          drug: nm,
+          dose: m.dose || "",
+          route: m.route || "",
+          frequency: m.frequency || "",
+          date: m.date || today,
+          indication: m.indication || "",
+          note: "",
+          editing: false
+        });
+      } else {
+        if (!ex.dose && m.dose) ex.dose = m.dose;
+        if (!ex.route && m.route) ex.route = m.route;
+        if (!ex.frequency && m.frequency) ex.frequency = m.frequency;
+        if (!ex.date && m.date) ex.date = m.date;
+        if (!ex.indication && m.indication) ex.indication = m.indication;
+      }
+    }
+
+    if (isAc) {
+      if (m.category !== "Anticoagulation / VTE") m.category = "Anticoagulation / VTE";
+      p.acType = "Pharmacological";
+      const exAc = p.anticoag.find(a => (a.drug || "").trim().toLowerCase() === nm.toLowerCase());
+      if (!exAc) {
+        p.anticoag.push({
+          drug: nm,
+          dose: m.dose || "",
+          route: m.route || "",
+          frequency: m.frequency || "",
+          date: m.date || today,
+          indication: m.indication || "",
+          editing: false
+        });
+      } else {
+        if (!exAc.dose && m.dose) exAc.dose = m.dose;
+        if (!exAc.route && m.route) exAc.route = m.route;
+        if (!exAc.frequency && m.frequency) exAc.frequency = m.frequency;
+        if (!exAc.date && m.date) exAc.date = m.date;
+        if (!exAc.indication && m.indication) exAc.indication = m.indication;
+      }
+    }
+  });
+
+  // 2. Sync Antibiotics card -> Medications card & Daily Plan checklist
+  (p.abx || []).forEach(a => {
+    const nm = (a.drug || "").trim();
+    if (!nm) return;
+    const exMed = p.meds.find(m => (m.drug || "").trim().toLowerCase() === nm.toLowerCase());
+    if (!exMed) {
+      p.meds.push({
+        category: "Antibiotics / Antimicrobials",
+        drug: nm,
+        dose: a.dose || "",
+        route: a.route || "",
+        frequency: a.frequency || "",
+        date: a.date || today,
+        indication: a.indication || "",
+        renal: "",
+        editing: false
+      });
+    } else {
+      exMed.category = "Antibiotics / Antimicrobials";
+      if (a.dose) exMed.dose = a.dose;
+      if (a.route) exMed.route = a.route;
+      if (a.frequency) exMed.frequency = a.frequency;
+      if (a.date) exMed.date = a.date;
+      if (a.indication) exMed.indication = a.indication;
+    }
+
+    const dNum = dayN(a.date);
+    const planLabel = `Antibiotic: ${nm}${a.dose ? " " + a.dose : ""}${dNum ? " (Day " + dNum + ")" : ""}${a.indication ? " — " + a.indication : ""}`;
+    const existingPlan = (p.plans || []).find(pl => (pl.text || "").toLowerCase().startsWith(("antibiotic: " + nm).toLowerCase()));
+    if (!existingPlan) {
+      p.plans.push({ text: planLabel, done: false });
+    } else {
+      existingPlan.text = planLabel;
+    }
+  });
+
+  // 3. Sync Anticoagulation card -> Medications card
+  (p.anticoag || []).forEach(ac => {
+    const nm = (ac.drug || "").trim();
+    if (!nm) return;
+    const exMed = p.meds.find(m => (m.drug || "").trim().toLowerCase() === nm.toLowerCase());
+    if (!exMed) {
+      p.meds.push({
+        category: "Anticoagulation / VTE",
+        drug: nm,
+        dose: ac.dose || "",
+        route: ac.route || "",
+        frequency: ac.frequency || "",
+        date: ac.date || today,
+        indication: ac.indication || "",
+        renal: "",
+        editing: false
+      });
+    } else {
+      exMed.category = "Anticoagulation / VTE";
+      if (ac.dose) exMed.dose = ac.dose;
+      if (ac.route) exMed.route = ac.route;
+      if (ac.frequency) exMed.frequency = ac.frequency;
+      if (ac.date) exMed.date = ac.date;
+      if (ac.indication) exMed.indication = ac.indication;
+    }
+  });
+}
+
+function anticoagRecs(p) {
+  const R = [];
+  const cg = crcl(p);
+  const cr = labVal(p, "creat", "mg/dL");
+  const inr = labVal(p, "inr", "ratio");
+  const plts = labVal(p, "plts", "10³/µL");
+  const activeAC = (p.anticoag || []).filter(x => x.drug);
+  const acNames = activeAC.map(x => `${x.drug} ${x.dose || ""} ${x.frequency || ""}`.toLowerCase()).join(" | ");
+
+  const hasLMWH = /enoxaparin|dalteparin|tinzaparin|clexane|lovenox/.test(acNames);
+  const hasFonda = /fondaparinux/.test(acNames);
+  const hasDOAC = /apixaban|rivaroxaban|dabigatran|edoxaban/.test(acNames);
+  const hasWarfarin = /warfarin/.test(acNames);
+  const hasUFH = /unfractionated heparin/.test(acNames);
+
+  R.push(`Coagulation & Renal Check: CrCl ${cg !== null ? cg.toFixed(1) + " mL/min" : "not calculated (enter Age, Weight, Creat, Sex)"} · INR ${inr !== null ? inr : "not entered"} · Platelets ${plts !== null ? plts + " ×10³/µL" : "not entered"}.`);
+
+  if (inr !== null) {
+    if (inr >= 3.0) {
+      R.push(`ALERT — Elevated INR (${inr}): High bleeding risk. Hold warfarin/anticoagulants, verify target INR and indication, and consider Vitamin K or PCC if active bleeding or INR > 4.5.`);
+    } else if (inr >= 2.0) {
+      if (hasLMWH || hasDOAC || hasUFH) {
+        R.push(`INR ${inr} (Therapeutic range): Verify no unintended duplicate parenteral/DOAC anticoagulation unless intentionally bridging warfarin.`);
+      } else if (hasWarfarin) {
+        R.push(`INR ${inr}: Within standard therapeutic VKA target (2.0–3.0).`);
+      } else {
+        R.push(`Spontaneous INR ${inr} (≥2.0): Assess for liver dysfunction or coagulopathy before initiating pharmacological anticoagulation.`);
+      }
+    } else if (inr >= 1.5) {
+      R.push(`Borderline INR (${inr}): Evaluate underlying coagulopathy/hepatic function before full-dose anticoagulation.`);
+    } else {
+      R.push(`Baseline INR (${inr}): Within normal coagulation range (<1.5).`);
+    }
+  } else {
+    R.push("INR missing: Enter INR in Labs, ABG & Imaging to complete coagulation safety verification.");
+  }
+
+  if (cg !== null) {
+    if (cg < 15) {
+      R.push(`ALERT — Severe Renal Impairment (CrCl ${cg.toFixed(0)} mL/min < 15): Avoid LMWH (enoxaparin/dalteparin), fondaparinux, and dabigatran/rivaroxaban due to bioaccumulation. Unfractionated heparin (UFH) is preferred.`);
+    } else if (cg < 30) {
+      if (hasLMWH) {
+        R.push(`ALERT — CrCl ${cg.toFixed(0)} mL/min (< 30) with LMWH prescribed: Reduce enoxaparin VTE prophylaxis to 20–30 mg SC once daily, or switch therapeutic dosing to UFH (or monitor anti-Xa levels).`);
+      } else if (hasFonda || hasDOAC) {
+        R.push(`ALERT — CrCl ${cg.toFixed(0)} mL/min (< 30) with Fondaparinux/DOAC: Contraindicated (fondaparinux/dabigatran) or requires strict renal dose adjustment. Prefer UFH.`);
+      } else {
+        R.push(`CrCl ${cg.toFixed(0)} mL/min (< 30): High bioaccumulation risk with LMWH/DOACs; prefer UFH if pharmacological anticoagulation is needed.`);
+      }
+    } else if (cg < 50) {
+      R.push(`Moderate Renal Impairment (CrCl ${cg.toFixed(0)} mL/min): Verify renal dosing thresholds for DOACs/LMWH and monitor serum creatinine trends closely.`);
+    } else {
+      R.push(`Adequate Renal Clearance (CrCl ${cg.toFixed(0)} mL/min ≥ 50): Standard renal dosing permissible for LMWH and DOACs.`);
+    }
+  } else if (cr !== null && cr >= 1.5) {
+    R.push(`Elevated Creatinine (${cr} mg/dL) without full CrCl inputs: Enter Age, Weight, and Sex to calculate Cockcroft–Gault CrCl before dosing LMWH/DOACs.`);
+  }
+
+  if (plts !== null && plts < 50) {
+    R.push(`ALERT — Thrombocytopenia (Platelets ${plts} ×10³/µL < 50): Hold pharmacological VTE prophylaxis/anticoagulation and use mechanical prophylaxis (IPC) unless high-risk acute thrombosis.`);
+  }
+
+  if (p.acType === "None" && !activeAC.length) {
+    R.push("No active VTE prophylaxis documented: Confirm mechanical or pharmacological prophylaxis unless contraindicated.");
+  }
+
+  return R;
 }
 
 /* ---------- Calculations ---------- */
@@ -1956,7 +2357,7 @@ const mkList = p => {
 /* ---------- Categorized Medications Rendering ---------- */
 const medsHTML = p => {
   const antibiotics = (p.abx || []).filter(x => x.drug || x.date || x.dose);
-  const abxHTML = `<h4>Antibiotics from Infection card</h4><p class="small">Read-only copy. Edit antibiotic details in the Infection card.</p>${antibiotics.length ? antibiotics.map(x => `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}</b><span>${esc(x.date || "Start date not entered")}</span><span>${esc([x.dose, x.route, x.frequency].filter(Boolean).join(" ") || "Dose not entered")}</span></div>`).join("") : `<p class="small">No antibiotics entered in the Infection card.</p>`}`;
+  const abxHTML = `<h4><span class="mist-dot"></span>Synced Antibiotics (Infection &amp; Plan Cards)</h4><p class="small">Auto-synced across Medications, Infection &amp; Sepsis, Daily Plan, and SBAR. Adding an antibiotic below automatically transfers it to all antibiotic cards.</p>${antibiotics.length ? antibiotics.map(x => `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}</b><span>${esc(x.date || "Start date not entered")}</span><span>${esc([x.dose, x.route, x.frequency].filter(Boolean).join(" ") || "Dose not entered")}</span></div>`).join("") : `<p class="small">No antibiotics entered yet.</p>`}`;
 
   const medList = p.meds || [];
   const groups = new Map();
@@ -3121,6 +3522,7 @@ function renderOutputs() {
   set("cvOut", `${k.al.length ? `<div class="al">${esc(k.al.join(" "))}</div>` : ""}MAP: <b>${k.map !== null ? k.map.toFixed(1) + " mmHg" : "—"}</b> · Shock index: <b>${k.si !== null ? k.si.toFixed(2) : "—"}</b> · Pulse pressure: <b>${k.pp !== null ? k.pp.toFixed(0) + " mmHg" : "—"}</b>`);
   set("cvRec", recList(cvRecs(p)));
   set("infRec", recList(infRecs(p)));
+  set("acRec", recList(anticoagRecs(p)));
   set("ventOut", ventCalc(p));
   set("abgOut", abgCalc(p));
   set("scoreOut", scoreHTML(p));
@@ -3198,6 +3600,7 @@ $("cards").addEventListener("input", e => {
   if (!path || !P()) return;
   const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
   setp(P(), path, v);
+  if (/^(meds|abx|anticoag)\./.test(path)) syncMedicationsAcrossCards(P());
   if (/^scoreList\.(\d+)\.value$/.test(path)) P().scoreList[+RegExp.$1].manual = true;
   if (e.target.classList.contains("trend")) e.target.dataset.v = v;
   persist();
@@ -3233,7 +3636,18 @@ $("cards").addEventListener("click", e => {
   }
   if (a === "del") {
     const it = ARR(p, x)[+idx];
-    if (it) toTrash({ kind: "item", bed: p.bed, x, item: it });
+    if (it) {
+      toTrash({ kind: "item", bed: p.bed, x, item: it });
+      const dName = (it.drug || "").trim().toLowerCase();
+      if (dName && (x === "meds" || x === "abx" || x === "anticoag")) {
+        if (x !== "meds") p.meds = p.meds.filter(m => (m.drug || "").trim().toLowerCase() !== dName);
+        if (x !== "abx") p.abx = p.abx.filter(m => (m.drug || "").trim().toLowerCase() !== dName);
+        if (x !== "anticoag") p.anticoag = p.anticoag.filter(m => (m.drug || "").trim().toLowerCase() !== dName);
+        if (x === "abx" || x === "meds") {
+          p.plans = p.plans.filter(pl => !(pl.text || "").toLowerCase().startsWith("antibiotic: " + dName));
+        }
+      }
+    }
     ARR(p, x).splice(+idx, 1);
   }
   if (a === "entryedit") {
