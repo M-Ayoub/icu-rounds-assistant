@@ -2818,7 +2818,7 @@ function parseCase(src) {
   const pu = /pupils?|perr?l/i.test(T) ? pick([
     [/fixed.{0,15}dilated|dilated.{0,15}fixed/i, "Fixed and dilated"],
     [/pinpoint/i, "Pinpoint"], [/unequal|anisocoria/i, "Unequal"],
-    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l\i, "Equal and reactive"]
+    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l/i, "Equal and reactive"]
   ]) : null;
   if (pu) add("Pupils: " + pu, [["pupils", pu]]);
 
