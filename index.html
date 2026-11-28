@@ -3,139 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#111a20">
+<meta name="theme-color" content="#123047">
 <title>ICU Rounds</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg">
 <style>
-:root{--fs:15px;--ac:#6a9be0;
---bg:#0c1216;--bg2:#111a20;--card:#172129;--card2:#1e2a34;--line:#2a3945;--txt:#dae3e9;--mut:#8da1af;
---inp:#0e161c;--inp-line:#33454f;--btn:#2a7587;--btn-t:#f2fafc;--gbtn:#26343f;--gbtn-t:#d3dee5;--xbtn:#8e3b3b;
---warn-bg:#2b2612;--warn-t:#e3d397;--out:#121c23;--hi:#ff8d84;--lo:#7db6f2;--ok:#7fd1a0;--na:#8099ab;
---shadow:0 10px 26px rgba(0,0,0,.38)}
-body.light{--bg:#e3e8eb;--bg2:#d7dee3;--card:#f3f5f6;--card2:#e7ecef;--line:#c5d0d8;--txt:#1d2a34;--mut:#5b7080;
---inp:#fbfcfc;--inp-line:#b3c1cb;--btn:#2a6f80;--gbtn:#d3dde4;--gbtn-t:#1d2a34;--xbtn:#a33d3d;
---warn-bg:#f1e8c6;--warn-t:#5b4a0c;--out:#e9eef1;--hi:#b42b25;--lo:#1d5f9e;--ok:#1d7040;--na:#6b8091;
---shadow:0 6px 18px rgba(30,50,65,.14)}
+:root{
+  --fs:15px;
+  --bg:#eef3f8;
+  --surface:#ffffff;
+  --surface-alt:#f6f9fc;
+  --ink:#13263a;
+  --muted:#5f7488;
+  --accent:#2b75a3;
+  --accent-deep:#16486b;
+  --border:#dce6f0;
+  --shadow:0 10px 28px rgba(18,48,71,.08);
+}
 *{box-sizing:border-box}
 html{scroll-padding-top:8px}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:var(--fs);line-height:1.4;
-background:var(--bg);color:var(--txt);margin:0;color-scheme:dark;-webkit-text-size-adjust:100%}
-body.light{color-scheme:light}
-body.xo{overflow:hidden}
-header{background:var(--bg2);border-bottom:1px solid var(--line);padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-header h2{margin:0 0 2px;font-size:19px;letter-spacing:-.01em}
-header small{color:var(--mut)}
-header button{min-height:36px;margin:0 0 0 4px;padding:6px 10px;border-radius:10px}
-main{max-width:720px;margin:auto;padding:12px 12px calc(40px + env(safe-area-inset-bottom,0px))}
-@media(min-width:900px){main{max-width:860px}}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#e7eff7 0%,#f4f7fa 45%,#eef3f8 100%);color:var(--ink);margin:0;min-height:100vh}
+header{background:linear-gradient(135deg,#123047 0%,#1f577e 100%);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(18,48,71,.16)}
+header h2{margin:0 0 2px;letter-spacing:-.2px}
+header small{opacity:.82}
+header button{min-height:36px;margin:0 0 0 4px;padding:6px 11px;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2)}
+header button:hover{background:rgba(255,255,255,.26)}
+main{max-width:860px;margin:auto;padding:14px}
+@media(min-width:1040px){main{max-width:980px}}
 
-section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin:14px 0;box-shadow:var(--shadow)}
-#rec{background:none;border:0;box-shadow:none;padding:0}
-h3{margin:0 0 10px;font-size:17px;letter-spacing:-.01em}
-#heading{font-size:22px;margin:6px 2px 12px}
-h4{margin:16px 0 6px;color:var(--ac);font-size:13.5px;font-weight:700}
-label{display:block;font-weight:600;font-size:calc(var(--fs) - 2px);color:var(--mut);margin-top:10px}
-input,textarea,select{width:100%;padding:10px 11px;margin-top:4px;border:1px solid var(--inp-line);border-radius:12px;font:inherit;font-size:var(--fs);background:var(--inp);color:var(--txt)}
+section{background:var(--surface);border-radius:18px;padding:18px;margin:14px 0;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.8)}
+h3{margin:0 0 10px;font-size:18px;letter-spacing:-.2px}
+h4{margin:16px 0 6px;color:var(--accent-deep);font-size:15px}
+label{display:block;font-weight:600;font-size:calc(var(--fs) - 2px);margin-top:10px}
+input,textarea,select{width:100%;padding:10px 12px;margin-top:4px;border:1px solid #c6d4e1;border-radius:10px;font:inherit;font-size:var(--fs);background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
 textarea{min-height:70px}
-input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
-input[type=checkbox]{accent-color:var(--ac)}
-button{padding:10px 14px;min-height:42px;background:var(--btn);color:var(--btn-t);border:0;border-radius:12px;margin:4px 4px 4px 0;font:inherit;cursor:pointer}
-button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
-button.x{background:var(--xbtn);color:#fff}
-button.g{background:var(--gbtn);color:var(--gbtn-t)}
-button.sm{min-height:34px;padding:4px 12px;margin:0}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(43,117,163,.16)}
+button{padding:10px 15px;min-height:42px;background:linear-gradient(135deg,#196387 0%,#124666 100%);color:#fff;border:0;border-radius:10px;margin:4px 4px 4px 0;font:inherit;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease,opacity .15s}
+button:hover{box-shadow:0 4px 12px rgba(20,91,120,.22)}
+button:active{transform:scale(.98)}
+button.x{background:linear-gradient(135deg,#b82e29 0%,#8f1e1a 100%)}
+button.g{background:#e7eff6;color:#163852;border:1px solid #cfdce8}
+button.g:hover{background:#dce7f1;box-shadow:none}
+button.sm{min-height:34px;padding:4px 12px;margin:0;font-size:13px}
 
-.warn{background:var(--warn-bg);color:var(--warn-t);padding:10px 12px;border-radius:14px;font-size:12.5px;line-height:1.5;margin:12px 0}
-.pt{display:flex;align-items:center;gap:6px;padding:3px 0}
+.warn{background:#fff5d6;border:1px solid #f0dc9c;color:#5c4508;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+.pt{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #e6edf4}
+.pt:last-child{border-bottom:0}
 .pt span{flex:1;min-width:0;overflow-wrap:anywhere}
 .pt button{margin:0}
 
-details{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:12px 0;box-shadow:var(--shadow)}
-details>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;font-weight:700;font-size:16px;cursor:pointer;position:sticky;top:0;z-index:20;background:var(--card);border-radius:19px}
+/* Keep collapsible sub-details inside floating modals clean */
+details{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:10px 0;overflow:visible;box-shadow:0 2px 8px rgba(18,48,71,.05)}
+details>summary{list-style:none;padding:13px 15px;background:linear-gradient(135deg,#17496b 0%,#266891 100%);color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;gap:10px;border-radius:13px;transition:box-shadow .18s ease}
 details>summary::-webkit-details-marker{display:none}
-details>summary::after,.chev{content:"";flex:none;width:8px;height:8px;margin:0 4px 3px auto;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:rotate(45deg);transition:transform .18s}
-.chev{display:block;transform:rotate(-45deg);margin:0 6px 0 auto}
-details[open]>summary::after{transform:rotate(-135deg);margin-bottom:-3px}
-details[open]{border-color:color-mix(in srgb,var(--ac) 40%,var(--line))}
-details[open]>summary{border-radius:19px 19px 0 0;border-bottom:1px solid var(--line)}
-.ic{flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:12px;font-size:19px;background:var(--card2);background:color-mix(in srgb,var(--ac) 22%,var(--card))}
-.tt{flex:1;min-width:0}
-.tt small{display:block;font-weight:400;font-size:12px;color:var(--mut)}
-.body{padding:4px 14px 16px}
-.body details{margin:10px 0 0;background:var(--card2);box-shadow:none;border-radius:16px}
-.body details>summary{background:var(--card2);padding:10px 12px;font-size:15px;z-index:21;border-radius:15px}
-.body details[open]>summary{border-radius:15px 15px 0 0}
-.body details .ic{display:none}
-.body details.sub>summary{font-weight:600}
+details>summary::after{content:"+";margin-left:auto}
+details[open]>summary{border-radius:13px 13px 6px 6px}
+details[open]>summary::after{content:"−"}
+.body{padding:6px 14px 14px}
+.body details{margin:10px 0 0}
+.body details>summary{background:#2f6485;padding:11px 14px;font-size:14px}
+.body details.sub>summary{background:#e8f0f7;color:#123047}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:12px 0;box-shadow:var(--shadow)}
-.card-head{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:12px 14px;min-height:0;background:transparent;color:var(--txt);text-align:left;font-size:16px;font-weight:700;border-radius:20px}
-.pills{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
-.pill{margin:0;min-height:34px;padding:5px 11px;border-radius:16px;background:var(--card2);color:var(--txt);border:1px solid var(--line);font-size:13px;display:inline-flex;align-items:center;gap:6px}
-.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ac)}
+/* Bed workspace header & navigation */
+#rec{background:linear-gradient(180deg,#f5f9fd 0%,#ffffff 100%);border:1px solid #d8e5f1;padding:20px}
+#navRow{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.85);padding:6px;margin:0 0 14px;border-radius:14px;border:1px solid #dce7f2;box-shadow:0 2px 10px rgba(18,48,71,.04)}
+#navRow button{flex:0 0 44px;margin:0;border-radius:10px}
+#navRow select{flex:1;min-width:0;margin:0;border-radius:10px;font-weight:700;border-color:transparent;background:transparent}
+.bed-hero{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:14px}
+.bed-hero h3{margin:0;font-size:22px;color:#102b40}
+.bed-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.slider-hint{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
 
+/* ---------- Medical Card Slider (inspired by reference design) ---------- */
+.slider-shell{position:relative;margin:4px -6px 16px;padding:6px}
+.card-slider{
+  display:flex;
+  gap:16px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  padding:8px 6px 18px;
+  -webkit-overflow-scrolling:touch;
+}
+.card-slider::-webkit-scrollbar{height:7px}
+.card-slider::-webkit-scrollbar-track{background:#e3ecf5;border-radius:99px}
+.card-slider::-webkit-scrollbar-thumb{background:#a6bfd6;border-radius:99px}
+.card-slider::-webkit-scrollbar-thumb:hover{background:#7ea2c2}
+
+.med-card{
+  flex:0 0 218px;
+  min-height:236px;
+  scroll-snap-align:start;
+  position:relative;
+  border-radius:24px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  text-align:left;
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,.95);
+  background:radial-gradient(circle at 22% 18%, #ffffff 0%, #f1f6fb 60%, #e4eef7 100%);
+  box-shadow:0 12px 26px rgba(24,58,88,.09), inset 0 1px 0 rgba(255,255,255,.9);
+  transition:transform .24s cubic-bezier(.22,.68,0,1.2), box-shadow .24s ease, background .24s ease, border-color .24s ease;
+  overflow:hidden;
+  user-select:none;
+}
+.med-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at 30% 25%, rgba(61,155,196,.12), transparent 65%);
+  pointer-events:none;
+}
+.med-card:hover, .med-card:focus-visible, .med-card.is-featured{
+  transform:translateY(-6px);
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 52%,#1b4563 100%);
+  border-color:rgba(147,209,242,.55);
+  box-shadow:0 18px 34px rgba(23,67,99,.28);
+  outline:none;
+}
+.med-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;position:relative;z-index:2}
+
+/* Translucent 3D-style medical organ/icon container */
+.organ-wrap{
+  width:92px;
+  height:92px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  filter:drop-shadow(0 10px 14px rgba(19,74,110,.18));
+  transition:transform .25s ease;
+}
+.med-card:hover .organ-wrap, .med-card.is-featured .organ-wrap{
+  transform:scale(1.06);
+  filter:drop-shadow(0 10px 18px rgba(10,30,48,.36));
+}
+.organ-wrap svg{width:88px;height:88px;overflow:visible}
+
+/* Top-right status / action orb matching reference */
+.status-orb{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:15px;
+  font-weight:800;
+  flex:none;
+  transition:all .22s ease;
+}
+.status-orb.ok{
+  background:radial-gradient(circle at 35% 30%, #72f296 0%, #37d66b 70%, #24b855 100%);
+  color:#ffffff;
+  box-shadow:0 6px 14px rgba(55,214,107,.38);
+}
+.status-orb.warn{
+  background:radial-gradient(circle at 35% 30%, #ff867c 0%, #e53935 75%, #b71c1c 100%);
+  color:#ffffff;
+  box-shadow:0 6px 14px rgba(229,57,53,.38);
+}
+.status-orb.idle{
+  background:#ffffff;
+  color:#1f587d;
+  box-shadow:0 5px 12px rgba(18,48,71,.12);
+}
+.med-card:hover .status-orb, .med-card.is-featured .status-orb{
+  background:#ffffff;
+  color:#16486b;
+  box-shadow:0 6px 16px rgba(0,0,0,.22);
+}
+
+.med-card-body{position:relative;z-index:2;margin-top:10px}
+.med-card-kicker{
+  font-size:10.5px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.7px;
+  color:#5b7a94;
+  margin-bottom:3px;
+  transition:color .2s;
+}
+.med-card-title{
+  font-size:15.5px;
+  font-weight:800;
+  line-height:1.25;
+  color:#132d42;
+  transition:color .2s;
+}
+.med-card-meta{
+  font-size:12px;
+  line-height:1.35;
+  color:#4f6b82;
+  margin-top:5px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  transition:color .2s;
+}
+.med-card:hover .med-card-kicker, .med-card.is-featured .med-card-kicker{color:#a8d5f2}
+.med-card:hover .med-card-title, .med-card.is-featured .med-card-title{color:#ffffff}
+.med-card:hover .med-card-meta, .med-card.is-featured .med-card-meta{color:#d8ecfa}
+
+.slider-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
+.slider-nav-btns{display:flex;gap:6px}
+.slider-nav-btns button{min-height:34px;padding:4px 12px;margin:0;border-radius:99px;font-size:13px}
+
+/* ---------- Floating Modal Card ---------- */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:rgba(11,28,44,.52);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  animation:fadeIn .18s ease-out;
+}
+.modal-backdrop[hidden]{display:none!important}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes floatUp{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.floating-card{
+  width:100%;
+  max-width:780px;
+  max-height:89vh;
+  display:flex;
+  flex-direction:column;
+  background:var(--surface);
+  border-radius:26px;
+  border:1px solid rgba(255,255,255,.85);
+  box-shadow:0 28px 70px rgba(8,24,40,.34);
+  overflow:hidden;
+  animation:floatUp .22s cubic-bezier(.2,.8,.2,1);
+}
+.floating-head{
+  background:linear-gradient(135deg,#17496b 0%,#296c96 100%);
+  color:#fff;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex:none;
+}
+.floating-head-left{display:flex;align-items:center;gap:12px;min-width:0}
+.floating-head-icon{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.16);display:grid;place-items:center;flex:none}
+.floating-head-icon svg{width:28px;height:28px}
+.floating-head h3{margin:0;font-size:18px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.floating-head small{display:block;font-size:12px;opacity:.82}
+.floating-head-actions{display:flex;align-items:center;gap:6px;flex:none}
+.floating-head-actions button{min-height:36px;padding:5px 11px;margin:0;border-radius:99px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px}
+.floating-head-actions button:hover{background:rgba(255,255,255,.3)}
+.floating-close{width:36px;padding:0!important;font-size:18px;line-height:1}
+
+.floating-body{
+  padding:16px 20px 24px;
+  overflow-y:auto;
+  flex:1;
+}
+
+.bed-actions-bar{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px solid #e2ebf3}
+
+/* ---------- Existing Form & Clinical Grids ---------- */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
 .abg-grid{display:grid;grid-template-columns:minmax(76px,1.1fr) repeat(3,minmax(0,1fr));gap:5px 7px;align-items:center;min-width:0}
-.abg-head{font-size:10px;font-weight:700;text-align:center;color:var(--mut)}
-.abg-name{font-size:12px;font-weight:700;color:var(--txt);background:var(--card2);border-radius:8px;padding:7px 5px}
+.abg-head{font-size:10px;font-weight:800;text-align:center;color:#526879}
+.abg-name{font-size:12px;font-weight:800;color:#103954;background:#eaf5fb;border-radius:6px;padding:7px 5px}
 .abg-grid label{font-size:10px;min-width:0;margin:0}
 .abg-grid input{font-size:12px;padding:6px 4px;margin-top:0;min-width:0;text-align:center}
-.abg-grid .abg-prev{background:var(--card2)}
+.abg-grid .abg-prev{background:#f3f6f8}
 
-.med-row{border:1px solid var(--line);border-radius:14px;padding:10px;margin:7px 0;background:var(--card2)}
+.med-row{border:1px solid #dce6ed;border-radius:10px;padding:9px;margin:7px 0;background:#f7fafc}
 .med-summary{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-width:0}
-.med-summary .med-name{font-size:17px;font-weight:800;color:var(--txt);min-width:70px;flex:1 1 35%;overflow-wrap:anywhere}
-.med-summary .med-details{font-size:12.5px;color:var(--mut);flex:1 1 100%;order:3;min-width:0;line-height:1.55;overflow-wrap:anywhere}
+.med-summary .med-name{font-size:17px;font-weight:900;color:#102f45;letter-spacing:.1px;min-width:70px;flex:1 1 35%;overflow-wrap:anywhere}
+.med-summary .med-details{font-size:12px;color:#526879;flex:1 1 100%;order:3;min-width:0;line-height:1.55;overflow-wrap:anywhere}
 .med-summary button{flex:none}
-.med-details .entry-value{font-size:14px;font-weight:700;color:var(--txt)}
+.med-details .entry-value{font-size:14px;font-weight:800;color:#103954}
 .med-details .entry-part{display:inline-block;margin:2px 8px 2px 0}
-.med-edit{border-top:1px solid var(--line);margin-top:8px;padding-top:6px}
+.med-edit{border-top:1px solid #dce6ed;margin-top:8px;padding-top:6px}
 .med-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}
 .med-grid label{min-width:0}
-.med-grid .wide{grid-column:1/-1}
-.med-grid input,.med-grid select,.med-grid textarea{padding:8px;font-size:13px}
-.mg{display:flex;align-items:center;gap:8px;margin:16px 2px 2px;font-size:11px;font-weight:700;letter-spacing:.03em;color:var(--mut)}
-.mg::after{content:"";flex:1;height:1px;background:var(--line)}
-.mg i{font-style:normal;opacity:.7}
-.mtag{display:block;font-size:10px;font-weight:600;color:var(--mut)}
-.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:8px 10px;margin:6px 0;background:var(--card2);border:1px dashed var(--line);border-radius:12px;font-size:12px;color:var(--txt)}
+.med-grid input,.med-grid select,.med-grid textarea{padding:7px;font-size:13px}
+.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:7px 9px;margin:5px 0;background:#eaf5fb;border-radius:8px;font-size:12px;color:#103954}
 .abx-copy-row b,.abx-copy-row span{overflow-wrap:anywhere}
 
-@media(max-width:420px){
+@media(max-width:480px){
   .g2,.med-grid,.calc-inputs{grid-template-columns:1fr}
   .abg-grid{grid-template-columns:minmax(65px,.9fr) repeat(3,minmax(0,1fr));gap:4px}
   .abg-grid input{font-size:11px;padding:6px 2px}
   .abg-name{font-size:11px;padding:6px 3px}
+  .med-card{flex:0 0 196px;min-height:220px;padding:15px}
+  .floating-card{max-height:93vh;border-radius:20px}
 }
 
 .scroll{overflow-x:auto}
 .lab{display:grid;grid-template-columns:64px 108px 76px 54px 46px 62px 62px 62px;gap:6px;min-width:590px;margin-bottom:6px;align-items:start}
 .rad{display:grid;grid-template-columns:70px 120px 1fr;gap:6px;min-width:380px;margin-bottom:6px}
 .lab input,.lab select,.rad input{margin:0;padding:7px 5px;font-size:12px}
-.nm{background:var(--card2);background:color-mix(in srgb,var(--ac) 18%,var(--card));color:var(--txt);font-weight:700;font-size:12px;padding:9px 6px;border-radius:9px}
-.fl{display:block;font-size:10px;font-weight:700;text-align:center;margin-top:2px}
-.hi{color:var(--hi)}
-.lo{color:var(--lo)}
-.ok{color:var(--ok)}
-.na{color:var(--na)}
-.trend[data-v=up]{color:#76d394}
-.trend[data-v=down]{color:var(--hi)}
+.nm{background:#ade3ff;color:#103954;font-weight:700;font-size:12px;padding:9px 6px;border-radius:7px}
+.fl{display:block;font-size:10px;font-weight:800;text-align:center;margin-top:2px}
+.hi{color:#c62828}
+.lo{color:#1769aa}
+.ok{color:#187448}
+.na{color:#718096}
+.trend[data-v=up]{color:#16833d}
+.trend[data-v=down]{color:#d62828}
 
-.ent{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:4px 10px 10px;margin:10px 0}
-.out{background:var(--out);border:1px solid var(--line);border-radius:14px;padding:10px;margin-top:10px;font-size:var(--fs);line-height:1.5;overflow-x:auto}
-.r{padding:8px 10px;margin:6px 0;border-radius:10px;background:var(--card2);border-left:4px solid var(--ac);font-size:var(--fs)}
-.r.a{border-color:var(--hi);background:rgba(255,141,132,.10)}
-table{border-collapse:collapse;font-size:var(--fs);min-width:430px;width:100%;background:transparent}
-td,th{border:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}
-th{background:var(--card2);background:color-mix(in srgb,var(--ac) 24%,var(--card2));color:var(--txt)}
-.w{color:#e3b25a;font-weight:700}
-.gd{color:var(--ok);font-weight:700}
-.small{font-size:12px;color:var(--mut);line-height:1.5}
-.al{background:rgba(255,141,132,.10);color:var(--hi);border-left:4px solid var(--hi);padding:8px 10px;margin:6px 0;border-radius:10px;font-size:13px}
-.chk{display:flex;gap:8px;align-items:center;font-weight:400;color:var(--txt);font-size:var(--fs);margin-top:8px}
+.ent{background:#f4f8fb;border:1px solid #dce6ed;border-radius:10px;padding:6px 10px 10px;margin:10px 0}
+.out{background:#f2f6f9;border-radius:10px;padding:10px;margin-top:10px;font-size:var(--fs);line-height:1.5;overflow-x:auto}
+.r{padding:7px;margin:5px 0;border-radius:7px;background:#fff;border-left:4px solid #315f91;font-size:var(--fs)}
+.r.a{border-color:#c62828;background:#fff0ef}
+table{border-collapse:collapse;font-size:var(--fs);min-width:430px;width:100%;background:#fff}
+td,th{border:1px solid #dce5eb;padding:6px;text-align:left;vertical-align:top}
+th{background:#123047;color:#fff}
+.w{color:#b45309;font-weight:700}
+.gd{color:#18733b;font-weight:700}
+.small{font-size:12px;color:#647b8c;line-height:1.5}
+.al{background:#fff0ef;color:#a12622;border-left:4px solid #c62828;padding:7px;margin:5px 0;border-radius:6px;font-size:13px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:8px}
 .chk input{width:auto;margin:0}
-.chk:has(input[type=checkbox]:checked){opacity:.4}
+.chk:has(input[type=checkbox]:checked){opacity:.38}
 .chk:has(input[type=checkbox]:checked) span{text-decoration:line-through}
 pre{white-space:pre-wrap;font:13px/1.55 system-ui}
 
@@ -146,80 +338,88 @@ pre{white-space:pre-wrap;font:13px/1.55 system-ui}
 .pi.done{opacity:.35}
 .pi.done input:not([type=checkbox]){text-decoration:line-through}
 
-#infoSvg svg{width:100%;height:auto;border:1px solid var(--line);border-radius:14px;display:block;margin-bottom:8px}
+#infoSvg svg{width:100%;height:auto;border:1px solid #dfe7ee;border-radius:12px;display:block;margin-bottom:8px}
 @media print{
-  body,body.light{background:#fff!important;color:#000!important}
-  header,.warn,main>*:not(#sheet){display:none!important}
-  #exSheet{display:none!important}
+  header,.warn,main>*:not(#sheet),.modal-backdrop{display:none!important}
   body.pinfo main>#rec{display:block!important}
   body.pinfo #rec>*:not(#infoBox){display:none!important}
   body.pinfo #infoBox>button{display:none}
-  section{box-shadow:none;border:0;background:#fff}
 }
 
-#navRow{position:relative;z-index:4;display:flex;gap:6px;align-items:center;background:var(--card);border:1px solid var(--line);padding:6px;margin:0 0 10px;border-radius:16px;box-shadow:var(--shadow)}
-#navRow button{flex:0 0 44px;margin:0}
-#navRow select{flex:1;min-width:0;margin:0}
-
-.abn{color:var(--hi)!important;border-color:var(--hi)!important;background:rgba(255,141,132,.12)!important;font-weight:800}
+.abn{color:#c62828!important;border-color:#c62828!important;background:#fdecea!important;font-weight:800}
 .chips{display:flex;flex-wrap:wrap}
 .chip{display:inline-flex;margin:3px 4px 3px 0}
 .chip input{display:none}
-.chip span{padding:7px 12px;border:1px solid var(--inp-line);border-radius:18px;font-size:13px;font-weight:600;cursor:pointer;color:var(--txt)}
-.chip input:checked+span{background:var(--ac);color:#0d1317;border-color:var(--ac)}
+.chip span{padding:7px 12px;border:1px solid #9fb3c2;border-radius:18px;font-size:13px;font-weight:600;cursor:pointer}
+.chip input:checked+span{background:#145b78;color:#fff;border-color:#145b78}
 .seg{display:flex;gap:6px;margin:8px 0}
-.seg button{flex:1;margin:0;background:var(--gbtn);color:var(--gbtn-t)}
-.seg button.on{background:var(--btn);color:#fff}
+.seg button{flex:1;margin:0;background:#dde6ed;color:#123047}
+.seg button.on{background:#145b78;color:#fff}
 
 .calc-select{margin:4px 0 10px}
 .calc-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
-.calc-result{border:1px solid var(--line);border-left:5px solid var(--ac);background:var(--out);border-radius:14px;padding:12px;margin-top:12px}
-.calc-result .calc-value{font-size:22px;font-weight:800;color:var(--txt);overflow-wrap:anywhere}
+.calc-result{border:1px solid #c9dce8;border-left:5px solid #145b78;background:#eef6fa;border-radius:10px;padding:12px;margin-top:12px}
+.calc-result .calc-value{font-size:22px;font-weight:900;color:#103954;overflow-wrap:anywhere}
 .calc-result .calc-rec{margin-top:8px;font-size:13px;line-height:1.5}
 
 .trash-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:16px}
 .trash-head h4{margin:0}
 
-/* ---------- Examination: floating swipe cards ---------- */
-#exSheet{position:fixed;inset:0;z-index:200;display:none;flex-direction:column;background:rgba(4,8,11,.86);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-body.light #exSheet{background:rgba(25,38,48,.62)}
-#exSheet.on{display:flex}
-.xbar{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 4px}
-.xtabs{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px}
-.xtabs::-webkit-scrollbar,.xtrack::-webkit-scrollbar{display:none}
-.xtab{flex:none;margin:0;min-height:36px;padding:6px 12px;border-radius:18px;background:var(--gbtn);color:var(--gbtn-t);font-size:13px;display:inline-flex;gap:6px;align-items:center;white-space:nowrap;border:1px solid transparent}
-.xtab.on{background:var(--card);background:color-mix(in srgb,var(--ac) 30%,var(--card));border-color:var(--ac);color:var(--txt)}
-.xclose{flex:none;margin:0;width:40px;min-height:40px;padding:0;border-radius:50%;background:var(--gbtn);color:var(--gbtn-t)}
-.xtrack{position:relative;flex:1;min-height:0;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
-padding:8px max(5vw,calc(50% - 280px)) calc(16px + env(safe-area-inset-bottom,0px))}
-.xpage{flex:0 0 min(90vw,560px);scroll-snap-align:center;scroll-snap-stop:always;display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:26px;background:var(--card);
-border:1px solid var(--line);border:1px solid color-mix(in srgb,var(--ac) 38%,var(--line));box-shadow:0 20px 50px rgba(0,0,0,.55)}
-.xhead{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--card2);background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 22%,var(--card)),var(--card))}
-.xhead .tt{font-size:18px;font-weight:800;letter-spacing:-.01em}
-.xn{margin-left:auto;font-size:12px;color:var(--mut)}
-.xbody{flex:1;min-height:0;overflow-y:auto;padding:4px 14px 24px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-/* ---------- Main deck ---------- */
-#deck{margin:0 0 12px}
-.dbar{position:sticky;top:0;z-index:30;background:var(--bg);padding:6px 0 8px;margin:0 -12px}
-.dtabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 12px}
-.dtabs::-webkit-scrollbar,.dtrack::-webkit-scrollbar{display:none}
-.dtrack{position:relative;display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
-height:calc(100vh - 170px);height:calc(100dvh - 170px);min-height:460px;margin:0 -12px;padding:4px max(14px,calc(50% - 320px)) 8px}
-.dpage{flex:0 0 min(calc(100% - 28px),640px);scroll-snap-align:center;scroll-snap-stop:always;display:flex;flex-direction:column;min-height:0;overflow:hidden;border-radius:26px;background:var(--card);
-border:1px solid var(--line);border:1px solid color-mix(in srgb,var(--ac) 38%,var(--line));box-shadow:var(--shadow)}
-.dpage .dbody{overscroll-behavior-y:auto}
-.bigtile{display:flex;align-items:center;gap:12px;width:100%;margin:8px 0 0;padding:10px 12px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:16px;font-size:16px;font-weight:700;text-align:left}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+/* ---------- Dark Mode ---------- */
+body.dark{background:linear-gradient(180deg,#0d141c 0%,#121b24 100%);color:#e6edf3}
+body.dark section,body.dark details,body.dark .ent,body.dark table,body.dark #navRow{background:#19232d;color:#e6edf3;border-color:#2a3846}
+body.dark #rec{background:linear-gradient(180deg,#16202b 0%,#1b2632 100%);border-color:#2b3b4b}
+body.dark .bed-hero h3{color:#e6edf3}
+body.dark .med-card{
+  background:radial-gradient(circle at 22% 18%, #243444 0%, #1a2633 65%, #141e29 100%);
+  border-color:#2e4154;
+  box-shadow:0 12px 26px rgba(0,0,0,.32);
+}
+body.dark .med-card:hover, body.dark .med-card:focus-visible, body.dark .med-card.is-featured{
+  background:linear-gradient(145deg,#2d668a 0%,#1d4a68 55%,#14364e 100%);
+  border-color:#5ba5d1;
+}
+body.dark .med-card-title{color:#eef5fc}
+body.dark .med-card-kicker{color:#8eb4d1}
+body.dark .med-card-meta{color:#a8bfd3}
+body.dark .status-orb.idle{background:#253647;color:#b8e4ff}
+body.dark .floating-card{background:#18222c;border-color:#304254}
+body.dark input,body.dark textarea,body.dark select{background:#0f171e;color:#e6edf3;border-color:#33424f}
+body.dark #navRow select{background:transparent}
+body.dark .out,body.dark .r{background:#212d38;color:#e6edf3}
+body.dark .r.a,body.dark .al{background:#3a1f1f;color:#ffb4ab}
+body.dark .nm{background:#1d4a63;color:#d6efff}
+body.dark .med-row{background:#202d38;border-color:#3b4c5b}
+body.dark .med-summary .med-name{color:#b8e4ff}
+body.dark .med-summary .med-details{color:#b5c5d1}
+body.dark .med-edit{border-color:#3b4c5b}
+body.dark .abx-copy-row{background:#18394b;color:#d6efff}
+body.dark .warn{background:#3b3216;color:#ffe9a8;border-color:#5c4d1f}
+body.dark td,body.dark th{border-color:#2f3d4a}
+body.dark .small{color:#9fb0bf}
+body.dark .body details.sub>summary{background:#26384a;color:#e6edf3}
+body.dark .pt{border-color:#2a3744}
+body.dark h4{color:#9fd3f0}
+body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}
+body.dark .seg button{background:#26384a;color:#e6edf3}
+body.dark .seg button.on{background:#2b7a9c;color:#fff}
+body.dark .chip span{border-color:#46607a}
+body.dark .calc-result{background:#1b3342;border-color:#34566b}
+body.dark .calc-result .calc-value{color:#b8e4ff}
+body.dark .abg-name{background:#1d4a63;color:#d6efff}
+body.dark .abg-grid .abg-prev{background:#15202b}
+body.dark .med-details .entry-value{color:#b8e4ff}
+body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
 </style>
 </head>
 <body>
 <header>
   <div>
     <h2>ICU Rounds Assistant</h2>
-    <small>Offline organizer for rounds · v21</small>
+    <small>Offline organizer for rounds · v19</small>
   </div>
   <div>
-    <button class="g" onclick="toggleDark()" aria-label="Switch between dim and soft light theme">🌓</button>
+    <button class="g" onclick="toggleDark()" aria-label="Toggle dark mode">🌓</button>
     <button class="g" onclick="fontStep(-1)" aria-label="Decrease font size">A−</button>
     <button class="g" onclick="fontStep(1)" aria-label="Increase font size">A+</button>
   </div>
@@ -254,13 +454,34 @@ border:1px solid var(--line);border:1px solid color-mix(in srgb,var(--ac) 38%,va
       <select id="jumpSel" aria-label="Select patient bed" onchange="openPatient(+this.value)"></select>
       <button onclick="jump(1)" aria-label="Next bed">▶</button>
     </div>
-    <h3 id="heading"></h3>
-    <div id="cards"></div>
-    <button onclick="newDay()">☀️ New day</button>
-    <button onclick="showInfo()">🖼️ Patient infographic</button>
-    <button onclick="exportOne()">Export this patient</button>
-    <button class="x" onclick="delPatient()">Delete patient</button>
-    <div id="infoBox" hidden>
+
+    <div class="bed-hero">
+      <div>
+        <h3 id="heading"></h3>
+        <div id="bedSub" class="bed-sub"></div>
+      </div>
+      <div class="slider-controls">
+        <span class="slider-hint">Swipe or tap a module card</span>
+        <div class="slider-nav-btns">
+          <button class="g" onclick="slideCards(-1)" aria-label="Scroll cards left">‹</button>
+          <button class="g" onclick="slideCards(1)" aria-label="Scroll cards right">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Horizontal Medical Card Slider -->
+    <div class="slider-shell">
+      <div id="cardSlider" class="card-slider" role="list"></div>
+    </div>
+
+    <div class="bed-actions-bar">
+      <button onclick="newDay()">☀️ New day</button>
+      <button onclick="showInfo()">🖼️ Patient infographic</button>
+      <button onclick="exportOne()">Export this patient</button>
+      <button class="x" onclick="delPatient()">Delete patient</button>
+    </div>
+
+    <div id="infoBox" hidden style="margin-top:14px">
       <div id="infoSvg"></div>
       <button onclick="dlInfo()">Download PNG</button>
       <button onclick="dlInfo(1)">Share image</button>
@@ -292,6 +513,27 @@ border:1px solid var(--line);border:1px solid color-mix(in srgb,var(--ac) 38%,va
     <pre id="sheetTxt"></pre>
   </section>
 </main>
+
+<!-- Floating Card Modal -->
+<div id="cardModal" class="modal-backdrop" hidden onclick="if(event.target===this)closeCardModal()">
+  <div class="floating-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="floating-head">
+      <div class="floating-head-left">
+        <div id="modalIcon" class="floating-head-icon"></div>
+        <div style="min-width:0">
+          <h3 id="modalTitle">Module</h3>
+          <small id="modalSub">Bed</small>
+        </div>
+      </div>
+      <div class="floating-head-actions">
+        <button onclick="stepModal(-1)" aria-label="Previous module">◀ Prev</button>
+        <button onclick="stepModal(1)" aria-label="Next module">Next ▶</button>
+        <button class="floating-close" onclick="closeCardModal()" aria-label="Close card">✕</button>
+      </div>
+    </div>
+    <div id="cards" class="floating-body"></div>
+  </div>
+</div>
 
 <script>
 window.addEventListener("error", function(e) {
@@ -327,15 +569,16 @@ window.addEventListener("error", function(e) {
 
 /* Expose inline-button handlers before startup/rendering */
 Object.assign(window, {
-  addPatient, applyImportPreview, autoImportCase, clearTrash, copySBAR, copySheet,
-  delPatient, delTrash, dlInfo, exportAll, exportOne, fontStep, forceUpdate,
-  importPreview, jump, makeSBAR, newDay, newDayAll, openPatient, printInfo,
-  restore, shareTxt, showInfo, showSheet, toggleDark
+  addPatient, applyImportPreview, autoImportCase, clearTrash, closeCardModal,
+  copySBAR, copySheet, delPatient, delTrash, dlInfo, exportAll, exportOne,
+  fontStep, forceUpdate, importPreview, jump, makeSBAR, newDay, newDayAll,
+  openCardModal, openPatient, printInfo, restore, shareTxt, showInfo,
+  showSheet, slideCards, stepModal, toggleDark
 });
 
 const KEY = "icu_rounds_data";
 const PREF_KEY = "icu_rounds_prefs";
-let data = [], active = null, bad = false;
+let data = [], active = null, bad = false, activeCardId = null;
 
 try {
   const s = localStorage.getItem(KEY);
@@ -381,23 +624,21 @@ function setp(o, path, v) {
 }
 
 /* ---------- Display preferences (Dark mode & Font size) ---------- */
-let prefs = { theme: "dim", fs: 15 };
+let prefs = { dark: false, fs: 15 };
 try {
   const savedPrefs = JSON.parse(localStorage.getItem(PREF_KEY));
   if (savedPrefs && typeof savedPrefs === "object") prefs = Object.assign(prefs, savedPrefs);
 } catch (e) {}
 
 function applyPrefs() {
-  document.body.classList.toggle("light", prefs.theme === "light");
-  const tc = document.querySelector('meta[name="theme-color"]');
-  if (tc) tc.setAttribute("content", prefs.theme === "light" ? "#d7dee3" : "#111a20");
+  document.body.classList.toggle("dark", !!prefs.dark);
   document.documentElement.style.setProperty("--fs", prefs.fs + "px");
 }
 function savePrefs() {
   try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {}
 }
 function toggleDark() {
-  prefs.theme = prefs.theme === "light" ? "dim" : "light";
+  prefs.dark = !prefs.dark;
   applyPrefs();
   savePrefs();
 }
@@ -407,6 +648,30 @@ function fontStep(delta) {
   savePrefs();
 }
 applyPrefs();
+
+/* ---------- Translucent 3D-Style Medical SVG Artwork ---------- */
+const ORGAN_SVGS = {
+  dx: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gDx" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6ed3cf"/><stop offset="100%" stop-color="#1d6fa5"/></linearGradient></defs><rect x="20" y="14" width="56" height="68" rx="14" fill="url(#gDx)" opacity=".88"/><rect x="34" y="8" width="28" height="12" rx="6" fill="#a7f3d0"/><path d="M32 36h32M32 48h24M32 60h28" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"/></svg>`,
+  cns: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gBr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="52%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><path d="M46 18c-12 0-22 9-22 21 0 4 1 8 3 11-3 3-4 7-4 12 0 11 9 18 20 18h3V18z" fill="url(#gBr)" opacity=".92"/><path d="M50 18c12 0 22 9 22 21 0 4-1 8-3 11 3 3 4 7 4 12 0 11-9 18-20 18h-3V18z" fill="url(#gBr)" opacity=".82"/><path d="M33 34c5 0 8 4 8 8M31 52c6 0 10 4 10 9M63 34c-5 0-8 4-8 8M65 52c-6 0-10 4-10 9" stroke="#e0f2fe" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".85"/></svg>`,
+  cv: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gHt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="55%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><path d="M44 24V12h8v12M56 26l8-9 6 5-8 9" stroke="#5eead4" stroke-width="5" stroke-linecap="round"/><path d="M48 80C26 66 18 51 18 37c0-10 8-17 17-17 6 0 11 3 13 8 2-5 7-8 13-8 9 0 17 7 17 17 0 14-8 29-30 43z" fill="url(#gHt)" opacity=".92"/><path d="M26 48h11l5-10 7 20 6-13h15" stroke="#a7f3d0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+  resp: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gLu" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0369a1"/></linearGradient></defs><path d="M48 14v24M48 38L34 50M48 38l14 12" stroke="#7dd3fc" stroke-width="5" stroke-linecap="round"/><path d="M42 26c-14 4-24 22-24 42 0 8 5 12 13 12h11V26z" fill="url(#gLu)" opacity=".9"/><path d="M54 26c14 4 24 22 24 42 0 8-5 12-13 12H54V26z" fill="url(#gLu)" opacity=".82"/></svg>`,
+  vent: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gVn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect x="18" y="20" width="60" height="44" rx="12" fill="url(#gVn)" opacity=".9"/><path d="M26 44h10l6-12 8 22 7-14h13" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M36 64v14M60 64v14M28 78h40" stroke="#38bdf8" stroke-width="4.5" stroke-linecap="round"/></svg>`,
+  wean: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gWn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs><circle cx="48" cy="48" r="30" fill="url(#gWn)" opacity=".88"/><path d="M34 49l10 10 20-22" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+  abd: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gLv" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4ade80"/><stop offset="50%" stop-color="#2dd4bf"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><path d="M44 18v12M52 20v10" stroke="#5eead4" stroke-width="4.5" stroke-linecap="round"/><path d="M20 38c0-9 10-14 28-14 19 0 30 6 30 16 0 11-11 16-24 19-12 3-20 14-27 14-5 0-7-12-7-35z" fill="url(#gLv)" opacity=".92"/></svg>`,
+  ext: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gEx" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1e40af"/></linearGradient></defs><path d="M36 16h16l4 32 14 22c3 4 0 10-5 10H38c-5 0-8-4-7-9l5-25V16z" fill="url(#gEx)" opacity=".88"/><circle cx="45" cy="48" r="7" fill="#a7f3d0" opacity=".9"/></svg>`,
+  inf: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gIn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0369a1"/></linearGradient></defs><circle cx="48" cy="48" r="22" fill="url(#gIn)" opacity=".92"/><path d="M48 16v10M48 70v10M16 48h10M70 48h10M25 25l7 7M64 64l7 7M71 25l-7 7M32 64l-7 7" stroke="#5eead4" stroke-width="4.5" stroke-linecap="round"/><circle cx="42" cy="43" r="4" fill="#fff" opacity=".85"/><circle cx="55" cy="52" r="3" fill="#fff" opacity=".75"/></svg>`,
+  lines: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gLn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7dd3fc"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><path d="M26 74c0-26 22-24 22-48V14M70 74c0-26-22-24-22-48" stroke="url(#gLn)" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="26" cy="74" r="6" fill="#34d399"/><circle cx="70" cy="74" r="6" fill="#38bdf8"/></svg>`,
+  inv: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gLb" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#67e8f9"/><stop offset="100%" stop-color="#1e40af"/></linearGradient></defs><rect x="34" y="16" width="28" height="64" rx="14" fill="url(#gLb)" opacity=".88"/><rect x="30" y="14" width="36" height="8" rx="4" fill="#5eead4"/><path d="M36 48h24v18c0 6-5 12-12 12s-12-6-12-12V48z" fill="#34d399" opacity=".8"/></svg>`,
+  trend: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gTr" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect x="18" y="20" width="60" height="56" rx="14" fill="url(#gTr)" opacity=".86"/><path d="M28 58l13-14 11 8 16-20" stroke="#6ee7b7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="68" cy="32" r="5" fill="#fff"/></svg>`,
+  meds: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gMd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs><g transform="rotate(-38 48 48)"><rect x="22" y="34" width="52" height="28" rx="14" fill="url(#gMd)" opacity=".92"/><path d="M48 34h12a14 14 0 0 1 0 28H48V34z" fill="#1e3a8a" opacity=".75"/></g></svg>`,
+  anti: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gAc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#60a5fa"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><path d="M48 16C34 36 26 47 26 59a22 22 0 0 0 44 0c0-12-8-23-22-43z" fill="url(#gAc)" opacity=".92"/><path d="M38 60a10 10 0 0 0 10 10" stroke="#a7f3d0" stroke-width="3.5" stroke-linecap="round" fill="none"/></svg>`,
+  fluid: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gKd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="60%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><path d="M42 18c-14 0-22 13-22 30s8 30 22 30c9 0 14-6 14-14 0-6-5-9-5-16s5-10 5-16c0-8-5-14-14-14z" fill="url(#gKd)" opacity=".92"/><path d="M54 38h16M54 48h14M54 58h16" stroke="#6ee7b7" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+  calc: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gCl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><rect x="24" y="14" width="48" height="68" rx="12" fill="url(#gCl)" opacity=".9"/><rect x="32" y="22" width="32" height="14" rx="4" fill="#e0f2fe"/><circle cx="37" cy="48" r="3.5" fill="#fff"/><circle cx="48" cy="48" r="3.5" fill="#fff"/><circle cx="59" cy="48" r="3.5" fill="#fff"/><circle cx="37" cy="60" r="3.5" fill="#fff"/><circle cx="48" cy="60" r="3.5" fill="#fff"/><circle cx="59" cy="60" r="3.5" fill="#6ee7b7"/></svg>`,
+  scores: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gSc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#1e40af"/></linearGradient></defs><rect x="22" y="46" width="12" height="30" rx="5" fill="url(#gSc)"/><rect x="42" y="30" width="12" height="46" rx="5" fill="url(#gSc)"/><rect x="62" y="18" width="12" height="58" rx="5" fill="url(#gSc)"/></svg>`,
+  plan: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gPl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6ee7b7"/><stop offset="100%" stop-color="#0369a1"/></linearGradient></defs><rect x="20" y="16" width="56" height="64" rx="14" fill="url(#gPl)" opacity=".9"/><path d="M32 36l5 5 9-9M52 37h14M32 54l5 5 9-9M52 55h14" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+  checklist: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gCk" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#0284c7"/></linearGradient></defs><rect x="20" y="18" width="56" height="60" rx="16" fill="url(#gCk)" opacity=".9"/><path d="M34 48l10 10 20-22" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
+  sbar: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gSb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><path d="M24 16h34l14 14v50H24V16z" fill="url(#gSb)" opacity=".9"/><path d="M34 42h28M34 54h28M34 66h18" stroke="#a7f3d0" stroke-width="3.8" stroke-linecap="round"/></svg>`
+};
 
 /* ---------- Reference tables & field definitions ---------- */
 const LAB = [
@@ -601,7 +866,6 @@ function ensure(p) {
     if (m.route === undefined) m.route = "";
     if (m.frequency === undefined) m.frequency = "";
     if (m.indication === undefined) m.indication = "";
-    if (m.type === undefined) m.type = "";
     if (m.editing === undefined) m.editing = false;
   });
   [...p.abx, ...p.anticoag].forEach(x => {
@@ -637,13 +901,7 @@ function fld([k, l, t = "text", o], base) {
 }
 const T = (l, k, t, o) => fld([k, l, t, o], "");
 const grid = (specs, base) => `<div class="g2">${specs.map(s => fld(s, base)).join("")}</div>`;
-const ACC = { "📋": "#7f9bb8", "🦠": "#d98f5a", "🔌": "#8aa0b3", "🧪": "#6a9be0", "📈": "#5fb7a0", "💊": "#d68fb0", "💉": "#cf6a82", "💧": "#5aa6c9", "🧮": "#9aa5b1", "📊": "#cdb060", "📝": "#6fb88a", "✅": "#7fbf7a", "📄": "#8aa0b3" };
-const S = (t, h, o) => {
-  const m = /^(\p{Extended_Pictographic}\uFE0F?)\s+([\s\S]*)$/u.exec(t);
-  const ac = m && ACC[m[1].replace("\uFE0F", "")];
-  const head = m ? `<span class="ic">${m[1]}</span><span class="tt">${m[2]}</span>` : `<span class="tt">${t}</span>`;
-  return `<details${o ? " open" : ""}${ac ? ` style="--ac:${ac}"` : ""}><summary>${head}</summary><div class="body">${h}</div></details>`;
-};
+const S = (t, h, o) => `<details${o ? " open" : ""}><summary>${t}</summary><div class="body">${h}</div></details>`;
 
 function labRow(it, i) {
   const b = `investigations.laboratory.${i}.`;
@@ -691,274 +949,395 @@ function editableEntriesHTML(name, heading = true) {
   return `${heading ? `<h4>${esc(L.t)}</h4>` : ""}${top}${rows}<button data-a="add:${name}">+ Add ${title.toLowerCase()}</button>`;
 }
 
-/* ---------- Examination: floating swipe cards ---------- */
-const XSYS = [
-  ["🧠", "CNS", "#a78bd0"], ["❤️", "Cardiovascular", "#d27478"], ["🫁", "Respiratory", "#4fb3bf"],
-  ["🌬️", "Ventilator", "#5b9fd4"], ["📉", "Weaning", "#6fb88a"], ["🫃", "Abdomen", "#d3ab55"], ["🦵", "Extremities", "#c98f6b"]
-];
-const exState = { open: false, i: 0, bed: null };
-const XP = (i, h) => {
-  const [e, n, c] = XSYS[i];
-  return `<article class="xpage" data-x="${i}" style="--ac:${c}" aria-label="${n}"><header class="xhead"><span class="ic">${e}</span><span class="tt">${n}</span><span class="xn">${i + 1} / ${XSYS.length}</span></header><div class="xbody">${h}</div></article>`;
-};
-const examTile = () =>
-  `<div class="card" style="--ac:#4fb3bf"><button class="card-head" data-a="xopen:${exState.i}" aria-label="Open examination"><span class="ic">🩺</span><span class="tt">Examination<small>Swipe through ${XSYS.length} systems</small></span><span class="chev"></span></button><div class="pills">${XSYS.map(([e, n, c], i) => `<button class="pill" style="--ac:${c}" data-a="xopen:${i}">${e} ${n}</button>`).join("")}</div></div>`;
-const examSheet = pages =>
-  `<div id="exSheet" role="dialog" aria-modal="true" aria-label="Examination"><div class="xbar"><div class="xtabs">${XSYS.map(([e, n, c], i) => `<button class="xtab${i === exState.i ? " on" : ""}" style="--ac:${c}" data-a="xgo:${i}">${e} ${n}</button>`).join("")}</div><button class="xclose" data-a="xclose" aria-label="Close examination">✕</button></div><div id="exTrack" class="xtrack">${pages}</div></div>`;
-
-function exScrollTo(k, smooth) {
-  const tr = $("exTrack"), pg = tr && tr.querySelectorAll(".xpage")[k];
-  if (!pg) return;
-  tr.scrollTo({ left: pg.offsetLeft + pg.offsetWidth / 2 - tr.clientWidth / 2, behavior: smooth ? "smooth" : "auto" });
-}
-function exMarkTabs(scroll) {
-  document.querySelectorAll(".xtab").forEach((t, k) => {
-    t.classList.toggle("on", k === exState.i);
-    if (scroll && k === exState.i) t.scrollIntoView({ inline: "center", block: "nearest" });
-  });
-}
-function exSync() {
-  const tr = $("exTrack");
-  if (!tr) return;
-  const pg = [...tr.querySelectorAll(".xpage")];
-  if (!pg.length) return;
-  const c = tr.scrollLeft + tr.clientWidth / 2;
-  let b = 0, bd = Infinity;
-  pg.forEach((el, k) => { const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - c); if (d < bd) { bd = d; b = k; } });
-  if (b !== exState.i) { exState.i = b; exMarkTabs(true); }
-}
-function showExam(on) {
-  const sh = $("exSheet");
-  if (!sh) return;
-  sh.classList.toggle("on", on);
-  document.body.classList.toggle("xo", on);
-  if (on) { exScrollTo(exState.i, false); exMarkTabs(true); }
-}
-function openExam(i) {
-  if (Number.isInteger(i) && i >= 0 && i < XSYS.length) exState.i = i;
-  exState.open = true;
-  showExam(true);
-  if (!(history.state && history.state.ex)) { try { history.pushState({ ex: 1 }, ""); } catch (e) {} }
-}
-function closeExam(fromPop) {
-  if (!exState.open) return;
-  exState.open = false;
-  showExam(false);
-  if (!fromPop && history.state && history.state.ex) { try { history.back(); } catch (e) {} }
-}
-window.addEventListener("popstate", () => closeExam(true));
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeExam(); });
-document.addEventListener("click", e => { if (e.target && (e.target.id === "exSheet" || e.target.id === "exTrack")) closeExam(); });
-let _exRaf = 0;
-document.addEventListener("scroll", e => {
-  if (!e.target || e.target.id !== "exTrack" || _exRaf) return;
-  _exRaf = requestAnimationFrame(() => { _exRaf = 0; exSync(); });
-}, true);
-
-/* ---------- Main deck: every card is a page you can swipe between ---------- */
-const DECK = [
-  ["📋", "Diagnosis", "Diagnosis and daily events", "#7f9bb8"], ["🩺", "Examination", "Examination", "#4fb3bf"],
-  ["🦠", "Infection", "Infection", "#d98f5a"], ["🔌", "Lines", "Lines and tubes", "#8aa0b3"],
-  ["🧪", "Investigations", "Investigations", "#6a9be0"], ["📈", "Trends", "Trends", "#5fb7a0"],
-  ["💊", "Medications", "Medications", "#d68fb0"], ["💉", "Anticoagulation", "Anticoagulation", "#cf6a82"],
-  ["💧", "Fluids", "Fluid balance", "#5aa6c9"], ["🧮", "Calculators", "Calculators", "#9aa5b1"],
-  ["📊", "Scores", "Scores", "#cdb060"], ["📝", "Plan", "Assessment and daily plan", "#6fb88a"],
-  ["✅", "Checklist", "Daily checklist", "#7fbf7a"], ["📄", "SBAR", "SBAR handover", "#8aa0b3"]
-];
-const dState = { i: 0 };
-const DP = (i, h) => {
-  const [e, , n, c] = DECK[i];
-  return `<article class="dpage" data-d="${i}" style="--ac:${c}" aria-label="${n}"><header class="xhead"><span class="ic">${e}</span><span class="tt">${n}</span><span class="xn">${i + 1} / ${DECK.length}</span></header><div class="xbody dbody">${h}</div></article>`;
-};
-const examLauncher = () =>
-  `<p class="small">Seven systems, one card each. Tap a system, then swipe left or right to move between them.</p>` +
-  XSYS.map(([e, n, c], i) => `<button class="bigtile" style="--ac:${c}" data-a="xopen:${i}"><span class="ic">${e}</span><span class="tt">${n}</span><span class="chev"></span></button>`).join("");
-const deckHTML = pages =>
-  `<div id="deck"><div class="dbar"><div class="dtabs">${DECK.map(([e, t, , c], i) => `<button class="xtab${i === dState.i ? " on" : ""}" style="--ac:${c}" data-a="dgo:${i}">${e} ${t}</button>`).join("")}</div></div><div id="dTrack" class="dtrack">${pages.join("")}</div></div>`;
-function dScrollTo(k, smooth) {
-  const tr = $("dTrack"), pg = tr && tr.querySelectorAll(".dpage")[k];
-  if (!pg) return;
-  tr.scrollTo({ left: pg.offsetLeft + pg.offsetWidth / 2 - tr.clientWidth / 2, behavior: smooth ? "smooth" : "auto" });
-}
-function dMarkTabs(scroll) {
-  document.querySelectorAll(".dtabs .xtab").forEach((t, k) => {
-    t.classList.toggle("on", k === dState.i);
-    if (scroll && k === dState.i) {
-      const bar = t.parentElement;
-      bar.scrollTo({ left: t.offsetLeft + t.offsetWidth / 2 - bar.clientWidth / 2, behavior: "smooth" });
-    }
-  });
-}
-function dSync() {
-  const tr = $("dTrack");
-  if (!tr) return;
-  const pg = [...tr.querySelectorAll(".dpage")];
-  if (!pg.length) return;
-  const c = tr.scrollLeft + tr.clientWidth / 2;
-  let b = 0, bd = Infinity;
-  pg.forEach((el, k) => { const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - c); if (d < bd) { bd = d; b = k; } });
-  if (b !== dState.i) { dState.i = b; dMarkTabs(true); }
-}
-let _dRaf = 0;
-document.addEventListener("scroll", e => {
-  if (!e.target || e.target.id !== "dTrack" || _dRaf) return;
-  _dRaf = requestAnimationFrame(() => { _dRaf = 0; dSync(); });
-}, true);
-
-function cards(p) {
-  const I = p.investigations, c = p.cardio;
-  const sv = (k, v) => String(getp(p, "scores." + k)) === v ? " selected" : "";
-  const gs = (k, l, a) => `<label>${esc(l)}<select data-p="scores.${k}"><option value=""></option>${a.map((t, i) => `<option value="${i + 1}"${sv(k, String(i + 1))}>${i + 1} – ${esc(t)}</option>`).join("")}</select></label>`;
+/* ---------- Modular Section Cards (for Slider + Floating Card Modal) ---------- */
+function getCardModules(p) {
+  ensure(p);
+  const c = p.cardio, v = c.vitals, k = cardioCalc(v), s = p.scores || {}, g = scoreCalc(p);
+  const a = p.investigations.abg, pf = pfOf(p), w = p.wean || {};
+  const sv = (k2, val) => String(getp(p, "scores." + k2)) === val ? " selected" : "";
+  const gs = (k2, l, arr) => `<label>${esc(l)}<select data-p="scores.${k2}"><option value=""></option>${arr.map((t, i) => `<option value="${i + 1}"${sv(k2, String(i + 1))}>${i + 1} – ${esc(t)}</option>`).join("")}</select></label>`;
   const RS = ["+4 Combative", "+3 Very agitated", "+2 Agitated", "+1 Restless", "0 Alert and calm", "-1 Drowsy", "-2 Light sedation", "-3 Moderate sedation", "-4 Deep sedation", "-5 Unarousable"];
 
-  const DX = DP(0,
-    grid([["age", "Age (years)", "number"], ["ventSex", "Sex", "sel", ["", "male", "female"]]]) +
-    T("Date of admission", "admissionDate", "date") +
-    T("Working diagnosis", "diagnosis", "area") +
-    T("Past medical history (PMH)", "pastMedicalHistory", "area") +
-    T("History of present illness (HPI)", "presentIllness", "area") +
-    T("Events in last 24 hours", "events", "area"), 1);
-
-  const CNS = XP(0,
-    `<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE", "Eye opening", ["None", "To pain", "To voice", "Spontaneous"])}${gs("gcsV", "Verbal (intubated: estimate)", ["None", "Incomprehensible sounds", "Inappropriate words", "Confused", "Oriented"])}${gs("gcsM", "Motor", ["None", "Extension", "Abnormal flexion", "Withdrawal", "Localizes", "Obeys"])}</div><div id="gcsOut" class="out"></div>` +
-    `<details class="sub"><summary>Sedation and neurological status</summary><div class="body"><div class="g2">${fld(["sedation", "Sedation agent", "sel", ["", "None", "Propofol", "Midazolam", "Dexmedetomidine", "Ketamine", "Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t => { const v = t.split(" ")[0]; return `<option value="${v}"${String(getp(p, "scores.rass")) === v ? " selected" : ""}>${esc(t)}</option>`; }).join("")}</select></label>${fld(["pupils", "Pupils", "sel", ["", "Equal and reactive", "Equal, sluggish", "Unequal", "Fixed and dilated", "Pinpoint", "Other"]])}${fld(["seizures", "Seizures", "sel", ["", "None", "Seizure in last 24 h", "On antiepileptics, seizure-free", "Status epilepticus"]])}</div></div></details>` +
-    `<h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>` +
-    T("CNS notes (delirium, etc.)", "cns", "area"));
-
-  const CV = XP(1,
-    `<div id="cvOut" class="out"></div>` +
-    S("Vitals and hemodynamics", grid([
-      ["sbp", "SBP (mmHg)", "number"], ["dbp", "DBP (mmHg)", "number"],
-      ["hr", "Heart rate (bpm)", "number"], ["cvp", "CVP (mmHg)", "number"],
-      ["targetMap", "MAP target (mmHg)", "number"],
-      ["rhythm", "Rhythm", "sel", ["", "Sinus rhythm", "Atrial fibrillation", "Atrial flutter", "SVT", "VT", "Paced rhythm", "Other"]]
-    ], "cardio.vitals"), 1) +
-    S(`Vasopressors and inotropes (${c.vasoactive.length})`, listHTML("vasoactive", 1)) +
-    S(`ECG (${c.ecg.length})`, listHTML("ecg", 1)) +
-    S(`Cardiac biomarkers (${c.biomarkers.length})`, listHTML("biomarkers", 1)) +
-    S("Echocardiography", `<div id="invEcho" class="out"></div>` + (c.echo.enabled ? `<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO, "cardio.echo")}` : `<button data-a="echo:on">+ Add echo</button>`)) +
-    `<h4>Recommendations</h4><div id="cvRec" class="out"></div>` +
-    T("Additional cardiovascular notes", "cv", "area"));
-
-  const RESP = XP(2,
-    grid([
-      ["respSupport", "Respiratory support", "sel", ["", "Room air", "Oxygen (nasal cannula / mask)", "HFNC / NIV", "Ventilator"]],
-      ["spo2", "SpO₂ (%)", "number"],
-      ["breathSounds", "Breath sounds", "sel", ["", "Normal vesicular", "Wheeze", "Crackles", "Coarse crackles", "Bronchial breathing", "Diminished air entry", "Absent breath sounds", "Stridor", "Pleural rub"]]
-    ]) +
-    T("Auscultation notes", "ausc", "area") +
-    T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)", "resp", "area") +
-    `<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`);
-
-  const VENT = XP(3,
-    T("Ventilator mode", "ventMode", "sel", ["", "VC", "PC", "SIMV-VC", "SIMV-PC", "PSV", "CPAP", "APRV", "Other"]) +
-    grid([
-      ["heightCm", "Height (cm)", "number"], ["ventRate", "Set RR (/min)", "number"],
-      ["setVT", "Set VT (mL)", "number"], ["fio2Percent", "FiO₂ (%)", "number"],
-      ["setPEEP", "Set PEEP (cmH₂O)", "number"], ["pressureSupport", "Pressure support", "number"],
-      ["peakPressure", "Peak pressure", "number"], ["plateauPressure", "Plateau pressure", "number"],
-      ["totalPeep", "Total PEEP", "number"], ["paO2", "PaO₂ (mmHg)", "number"],
-      ["ieRatio", "I:E ratio"]
-    ]) +
-    `<p class="small">Sex is set in the first card. If PaO₂ or FiO₂ are empty here, the ABG values are used.</p><div id="ventOut" class="out"></div>`);
-
-  const w = p.wean || {};
-  const WEAN = XP(4,
-    WCRIT.map((t, i) => `<label class="chk"><input type="checkbox" data-p="wean.c${i}"${w["c" + i] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") +
-    grid([
-      ["rr", "Spontaneous RR (/min)", "number"], ["vt", "Spontaneous VT (mL)", "number"],
-      ["sbt", "SBT result", "sel", ["", "Not done", "Passed", "Failed"]],
-      ["leak", "Cuff leak test", "sel", ["", "Not done", "Leak present", "No leak"]]
-    ], "wean") +
-    `<div id="wnOut" class="out"></div>`);
-
-  const ABD = XP(5,
-    grid([
-      ["palpation", "Palpation", "sel", ["", "Soft and lax", "Distended", "Tense", "Tender", "Guarding / rebound", "Rigid"]],
-      ["bowelSounds", "Bowel sounds", "sel", ["", "Present", "Hypoactive", "Absent", "Hyperactive"]],
-      ["feeding", "Feeding", "sel", ["", "Oral", "Enteral (NG/OG)", "Parenteral", "Enteral + parenteral", "Nil by mouth"]],
-      ["stool", "Stool", "sel", ["", "Passed stool", "Not passed", "Diarrhea", "Constipated"]],
-      ["rbs", "RBS (mg/dL)", "number"]
-    ]) +
-    `<div id="rbsOut" class="small"></div>` +
-    T("Abdomen notes", "abdNotes", "area"));
-
-  const EXT = XP(6,
-    grid([
-      ["edema", "Edema", "sel", ["", "None", "Mild pitting", "Moderate pitting", "Severe pitting", "Generalized (anasarca)"]],
-      ["pulses", "Peripheral pulses", "sel", ["", "Present", "Weak", "Absent"]],
-      ["capRefill", "Capillary refill", "sel", ["", "<2 s", "2–3 s", ">3 s"]],
-      ["limbTemp", "Skin / limb temperature", "sel", ["", "Warm", "Cool", "Mottled"]],
-      ["dvtSigns", "Calf swelling / tenderness", "sel", ["", "No", "Yes"]],
-      ["skin", "Skin integrity", "sel", ["", "Intact", "Pressure injury", "Rash", "Wound"]]
-    ]) +
-    T("Extremities notes", "extNotes", "area"));
-
-  const INF = DP(2,
-    grid([["temp", "Temperature (°C)", "number"], ["sepsisTime", "Sepsis recognised (date/time)", "datetime-local"]]) +
-    `<h4>Sepsis markers</h4><p class="small">Select one or more markers. Enter a separate value for each selected marker.</p>` +
-    `<div class="chips">${MK.map(k => `<label class="chip"><input type="checkbox" data-p="sepsisM.${k}"${getp(p, "sepsisM." + k) || p.sepsisMarker === k ? " checked" : ""}><span>${esc(k)}</span></label>`).join("")}</div>` +
-    `<div class="g2">${MK.map((k, i) => (getp(p, "sepsisM." + k) || p.sepsisMarker === k) ? fld([String(i), k + " – value"], "sepsisMarkerValues") : "").join("")}</div>` +
-    editableEntriesHTML("abx") +
-    editableEntriesHTML("cultures") +
-    T("Source, source control, other notes", "infection", "area") +
-    `<h4>Recommendations</h4><div id="infRec" class="out"></div>`);
-
-  const LINES = DP(3, editableEntriesHTML("lines"));
-
-  const INV = DP(4,
-    `<h4>Laboratory</h4><div class="scroll"><div class="lab small"><b>Test</b><b>Date</b><b>Result</b><b>Unit</b><b>Trend</b><b>Last 1</b><b>Last 2</b><b>Last 3</b></div>${I.laboratory.map(labRow).join("")}</div><button data-a="addlab">+ Add lab test</button>` +
-    `<h4>Arterial blood gas</h4><div class="abg-grid"><span></span><span class="abg-head">Current</span><span class="abg-head">Previous 1</span><span class="abg-head">Previous 2</span>${ABGF.map(([k, l]) => `<span class="abg-name">${l}</span>${fld([k, "", "number"], "investigations.abg")}${fld([k + "_prev1", "", "number"], "investigations.abg").replace('<input ', '<input class="abg-prev" ')}${fld([k + "_prev2", "", "number"], "investigations.abg").replace('<input ', '<input class="abg-prev" ')}`).join("")}</div><p class="small">Enter the current result and, when available, the two most recent previous results.</p><div id="abgOut" class="out"></div>` +
-    `<h4>Radiology</h4><div class="scroll">${I.radiology.map(radRow).join("")}</div><button data-a="addrad">+ Add radiology</button>` +
-    T("Additional investigation notes", "labs", "area"));
-
-  const keys = [...new Set([...(p.trend || []).flatMap(e => Object.keys(e.v)), ...Object.keys(snap(p))])];
-  const TREND = DP(5,
-    `<select id="trSel" aria-label="Trend parameter">${keys.map(k => `<option value="${esc(k)}"${k === (window._tr || keys[0]) ? " selected" : ""}>${esc(k)}</option>`).join("")}</select><button data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`);
-
-  const MEDS = DP(6, medsHTML(p) + `<div id="medOut"></div>`);
-
-  const ANTI = DP(7,
-    acHTML(p) +
-    `<details class="sub"><summary>Other notes (nutrition, GI, skin, renal)</summary><div class="body">${T("Renal and metabolic notes", "renal", "area")}${T("Other systems notes", "other", "area")}</div></details>`);
-
-  const FLUID = DP(8,
-    grid([
-      ["weight", "Weight (kg)", "number"], ["duration", "Duration (hours)", "number"],
-      ["fluidIn", "Total intake (mL)", "number"], ["fluidOut", "Total output (mL)", "number"]
-    ]) +
-    `<p class="small">Output rate uses the total output entered. For urine output, enter urine volume alone.</p><div id="fluidOut2" class="out"></div>`);
-
-  const CALC = DP(9,
-    `<label>Choose calculator<select class="calc-select" data-p="calc.selected"><option value="">Select a calculator...</option>${Object.entries(CALC_DEFS).map(([k, v]) => `<option value="${k}"${(p.calc && p.calc.selected) === k ? " selected" : ""}>${esc(v.label)}</option>`).join("")}</select></label><div id="calcOut"></div><p class="small">Enter the requested values. Results are calculation aids, not treatment orders; verify inputs, units and clinical context.</p>`);
-
-  const SCORES_CARD = DP(10,
-    `<h4>Recommended for this patient</h4><div id="recScores" class="out"></div>` +
-    `<label>ICU score<select id="scoreSel"><option value="">Select score...</option>${SCORES.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join("")}</select></label><button data-a="addscore">+ Add score</button>` +
-    (p.scoreList || []).map((it, i) => {
-      const d = SD[it.name];
-      return `<div class="ent"><b>${esc(it.name)}</b> <span class="small" id="sa${i}"></span>${d && d.c ? `<div class="g2">${d.c.map(([l], j) => `<label>${esc(l)}<input type="number" step="any" data-p="scoreList.${i}.comps.${j}" value="${esc((it.comps || {})[j])}"></label>`).join("")}</div><p>Total: <b id="st${i}">—</b></p>` : `<label>Value<input data-p="scoreList.${i}.value" value="${esc(it.value)}"></label>`}<div class="r" id="si${i}" hidden></div><label>Note<input data-p="scoreList.${i}.note" value="${esc(it.note)}"></label><button class="g" data-a="autosc:${i}">Use auto values</button><button class="x" data-a="del:scoreList:${i}">Remove</button></div>`;
-    }).join("") +
-    grid([["uo", "Urine output (mL/24 h), for SOFA", "number"]], "scores") +
-    `<div id="scoreOut" class="out"></div>`);
-
-  const PLAN = DP(11,
-    T("Problems, targets, interventions...", "plan", "area") +
-    `<h4>Plan checklist</h4><select id="tplSel" aria-label="Plan template"><option value="">Add items from a template...</option>${Object.keys(TPL).map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join("")}</select><button class="g" data-a="tpl">Add template items</button>` +
-    (p.plans || []).map((it, i) => `<div class="pi${it.done ? " done" : ""}"><input type="checkbox" data-p="plans.${i}.done"${it.done ? " checked" : ""} aria-label="Done"><input data-p="plans.${i}.text" value="${esc(it.text)}" placeholder="Plan item"><button class="x" data-a="del:plans:${i}">×</button></div>`).join("") +
-    `<button data-a="addplan">+ Add plan</button><button class="x" data-a="clearplans">Remove all plan items</button>`);
-
-  const CHECKLIST = DP(12,
-    CHK.map(([k, l]) => `<label class="chk"><input type="checkbox" data-p="checks.${k}"${getp(p, "checks." + k) ? " checked" : ""}><span>${esc(l)}</span></label>`).join("") +
-    `<button class="g" data-a="resetchk">Reset for new day</button>`);
-
-  const SBAR_CARD = DP(13,
-    `<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:240px" placeholder="SBAR appears here..."></textarea>`);
+  const abnLabCount = p.investigations.laboratory.filter(it => {
+    const f = labFlag(it, p);
+    return f[1] === "hi" || f[1] === "lo";
+  }).length;
+  const enteredLabCount = p.investigations.laboratory.filter(it => String(it.result).trim() !== "").length;
+  const openPlans = (p.plans || []).filter(x => x.text && !x.done);
+  const chkDone = CHK.filter(([q]) => (p.checks || {})[q]).length;
+  const inn = parseFloat(p.fluidIn), out = parseFloat(p.fluidOut);
+  const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
+  const icuDay = dayN(p.admissionDate);
 
   return [
-    deckHTML([DX, DP(1, examLauncher()), INF, LINES, INV, TREND, MEDS, ANTI, FLUID, CALC, SCORES_CARD, PLAN, CHECKLIST, SBAR_CARD]),
-    examSheet(CNS + CV + RESP + VENT + WEAN + ABD + EXT)
-  ].join("");
+    {
+      id: "dx",
+      kicker: "Overview",
+      title: "Diagnosis & Events",
+      meta: p.diagnosis ? p.diagnosis : (icuDay > 0 ? `ICU Day ${icuDay}` : "Demographics, PMH, HPI"),
+      status: p.diagnosis ? "ok" : "idle",
+      badge: p.diagnosis ? "✓" : "+",
+      render: () =>
+        grid([["age", "Age (years)", "number"], ["ventSex", "Sex", "sel", ["", "male", "female"]]]) +
+        T("Date of admission", "admissionDate", "date") +
+        T("Working diagnosis", "diagnosis", "area") +
+        T("Past medical history (PMH)", "pastMedicalHistory", "area") +
+        T("History of present illness (HPI)", "presentIllness", "area") +
+        T("Events in last 24 hours", "events", "area")
+    },
+    {
+      id: "cns",
+      kicker: "Neurology",
+      title: "CNS & Sedation",
+      meta: [g.gcs !== null && `GCS ${g.gcs}`, s.rass && `RASS ${s.rass}`, p.sedation && p.sedation !== "None" && p.sedation].filter(Boolean).join(" · ") || "GCS, RASS, pupils, CT brain",
+      status: (g.gcs !== null && g.gcs <= 8) || p.seizures === "Status epilepticus" ? "warn" : (g.gcs !== null || s.rass ? "ok" : "idle"),
+      badge: g.gcs !== null ? String(g.gcs) : "+",
+      render: () =>
+        `<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE", "Eye opening", ["None", "To pain", "To voice", "Spontaneous"])}${gs("gcsV", "Verbal (intubated: estimate)", ["None", "Incomprehensible sounds", "Inappropriate words", "Confused", "Oriented"])}${gs("gcsM", "Motor", ["None", "Extension", "Abnormal flexion", "Withdrawal", "Localizes", "Obeys"])}</div><div id="gcsOut" class="out"></div>` +
+        `<details class="sub" open><summary>Sedation and neurological status</summary><div class="body"><div class="g2">${fld(["sedation", "Sedation agent", "sel", ["", "None", "Propofol", "Midazolam", "Dexmedetomidine", "Ketamine", "Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t => { const val = t.split(" ")[0]; return `<option value="${val}"${String(getp(p, "scores.rass")) === val ? " selected" : ""}>${esc(t)}</option>`; }).join("")}</select></label>${fld(["pupils", "Pupils", "sel", ["", "Equal and reactive", "Equal, sluggish", "Unequal", "Fixed and dilated", "Pinpoint", "Other"]])}${fld(["seizures", "Seizures", "sel", ["", "None", "Seizure in last 24 h", "On antiepileptics, seizure-free", "Status epilepticus"]])}</div></div></details>` +
+        `<h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>` +
+        T("CNS notes (delirium, etc.)", "cns", "area")
+    },
+    {
+      id: "cv",
+      kicker: "Hemodynamics",
+      title: "Cardiovascular",
+      meta: [k.map !== null && `MAP ${k.map.toFixed(0)}`, v.hr && `HR ${v.hr}`, c.vasoactive.length && `${c.vasoactive.length} pressor(s)`].filter(Boolean).join(" · ") || "Vitals, pressors, ECG, echo",
+      status: k.al.length ? "warn" : (k.map !== null || v.hr ? "ok" : "idle"),
+      badge: k.al.length ? "!" : (k.map !== null ? k.map.toFixed(0) : "+"),
+      render: () =>
+        `<div id="cvOut" class="out"></div>` +
+        S("Vitals and hemodynamics", grid([
+          ["sbp", "SBP (mmHg)", "number"], ["dbp", "DBP (mmHg)", "number"],
+          ["hr", "Heart rate (bpm)", "number"], ["cvp", "CVP (mmHg)", "number"],
+          ["targetMap", "MAP target (mmHg)", "number"],
+          ["rhythm", "Rhythm", "sel", ["", "Sinus rhythm", "Atrial fibrillation", "Atrial flutter", "SVT", "VT", "Paced rhythm", "Other"]]
+        ], "cardio.vitals"), 1) +
+        S(`Vasopressors and inotropes (${c.vasoactive.length})`, listHTML("vasoactive", 1), c.vasoactive.length > 0) +
+        S(`ECG (${c.ecg.length})`, listHTML("ecg", 1)) +
+        S(`Cardiac biomarkers (${c.biomarkers.length})`, listHTML("biomarkers", 1)) +
+        S("Echocardiography", `<div id="invEcho" class="out"></div>` + (c.echo.enabled ? `<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO, "cardio.echo")}` : `<button data-a="echo:on">+ Add echo</button>`)) +
+        `<h4>Recommendations</h4><div id="cvRec" class="out"></div>` +
+        T("Additional cardiovascular notes", "cv", "area")
+    },
+    {
+      id: "resp",
+      kicker: "Pulmonary",
+      title: "Respiratory Exam",
+      meta: [p.respSupport, p.spo2 && `SpO₂ ${p.spo2}%`, p.breathSounds].filter(Boolean).join(" · ") || "Support, SpO₂, auscultation",
+      status: parseFloat(p.spo2) < 92 ? "warn" : (p.respSupport || p.spo2 ? "ok" : "idle"),
+      badge: p.spo2 ? `${p.spo2}%` : "+",
+      render: () =>
+        grid([
+          ["respSupport", "Respiratory support", "sel", ["", "Room air", "Oxygen (nasal cannula / mask)", "HFNC / NIV", "Ventilator"]],
+          ["spo2", "SpO₂ (%)", "number"],
+          ["breathSounds", "Breath sounds", "sel", ["", "Normal vesicular", "Wheeze", "Crackles", "Coarse crackles", "Bronchial breathing", "Diminished air entry", "Absent breath sounds", "Stridor", "Pleural rub"]]
+        ]) +
+        T("Auscultation notes", "ausc", "area") +
+        T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)", "resp", "area") +
+        `<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`
+    },
+    {
+      id: "vent",
+      kicker: "Mechanical Vent",
+      title: "Ventilator Monitor",
+      meta: [p.ventMode, p.setVT && `VT ${p.setVT}`, p.setPEEP && `PEEP ${p.setPEEP}`, pf !== null && `P/F ${pf.toFixed(0)}`].filter(Boolean).join(" · ") || "PBW, driving pressure, P/F",
+      status: (pf !== null && pf <= 150) || parseFloat(p.plateauPressure) > 30 ? "warn" : (p.ventMode ? "ok" : "idle"),
+      badge: p.ventMode || "+",
+      render: () =>
+        T("Ventilator mode", "ventMode", "sel", ["", "VC", "PC", "SIMV-VC", "SIMV-PC", "PSV", "CPAP", "APRV", "Other"]) +
+        grid([
+          ["heightCm", "Height (cm)", "number"], ["ventRate", "Set RR (/min)", "number"],
+          ["setVT", "Set VT (mL)", "number"], ["fio2Percent", "FiO₂ (%)", "number"],
+          ["setPEEP", "Set PEEP (cmH₂O)", "number"], ["pressureSupport", "Pressure support", "number"],
+          ["peakPressure", "Peak pressure", "number"], ["plateauPressure", "Plateau pressure", "number"],
+          ["totalPeep", "Total PEEP", "number"], ["paO2", "PaO₂ (mmHg)", "number"],
+          ["ieRatio", "I:E ratio"]
+        ]) +
+        `<p class="small">Sex is set in Diagnosis & Events. If PaO₂ or FiO₂ are empty here, the ABG values are used.</p><div id="ventOut" class="out"></div>`
+    },
+    {
+      id: "wean",
+      kicker: "Extubation",
+      title: "Weaning Check",
+      meta: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length} criteria` + (w.sbt ? ` · SBT: ${w.sbt}` : ""),
+      status: w.sbt === "Passed" ? "ok" : (w.sbt === "Failed" ? "warn" : (WCRIT.some((_, i) => w["c" + i]) ? "ok" : "idle")),
+      badge: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length}`,
+      render: () =>
+        WCRIT.map((t, i) => `<label class="chk"><input type="checkbox" data-p="wean.c${i}"${w["c" + i] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") +
+        grid([
+          ["rr", "Spontaneous RR (/min)", "number"], ["vt", "Spontaneous VT (mL)", "number"],
+          ["sbt", "SBT result", "sel", ["", "Not done", "Passed", "Failed"]],
+          ["leak", "Cuff leak test", "sel", ["", "Not done", "Leak present", "No leak"]]
+        ], "wean") +
+        `<div id="wnOut" class="out"></div>`
+    },
+    {
+      id: "abd",
+      kicker: "GI & Metabolic",
+      title: "Abdomen & Glucose",
+      meta: [p.palpation, p.feeding, p.rbs && `RBS ${p.rbs}`].filter(Boolean).join(" · ") || "Palpation, feeding, stool, RBS",
+      status: parseFloat(p.rbs) > 180 || parseFloat(p.rbs) < 70 ? "warn" : (p.palpation || p.feeding || p.rbs ? "ok" : "idle"),
+      badge: p.rbs ? p.rbs : "+",
+      render: () =>
+        grid([
+          ["palpation", "Palpation", "sel", ["", "Soft and lax", "Distended", "Tense", "Tender", "Guarding / rebound", "Rigid"]],
+          ["bowelSounds", "Bowel sounds", "sel", ["", "Present", "Hypoactive", "Absent", "Hyperactive"]],
+          ["feeding", "Feeding", "sel", ["", "Oral", "Enteral (NG/OG)", "Parenteral", "Enteral + parenteral", "Nil by mouth"]],
+          ["stool", "Stool", "sel", ["", "Passed stool", "Not passed", "Diarrhea", "Constipated"]],
+          ["rbs", "RBS (mg/dL)", "number"]
+        ]) +
+        `<div id="rbsOut" class="small"></div>` +
+        T("Abdomen notes", "abdNotes", "area")
+    },
+    {
+      id: "ext",
+      kicker: "Perfusion & Skin",
+      title: "Extremities",
+      meta: [p.edema && `Edema: ${p.edema}`, p.capRefill && `CRT ${p.capRefill}`, p.limbTemp].filter(Boolean).join(" · ") || "Edema, pulses, perfusion, skin",
+      status: p.dvtSigns === "Yes" || p.capRefill === ">3 s" ? "warn" : (p.edema || p.pulses ? "ok" : "idle"),
+      badge: p.dvtSigns === "Yes" ? "!" : (p.edema ? "✓" : "+"),
+      render: () =>
+        grid([
+          ["edema", "Edema", "sel", ["", "None", "Mild pitting", "Moderate pitting", "Severe pitting", "Generalized (anasarca)"]],
+          ["pulses", "Peripheral pulses", "sel", ["", "Present", "Weak", "Absent"]],
+          ["capRefill", "Capillary refill", "sel", ["", "<2 s", "2–3 s", ">3 s"]],
+          ["limbTemp", "Skin / limb temperature", "sel", ["", "Warm", "Cool", "Mottled"]],
+          ["dvtSigns", "Calf swelling / tenderness", "sel", ["", "No", "Yes"]],
+          ["skin", "Skin integrity", "sel", ["", "Intact", "Pressure injury", "Rash", "Wound"]]
+        ]) +
+        T("Extremities notes", "extNotes", "area")
+    },
+    {
+      id: "inf",
+      kicker: "Microbiology",
+      title: "Infection & Sepsis",
+      meta: [p.temp && `T ${p.temp}°C`, p.abx.length && `${p.abx.length} abx`, p.cultures.length && `${p.cultures.length} cx`].filter(Boolean).join(" · ") || "Temp, markers, antibiotics, cultures",
+      status: parseFloat(p.temp) >= 38.3 || parseFloat(p.temp) < 36 ? "warn" : (p.abx.length || p.cultures.length || p.temp ? "ok" : "idle"),
+      badge: p.abx.length ? String(p.abx.length) : "+",
+      render: () =>
+        grid([["temp", "Temperature (°C)", "number"], ["sepsisTime", "Sepsis recognised (date/time)", "datetime-local"]]) +
+        `<h4>Sepsis markers</h4><p class="small">Select one or more markers. Enter a separate value for each selected marker.</p>` +
+        `<div class="chips">${MK.map(k2 => `<label class="chip"><input type="checkbox" data-p="sepsisM.${k2}"${getp(p, "sepsisM." + k2) || p.sepsisMarker === k2 ? " checked" : ""}><span>${esc(k2)}</span></label>`).join("")}</div>` +
+        `<div class="g2">${MK.map((k2, i) => (getp(p, "sepsisM." + k2) || p.sepsisMarker === k2) ? fld([String(i), k2 + " – value"], "sepsisMarkerValues") : "").join("")}</div>` +
+        editableEntriesHTML("abx") +
+        editableEntriesHTML("cultures") +
+        T("Source, source control, other notes", "infection", "area") +
+        `<h4>Recommendations</h4><div id="infRec" class="out"></div>`
+    },
+    {
+      id: "lines",
+      kicker: "Vascular & Tubes",
+      title: "Lines & Tubes",
+      meta: p.lines.length ? p.lines.map(x => `${x.type || "Line"}${x.date ? " D" + dayN(x.date) : ""}`).join(", ") : "CVC, arterial line, ETT, drains",
+      status: p.lines.length ? "ok" : "idle",
+      badge: p.lines.length ? String(p.lines.length) : "+",
+      render: () => editableEntriesHTML("lines")
+    },
+    {
+      id: "inv",
+      kicker: "Diagnostics",
+      title: "Labs, ABG & Imaging",
+      meta: [enteredLabCount && `${enteredLabCount} labs (${abnLabCount} abn)`, a.pH && `pH ${a.pH}`, a.Lactate && `Lac ${a.Lactate}`].filter(Boolean).join(" · ") || "Lab panel, ABG interpreter, CT/Echo",
+      status: abnLabCount > 0 || parseFloat(a.Lactate) > 2 ? "warn" : (enteredLabCount || a.pH ? "ok" : "idle"),
+      badge: abnLabCount > 0 ? `${abnLabCount}!` : (enteredLabCount ? String(enteredLabCount) : "+"),
+      render: () =>
+        `<h4>Laboratory</h4><div class="scroll"><div class="lab small"><b>Test</b><b>Date</b><b>Result</b><b>Unit</b><b>Trend</b><b>Last 1</b><b>Last 2</b><b>Last 3</b></div>${p.investigations.laboratory.map(labRow).join("")}</div><button data-a="addlab">+ Add lab test</button>` +
+        `<h4>Arterial blood gas</h4><div class="abg-grid"><span></span><span class="abg-head">Current</span><span class="abg-head">Previous 1</span><span class="abg-head">Previous 2</span>${ABGF.map(([k2, l]) => `<span class="abg-name">${l}</span>${fld([k2, "", "number"], "investigations.abg")}${fld([k2 + "_prev1", "", "number"], "investigations.abg").replace('<input ', '<input class="abg-prev" ')}${fld([k2 + "_prev2", "", "number"], "investigations.abg").replace('<input ', '<input class="abg-prev" ')}`).join("")}</div><p class="small">Enter the current result and, when available, the two most recent previous results.</p><div id="abgOut" class="out"></div>` +
+        `<h4>Radiology</h4><div class="scroll">${p.investigations.radiology.map(radRow).join("")}</div><button data-a="addrad">+ Add radiology</button>` +
+        T("Additional investigation notes", "labs", "area")
+    },
+    {
+      id: "trend",
+      kicker: "Time Series",
+      title: "Trends & Snapshots",
+      meta: `${(p.trend || []).length} saved snapshot(s)`,
+      status: (p.trend || []).length ? "ok" : "idle",
+      badge: String((p.trend || []).length || "+"),
+      render: () => {
+        const keys = [...new Set([...(p.trend || []).flatMap(e => Object.keys(e.v)), ...Object.keys(snap(p))])];
+        return `<select id="trSel" aria-label="Trend parameter">${keys.map(k2 => `<option value="${esc(k2)}"${k2 === (window._tr || keys[0]) ? " selected" : ""}>${esc(k2)}</option>`).join("")}</select><button data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`;
+      }
+    },
+    {
+      id: "meds",
+      kicker: "Pharmacology",
+      title: "Medications",
+      meta: `${p.meds.length} drug(s)` + (p.abx.length ? ` + ${p.abx.length} abx` : ""),
+      status: p.meds.length || p.abx.length ? "ok" : "idle",
+      badge: String(p.meds.length + p.abx.length || "+"),
+      render: () => medsHTML(p) + `<div id="medOut"></div>`
+    },
+    {
+      id: "anti",
+      kicker: "Prophylaxis",
+      title: "Anticoagulation & Other",
+      meta: p.acType ? `${p.acType}${p.anticoag.length ? " (" + p.anticoag.length + ")" : ""}` : "VTE prophylaxis, renal & other notes",
+      status: p.acType ? "ok" : "idle",
+      badge: p.acType ? "✓" : "+",
+      render: () =>
+        acHTML(p) +
+        `<details class="sub" open><summary>Other notes (nutrition, GI, skin, renal)</summary><div class="body">${T("Renal and metabolic notes", "renal", "area")}${T("Other systems notes", "other", "area")}</div></details>`
+    },
+    {
+      id: "fluid",
+      kicker: "Renal & I/O",
+      title: "Fluid Balance",
+      meta: bal !== null ? `Net ${bal > 0 ? "+" : ""}${bal.toFixed(0)} mL` : "Weight, intake, output rate",
+      status: bal !== null ? "ok" : "idle",
+      badge: bal !== null ? (bal > 0 ? "+" : "") + bal.toFixed(0) : "+",
+      render: () =>
+        grid([
+          ["weight", "Weight (kg)", "number"], ["duration", "Duration (hours)", "number"],
+          ["fluidIn", "Total intake (mL)", "number"], ["fluidOut", "Total output (mL)", "number"]
+        ]) +
+        `<p class="small">Output rate uses the total output entered. For urine output, enter urine volume alone.</p><div id="fluidOut2" class="out"></div>`
+    },
+    {
+      id: "calc",
+      kicker: "Bedside Tools",
+      title: "ICU Calculators",
+      meta: (p.calc && p.calc.selected && CALC_DEFS[p.calc.selected]) ? CALC_DEFS[p.calc.selected].label : "17 clinical calculators",
+      status: (p.calc && p.calc.selected) ? "ok" : "idle",
+      badge: "fx",
+      render: () =>
+        `<label>Choose calculator<select class="calc-select" data-p="calc.selected"><option value="">Select a calculator...</option>${Object.entries(CALC_DEFS).map(([k2, val]) => `<option value="${k2}"${(p.calc && p.calc.selected) === k2 ? " selected" : ""}>${esc(val.label)}</option>`).join("")}</select></label><div id="calcOut"></div><p class="small">Enter the requested values. Results are calculation aids, not treatment orders; verify inputs, units and clinical context.</p>`
+    },
+    {
+      id: "scores",
+      kicker: "Severity",
+      title: "Clinical Scores",
+      meta: g.n > 0 ? `SOFA ${g.total}${g.n < 6 ? "*" : ""} · ${p.scoreList.length} custom` : "Auto SOFA, qSOFA, CURB-65, RASS",
+      status: g.total >= 6 ? "warn" : (g.n > 0 || p.scoreList.length ? "ok" : "idle"),
+      badge: g.n > 0 ? String(g.total) : "+",
+      render: () =>
+        `<h4>Recommended for this patient</h4><div id="recScores" class="out"></div>` +
+        `<label>ICU score<select id="scoreSel"><option value="">Select score...</option>${SCORES.map(sc => `<option value="${esc(sc)}">${esc(sc)}</option>`).join("")}</select></label><button data-a="addscore">+ Add score</button>` +
+        (p.scoreList || []).map((it, i) => {
+          const d = SD[it.name];
+          return `<div class="ent"><b>${esc(it.name)}</b> <span class="small" id="sa${i}"></span>${d && d.c ? `<div class="g2">${d.c.map(([l], j) => `<label>${esc(l)}<input type="number" step="any" data-p="scoreList.${i}.comps.${j}" value="${esc((it.comps || {})[j])}"></label>`).join("")}</div><p>Total: <b id="st${i}">—</b></p>` : `<label>Value<input data-p="scoreList.${i}.value" value="${esc(it.value)}"></label>`}<div class="r" id="si${i}" hidden></div><label>Note<input data-p="scoreList.${i}.note" value="${esc(it.note)}"></label><button class="g" data-a="autosc:${i}">Use auto values</button><button class="x" data-a="del:scoreList:${i}">Remove</button></div>`;
+        }).join("") +
+        grid([["uo", "Urine output (mL/24 h), for SOFA", "number"]], "scores") +
+        `<div id="scoreOut" class="out"></div>`
+    },
+    {
+      id: "plan",
+      kicker: "Management",
+      title: "Daily Plan",
+      meta: openPlans.length ? `${openPlans.length} active item(s)` : ((p.plans || []).length ? "All items completed" : "Problems, targets & templates"),
+      status: openPlans.length ? "ok" : "idle",
+      badge: openPlans.length ? String(openPlans.length) : "+",
+      render: () =>
+        T("Problems, targets, interventions...", "plan", "area") +
+        `<h4>Plan checklist</h4><select id="tplSel" aria-label="Plan template"><option value="">Add items from a template...</option>${Object.keys(TPL).map(k2 => `<option value="${esc(k2)}">${esc(k2)}</option>`).join("")}</select><button class="g" data-a="tpl">Add template items</button>` +
+        (p.plans || []).map((it, i) => `<div class="pi${it.done ? " done" : ""}"><input type="checkbox" data-p="plans.${i}.done"${it.done ? " checked" : ""} aria-label="Done"><input data-p="plans.${i}.text" value="${esc(it.text)}" placeholder="Plan item"><button class="x" data-a="del:plans:${i}">×</button></div>`).join("") +
+        `<button data-a="addplan">+ Add plan</button><button class="x" data-a="clearplans">Remove all plan items</button>`
+    },
+    {
+      id: "checklist",
+      kicker: "FAST-HUG",
+      title: "Daily Checklist",
+      meta: `${chkDone}/${CHK.length} safety checks done`,
+      status: chkDone === CHK.length ? "ok" : (chkDone > 0 ? "ok" : "idle"),
+      badge: `${chkDone}/${CHK.length}`,
+      render: () =>
+        CHK.map(([k2, l]) => `<label class="chk"><input type="checkbox" data-p="checks.${k2}"${getp(p, "checks." + k2) ? " checked" : ""}><span>${esc(l)}</span></label>`).join("") +
+        `<button class="g" data-a="resetchk">Reset for new day</button>`
+    },
+    {
+      id: "sbar",
+      kicker: "Sign-Out",
+      title: "SBAR Handover",
+      meta: "Generate, copy, share or view archive",
+      status: "ok",
+      badge: "↗",
+      render: () =>
+        `<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:260px" placeholder="SBAR appears here...">${esc(sbarText(p))}</textarea>`
+    }
+  ];
+}
+
+function slideCards(dir) {
+  const el = $("cardSlider");
+  if (!el) return;
+  el.scrollBy({ left: dir * 460, behavior: "smooth" });
+}
+
+function openCardModal(cardId) {
+  if (active === null || !P()) return;
+  activeCardId = cardId;
+  renderSlider();
+  renderModalContent();
+  $("cardModal").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function closeCardModal() {
+  activeCardId = null;
+  const m = $("cardModal");
+  if (m) m.hidden = true;
+  document.body.style.overflow = "";
+  renderSlider();
+}
+
+function stepModal(dir) {
+  if (!P() || !activeCardId) return;
+  const mods = getCardModules(P());
+  const idx = mods.findIndex(m => m.id === activeCardId);
+  if (idx === -1) return;
+  const next = mods[(idx + dir + mods.length) % mods.length];
+  openCardModal(next.id);
+  const cardEl = document.querySelector(`.med-card[data-card="${next.id}"]`);
+  if (cardEl) cardEl.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && activeCardId) closeCardModal();
+});
+
+function renderSlider() {
+  const slider = $("cardSlider");
+  const p = P();
+  if (!slider || !p) return;
+  const mods = getCardModules(p);
+  slider.innerHTML = mods.map(m => `
+    <div class="med-card${m.id === activeCardId ? " is-featured" : ""}" role="button" tabindex="0" data-card="${m.id}"
+         onclick="openCardModal('${m.id}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCardModal('${m.id}')}">
+      <div class="med-card-top">
+        <div class="organ-wrap">${ORGAN_SVGS[m.id] || ORGAN_SVGS.dx}</div>
+        <span class="status-orb ${m.status}">${esc(m.badge)}</span>
+      </div>
+      <div class="med-card-body">
+        <div class="med-card-kicker">${esc(m.kicker)}</div>
+        <div class="med-card-title">${esc(m.title)}</div>
+        <div class="med-card-meta">${esc(m.meta)}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderModalContent() {
+  const p = P();
+  const body = $("cards");
+  if (!p || !activeCardId || !body) return;
+  const mods = getCardModules(p);
+  const mod = mods.find(m => m.id === activeCardId);
+  if (!mod) return;
+
+  const savedScroll = body.scrollTop;
+  const openSubs = [...body.querySelectorAll("details")].map(d => d.open);
+
+  $("modalTitle").textContent = mod.title;
+  $("modalSub").textContent = `${p.bed || "Bed"} · ${mod.kicker}`;
+  $("modalIcon").innerHTML = ORGAN_SVGS[mod.id] || ORGAN_SVGS.dx;
+  body.innerHTML = mod.render();
+
+  [...body.querySelectorAll("details")].forEach((d, i) => {
+    if (openSubs[i] !== undefined) d.open = openSubs[i];
+  });
+  renderOutputs();
+  body.scrollTop = savedScroll;
 }
 
 /* ---------- Calculations ---------- */
@@ -970,7 +1349,7 @@ function labFlag(it, p) {
   if (n === "hb") {
     if (p.ventSex === "male") r = [13, 17, "g/dL"];
     else if (p.ventSex === "female") r = [12, 16, "g/dL"];
-    else return ["SET SEX", "na", "Select sex in the first card"];
+    else return ["SET SEX", "na", "Select sex in Diagnosis & Events"];
   }
   if (!r) return ["NO RANGE", "na", "Use local laboratory range"];
   if (String(it.unit).trim().toLowerCase() !== r[2].toLowerCase()) return ["CHECK UNIT", "na", "Expected " + r[2]];
@@ -1234,20 +1613,15 @@ const mkList = p => {
   return out;
 };
 
-const MED_TYPES = ["Antibiotics", "Antifungals / antivirals", "Fluids", "Nebulizers / inhalers", "Vasopressors / inotropes", "Sedation / analgesia", "Anticonvulsants", "Cardiac / antihypertensives", "Diuretics", "GI protection / antiemetics", "Steroids / hormones", "Insulin / electrolytes", "Nutrition / vitamins", "Other"];
 const medsHTML = p => {
-  const groups = {};
-  const put = (t, html) => (groups[t] = groups[t] || []).push(html);
-  const abx = (p.abx || []).filter(x => x.drug || x.date || x.dose);
-  abx.forEach(x => put("Antibiotics", `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}<span class="mtag">Infection card</span></b><span>${esc(x.date || "Start date not entered")}</span><span>${esc([x.dose, x.route, x.frequency].filter(Boolean).join(" ") || "Dose not entered")}</span></div>`));
-  (p.meds || []).forEach((m, i) => {
+  const antibiotics = (p.abx || []).filter(x => x.drug || x.date || x.dose);
+  const abxHTML = `<h4>Antibiotics from Infection card</h4><p class="small">Read-only copy. Edit antibiotic details in the Infection card.</p>${antibiotics.length ? antibiotics.map(x => `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}</b><span>${esc(x.date || "Start date not entered")}</span><span>${esc([x.dose, x.route, x.frequency].filter(Boolean).join(" ") || "Dose not entered")}</span></div>`).join("") : `<p class="small">No antibiotics entered in the Infection card.</p>`}`;
+  const meds = (p.meds || []).map((m, i) => {
     const details = [m.dose, m.route, m.frequency, m.indication].filter(Boolean).map(esc).join(" · ");
-    const typeSel = `<label class="wide">Type<select data-p="meds.${i}.type"><option value="">Select type…</option>${MED_TYPES.map(t => `<option value="${esc(t)}"${m.type === t ? " selected" : ""}>${esc(t)}</option>`).join("")}</select></label>`;
-    const editor = m.editing ? `<div class="med-edit"><div class="med-grid">${typeSel}${[["drug", "Medication name"], ["dose", "Dose"], ["route", "Route"], ["frequency", "Frequency"], ["indication", "Indication (optional)"]].map(([k, l]) => fld([k, l], "meds." + i)).join("")}</div><button class="g sm" data-a="mededit:${i}">Done</button></div>` : "";
-    put(MED_TYPES.includes(m.type) ? m.type : "Not categorised", `<div class="med-row"><div class="med-summary"><span class="med-name">${esc(m.drug || "New medication")}</span><span class="med-details">${details || "Details not entered"}</span><button class="g sm" data-a="mededit:${i}">Edit</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove medication">×</button></div>${editor}</div>`);
-  });
-  const body = [...MED_TYPES, "Not categorised"].filter(t => groups[t]).map(t => `<div class="mg">${esc(t)}<i>${groups[t].length}</i></div>${groups[t].join("")}`).join("");
-  return (body || `<p class="small">No medications entered yet.</p>`) + (abx.length ? `<p class="small">Antibiotics tagged "Infection card" are copied from the Infection card. Edit them there.</p>` : "") + `<button data-a="addmed">+ Add medication</button>`;
+    const editor = m.editing ? `<div class="med-edit"><div class="med-grid">${[["drug", "Medication name"], ["dose", "Dose"], ["route", "Route"], ["frequency", "Frequency"], ["indication", "Indication (optional)"]].map(([k, l]) => fld([k, l], "meds." + i)).join("")}</div><button class="g sm" data-a="mededit:${i}">Done</button></div>` : "";
+    return `<div class="med-row"><div class="med-summary"><span class="med-name">${esc(m.drug || "New medication")}</span><span class="med-details">${details || "Details not entered"}</span><button class="g sm" data-a="mededit:${i}">Edit</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove medication">×</button></div>${editor}</div>`;
+  }).join("");
+  return abxHTML + `<h4>Other medications</h4>${meds}<button data-a="addmed">+ Add medication</button>`;
 };
 
 function acHTML(p) {
@@ -1407,7 +1781,7 @@ function infRecs(p) {
     const cg = (140 - age) * w / (72 * cr) * (p.ventSex === "female" ? 0.85 : 1);
     R.push(`Estimated CrCl ≈ ${cg.toFixed(0)} mL/min (Cockcroft–Gault, actual weight${p.ventSex ? "" : "; sex not set, male assumed"}).` + (A.length && cg < 50 ? " Check renal dose adjustment of each antibiotic with pharmacy or local guidance. In the first 24–48 h of sepsis many protocols keep full β-lactam doses; confirm locally. Consider levels for vancomycin and aminoglycosides." : ""));
   } else if (A.length) {
-    R.push("For renal dose checks, enter age, weight (Fluid balance card), creatinine (mg/dL) and sex.");
+    R.push("For renal dose checks, enter age, weight (Fluid Balance card), creatinine (mg/dL) and sex.");
   }
   if (age >= 65 && A.length) R.push("Age ≥65: creatinine can overestimate renal function; take care with nephrotoxic antibiotics.");
   return R;
@@ -1491,7 +1865,7 @@ function showInfo() {
   if (active === null || !P()) return;
   $("infoSvg").innerHTML = infoSVG(P());
   $("infoBox").hidden = false;
-  $("infoBox").scrollIntoView();
+  $("infoBox").scrollIntoView({ behavior: "smooth" });
 }
 
 function dlInfo(share) {
@@ -1620,4 +1994,1217 @@ function trendHTML(p, key) {
   if (pts.length < 2) return `<span class="small">Need at least two points. Save a snapshot or use New day to build the trend.</span>`;
 
   const W = 320, H = 130, mn = Math.min(...pts.map(x => x.v)), mx = Math.max(...pts.map(x => x.v)), sp = mx - mn || 1;
-  const X = i => 20 + i * (W - 40) / (pts.length
+  const X = i => 20 + i * (W - 40) / (pts.length - 1);
+  const Y = v => H - 28 - (v - mn) / sp * (H - 58);
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:440px"><polyline fill="none" stroke="#145b78" stroke-width="2" points="${pts.map((x, i) => X(i).toFixed(1) + "," + Y(x.v).toFixed(1)).join(" ")}"/>${pts.map((x, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="#145b78"/><text x="${X(i).toFixed(1)}" y="${(Y(x.v) - 8).toFixed(1)}" font-size="10" text-anchor="middle" fill="currentColor">${x.v}</text><text x="${X(i).toFixed(1)}" y="${H - 6}" font-size="8" text-anchor="middle" fill="currentColor">${esc(x.l.slice(0, 5))}</text>`).join("")}</svg>`;
+}
+
+function rollDay(p) {
+  ensure(p);
+  p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
+  p.trend = p.trend.slice(-60);
+  p.history.push({ d: new Date().toISOString().slice(0, 10), sbar: sbarText(p) });
+  p.history = p.history.slice(-7);
+  p.investigations.laboratory.forEach(it => {
+    if (String(it.result).trim() !== "") {
+      it.last3 = it.last2 || "";
+      it.last2 = it.lastResult || "";
+      it.lastResult = it.result;
+      it.result = "";
+      it.date = "";
+    }
+  });
+  p.checks = {};
+  p.events = "";
+  p.wean = {};
+}
+
+function newDay() {
+  if (active === null || !P()) return;
+  if (!confirm("Start a new day? Today's SBAR is archived, lab results move to last result, and the checklist, 24-hour events and weaning check are cleared.")) return;
+  rollDay(P());
+  persist();
+  draw();
+  renderList();
+}
+
+function newDayAll() {
+  if (!data.length) return;
+  if (!confirm("Start a new day for ALL beds?")) return;
+  data.forEach(rollDay);
+  persist();
+  renderList();
+  if (active !== null && P()) draw();
+}
+
+function jump(d) {
+  if (!data.length) return;
+  openPatient((active + d + data.length) % data.length);
+}
+
+function shareTxt(t) {
+  if (!t) { alert("Nothing to share yet."); return; }
+  if (navigator.share) navigator.share({ text: t }).catch(() => {});
+  else if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => alert("Sharing is not available here; copied instead."), () => alert("Sharing not available."));
+  else alert("Sharing is not available in this browser.");
+}
+
+function wnHTML(p) {
+  const w = p.wean || {}, n = WCRIT.filter((_, i) => w["c" + i]).length;
+  const f = parseFloat(p.fio2Percent), pe = parseFloat(p.setPEEP), sat = parseFloat(p.spo2);
+  const pr = p.cardio.vasoactive.some(d => d.trend !== "Stopped" && /^(norepi|epi)/i.test(d.drug || "") && parseFloat(d.dose) > 0.1);
+  const rr = parseFloat(w.rr), vt = parseFloat(w.vt);
+  const H = (t, ok) => ok === null ? "" : `<div class="r${ok ? "" : " a"}">${ok ? "✓" : "✗"} ${t}</div>`;
+
+  return `<b>${n}/${WCRIT.length}</b> criteria ticked` +
+    H(`FiO₂ ${f}%, PEEP ${pe} (usual: ≤50%, ≤8)`, f > 0 && pe >= 0 ? f <= 50 && pe <= 8 : null) +
+    H(`SpO₂ ${sat}% (usual: ≥92%)`, sat > 0 ? sat >= 92 : null) +
+    H("Vasopressor dose " + (pr ? "above 0.1 mcg/kg/min" : "low or none"), p.cardio.vasoactive.length ? !pr : null) +
+    (rr > 0 && vt > 0 ? `<div class="r">RSBI ${(rr / (vt / 1000)).toFixed(0)} (<105 favourable)</div>` : "") +
+    `<p class="small">Typical criteria; adapt to your unit's protocol. Hints come from the other cards.</p>`;
+}
+
+function crcl(p) {
+  const age = parseFloat(p.age), w = parseFloat(p.weight), cr = labVal(p, "creat", "mg/dL");
+  return age > 0 && w > 0 && cr > 0 ? (140 - age) * w / (72 * cr) * (p.ventSex === "female" ? 0.85 : 1) : null;
+}
+
+function medHTML(p) {
+  const cg = crcl(p), cr = labVal(p, "creat", "mg/dL");
+  const imp = (cg !== null && cg < 60) || (cr !== null && cr >= 1.5);
+  const names = [...p.meds, ...p.abx, ...p.anticoag].map(m => m.drug || "").filter(n => RENAL.test(n));
+  return imp && names.length
+    ? `<div class="al">Reduced renal function${cg !== null ? " (CrCl ≈ " + cg.toFixed(0) + " mL/min)" : ""}: review renal dosing of ${esc([...new Set(names)].join(", "))}.</div><p class="small">Covers common renally cleared drugs only; not complete and not an interaction check.</p>`
+    : "";
+}
+
+/* ---------- Clinical calculators ---------- */
+const CALC_DEFS = {
+  map: { label: "Mean arterial pressure (MAP)", fields: [["sbp", "Systolic BP (mmHg)"], ["dbp", "Diastolic BP (mmHg)"]], run: v => { const s = +v.sbp, d = +v.dbp; if (!(s > 0 && d > 0 && s >= d)) return null; const x = (s + 2 * d) / 3; return [x.toFixed(1) + " mmHg", x < 65 ? "Below the commonly used initial target of 65 mmHg; interpret against the patient's perfusion and individualized target." : "Compare with the prescribed patient-specific MAP target and assess perfusion."]; } },
+  shock: { label: "Shock index", fields: [["hr", "Heart rate (beats/min)"], ["sbp", "Systolic BP (mmHg)"]], run: v => { const h = +v.hr, s = +v.sbp; if (!(h > 0 && s > 0)) return null; const x = h / s; return [x.toFixed(2), x >= 0.9 ? "Elevated in many adult contexts; assess for shock and interpret with age, pregnancy, medications and clinical findings." : "A value below 0.9 does not exclude shock; assess perfusion and trends."]; } },
+  pf: { label: "PaO₂ / FiO₂ ratio (P/F)", fields: [["pao2", "PaO₂ (mmHg)"], ["fio2", "FiO₂ (%)"]], run: v => { const p = +v.pao2, f = +v.fio2; if (!(p > 0 && f >= 21 && f <= 100)) return null; const x = p / (f / 100); return [x.toFixed(0) + " mmHg", x <= 100 ? "Severe oxygenation impairment range; ARDS severity requires the full Berlin criteria and PEEP/CPAP context." : x <= 200 ? "Moderate oxygenation impairment range; interpret with ARDS criteria and PEEP/CPAP." : x <= 300 ? "Mild oxygenation impairment range; interpret with the full clinical context." : "Not in the P/F oxygenation impairment thresholds; this alone does not exclude respiratory failure."]; } },
+  ibw: { label: "Ideal body weight and lung-protective VT", fields: [["sex", "Sex", "select", ["male", "female"]], ["height", "Height (cm)"], ["vt", "Set tidal volume (mL)"]], run: v => { const h = +v.height, vt = +v.vt; if (!(h > 100 && h < 230) || !v.sex) return null; const x = (v.sex === "male" ? 50 : 45.5) + .91 * (h - 152.4), r = vt > 0 ? `; current VT ${vt} mL = ${(vt / x).toFixed(1)} mL/kg PBW` : ""; return [x.toFixed(1) + " kg PBW" + r, vt > 0 ? (vt / x > 8 ? "VT is above 8 mL/kg PBW; review against lung-protective ventilation targets." : vt / x < 4 ? "VT is below 4 mL/kg PBW; confirm this is intended and clinically appropriate." : "Common ARDS target is 4–8 mL/kg PBW (often starting near 6); individualize to mechanics and gas exchange.") : "For ARDS, a common initial target is about 6 mL/kg PBW, adjusted within 4–8 mL/kg with plateau-pressure monitoring."]; } },
+  crcl: { label: "Creatinine clearance (Cockcroft–Gault)", fields: [["age", "Age (years)"], ["sex", "Sex", "select", ["male", "female"]], ["weight", "Weight (kg)"], ["creat", "Serum creatinine (mg/dL)"]], run: v => { const a = +v.age, w = +v.weight, c = +v.creat; if (!(a > 0 && w > 0 && c > 0 && v.sex)) return null; const x = ((140 - a) * w) / (72 * c) * (v.sex === "female" ? .85 : 1); return [x.toFixed(1) + " mL/min", "Estimate may be unreliable in acute kidney injury, rapidly changing creatinine, extremes of body size or low muscle mass. Use local dosing guidance."]; } },
+  na: { label: "Corrected sodium for hyperglycemia", fields: [["na", "Measured sodium (mmol/L)"], ["glucose", "Glucose (mg/dL)"]], run: v => { const n = +v.na, g = +v.glucose; if (!(n > 0 && g >= 0)) return null; const a = n + 1.6 * (g - 100) / 100, b = n + 2.4 * (g - 100) / 100; return [a.toFixed(1) + " to " + b.toFixed(1) + " mmol/L", "Correction factors of 1.6 and 2.4 are commonly used; interpret with the degree of hyperglycemia and clinical context."]; } },
+  ca: { label: "Albumin-corrected total calcium", fields: [["ca", "Total calcium (mg/dL)"], ["albumin", "Albumin (g/dL)"]], run: v => { const c = +v.ca, a = +v.albumin; if (!(c > 0 && a > 0)) return null; return [(c + .8 * (4 - a)).toFixed(1) + " mg/dL", "Correction formulas are imprecise in critical illness, renal dysfunction and acid–base disturbance; use ionized calcium when clinically important."]; } },
+  ag: { label: "Anion gap (without potassium)", fields: [["na", "Sodium (mmol/L)"], ["cl", "Chloride (mmol/L)"], ["hco3", "Bicarbonate (mmol/L)"]], run: v => { const n = +v.na, c = +v.cl, b = +v.hco3; if (!(n > 0 && c >= 0 && b >= 0)) return null; const x = n - c - b; return [x.toFixed(1) + " mmol/L", x > 12 ? "Elevated using a conventional 12 mmol/L reference; consider albumin correction and evaluate causes of high-anion-gap metabolic acidosis." : "Interpret against the laboratory's reference range and serum albumin; a normal gap does not exclude metabolic acidosis."]; } },
+  delta: { label: "Delta ratio", fields: [["na", "Sodium (mmol/L)"], ["cl", "Chloride (mmol/L)"], ["hco3", "Bicarbonate (mmol/L)"]], run: v => { const n = +v.na, c = +v.cl, b = +v.hco3; if (!(n > 0 && c >= 0 && b > 0 && b < 24)) return null; const ag = n - c - b, x = (ag - 12) / (24 - b); return [x.toFixed(2), x < .4 ? "Pattern may suggest additional normal-anion-gap metabolic acidosis." : x < .8 ? "May indicate mixed high-anion-gap and normal-anion-gap metabolic acidosis." : x <= 2 ? "Compatible with a predominantly high-anion-gap metabolic acidosis." : "May suggest concurrent metabolic alkalosis; interpret cautiously and use albumin-corrected gap when appropriate."]; } },
+  water: { label: "Free water deficit (hypernatremia)", fields: [["na", "Serum sodium (mmol/L)"], ["weight", "Weight (kg)"], ["sex", "Sex", "select", ["male", "female"]]], run: v => { const n = +v.na, w = +v.weight; if (!(n > 140 && w > 0 && v.sex)) return null; const x = w * (v.sex === "male" ? .6 : .5) * (n / 140 - 1); return [x.toFixed(2) + " L", "Estimate only. Plan correction rate and fluid choice according to acuity, volume status, ongoing losses and comorbidities; monitor sodium frequently."]; } },
+  bmi: { label: "Body mass index (BMI)", fields: [["weight", "Weight (kg)"], ["height", "Height (cm)"]], run: v => { const w = +v.weight, h = +v.height; if (!(w > 0 && h > 0)) return null; const x = w / Math.pow(h / 100, 2); return [x.toFixed(1) + " kg/m²", x < 18.5 ? "Below the usual adult reference range." : x < 25 ? "Within the usual adult reference range." : x < 30 ? "Overweight range by standard adult BMI categories." : "Obesity range by standard adult BMI categories; BMI has limitations in critical illness and altered fluid status."]; } },
+  uo: { label: "Urine output rate", fields: [["urine", "Urine output (mL)"], ["duration", "Duration (hours)"], ["weight", "Weight (kg)"]], run: v => { const u = +v.urine, d = +v.duration, w = +v.weight; if (!(u >= 0 && d > 0 && w > 0)) return null; const x = u / (d * w); return [x.toFixed(2) + " mL/kg/h", x < .5 ? "Below 0.5 mL/kg/h; assess duration, volume status, obstruction and kidney function." : "At or above 0.5 mL/kg/h; interpret with trends and the overall clinical picture."]; } },
+  fluid: { label: "Fluid balance", fields: [["input", "Total intake (mL)"], ["output", "Total output (mL)"]], run: v => { const i = +v.input, o = +v.output; if (!(i >= 0 && o >= 0)) return null; const x = i - o; return [(x > 0 ? "+" : "") + x.toFixed(0) + " mL", x > 0 ? "Positive balance; assess whether fluid administration remains indicated and review cumulative balance." : x < 0 ? "Negative balance; assess perfusion, volume status and ongoing losses." : "Net balance is zero for the entered interval."]; } },
+  rsbi: { label: "Rapid shallow breathing index (RSBI)", fields: [["rr", "Respiratory rate (breaths/min)"], ["vt", "Tidal volume (L)"]], run: v => { const r = +v.rr, t = +v.vt; if (!(r > 0 && t > 0)) return null; const x = r / t; return [x.toFixed(1) + " breaths/min/L", x < 105 ? "Below the traditional 105 threshold; RSBI alone does not establish readiness for extubation." : "At or above the traditional 105 threshold; reassess clinical readiness and reversible causes."]; } },
+  osm: { label: "Effective serum osmolality (tonicity)", fields: [["na", "Sodium (mmol/L)"], ["glucose", "Glucose (mg/dL)"]], run: v => { const n = +v.na, g = +v.glucose; if (!(n > 0 && g >= 0)) return null; const x = 2 * n + g / 18; return [x.toFixed(1) + " mOsm/kg", "Calculated effective osmolality excludes urea; interpret with measured osmolality, neurologic status and the clinical context."]; } },
+  bsa: { label: "Body surface area (Mosteller)", fields: [["weight", "Weight (kg)"], ["height", "Height (cm)"]], run: v => { const w = +v.weight, h = +v.height; if (!(w > 0 && h > 0)) return null; const x = Math.sqrt(w * h / 3600); return [x.toFixed(2) + " m²", "Estimate only; verify whether the relevant medication or protocol uses actual, ideal or another dosing weight."]; } },
+  qtc: { label: "Corrected QT (Bazett)", fields: [["qt", "QT interval (ms)"], ["hr", "Heart rate (beats/min)"]], run: v => { const q = +v.qt, h = +v.hr; if (!(q > 0 && h > 0)) return null; const x = q / Math.sqrt(60 / h); return [x.toFixed(0) + " ms", "Bazett correction may overcorrect at high heart rates and undercorrect at low rates; manually verify QT and consider Fridericia correction when appropriate."]; } }
+};
+
+function calcHTML(p) {
+  const c = p.calc || {}, selected = c.selected || "", d = CALC_DEFS[selected], vals = (c.inputs || {})[selected] || {};
+  if (!d) return `<p class="small">Choose a calculator above to enter its required values.</p>`;
+  const fields = d.fields.map(([k, l, t, opts]) => t === "select"
+    ? `<label>${esc(l)}<select data-p="calc.inputs.${selected}.${k}"><option value="">Select...</option>${opts.map(o => `<option value="${esc(o)}"${vals[k] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`
+    : `<label>${esc(l)}<input type="number" step="any" inputmode="decimal" data-p="calc.inputs.${selected}.${k}" value="${esc(vals[k] === undefined ? "" : vals[k])}"></label>`).join("");
+  const requiredKeys = selected === "ibw" ? ["sex", "height"] : d.fields.map(f => f[0]);
+  const complete = requiredKeys.every(k => vals[k] !== undefined && String(vals[k]).trim() !== "");
+  const result = complete ? d.run(vals) : null;
+  const box = result
+    ? `<div class="calc-result"><div class="small"><b>RESULT</b></div><div class="calc-value">${esc(result[0])}</div><div class="calc-rec"><b>Clinical interpretation / recommendation</b><br>${esc(result[1])}</div></div>`
+    : `<p class="small">Enter all required values to calculate.</p>`;
+  return `<div class="calc-inputs">${fields}</div>${box}`;
+}
+
+/* ---------- Import case from text (rule-based, offline) ---------- */
+const LABPAT = {
+  "Hb": "hb|hemoglobin|haemoglobin", "WBC": "wbc|tlc|white (?:blood )?cells?", "Plts": "plts?|platelets?",
+  "Na": "na\\+?|sodium", "K": "k\\+?|potassium", "Creat": "creat(?:inine)?|cr", "Urea": "urea|bun",
+  "Ca I": "(?:ionized|ionised)\\s*(?:ca|calcium)|ica|ca\\s*i", "Ca T": "(?:total\\s*)?calcium|ca(?!\\s*i)",
+  "Mg": "mg|magnesium", "Po4": "po4|phos(?:phate|phorus)?", "Alb": "alb(?:umin)?",
+  "Alt": "alt|sgpt", "Ast": "ast|sgot", "Bil D": "(?:direct|conj(?:ugated)?)\\s*bil(?:irubin)?|bil\\.?\\s*d",
+  "Bil T": "(?:total\\s*)?bilirubin|t\\.?\\s*bil|bil\\.?\\s*t",
+  "INR": "inr", "PT": "pt(?!t)", "PTT": "a?ptt", "CRP": "crp", "Tgen": "troponin|trop|tgen|hs-?tni|hs-?tnt"
+};
+const LCONV = {
+  Creat: v => v > 20 ? [v / 88.4, "from µmol/L"] : null,
+  "Bil T": v => v > 30 ? [v / 17.1, "from µmol/L"] : null,
+  "Bil D": v => v > 15 ? [v / 17.1, "from µmol/L"] : null,
+  Alb: v => v > 10 ? [v / 10, "from g/L"] : null,
+  Hb: v => v > 25 ? [v / 10, "from g/L"] : null,
+  "Ca T": v => v < 5 ? [v * 4.008, "from mmol/L"] : null,
+  Plts: v => v > 2000 ? [v / 1000, "÷1000"] : null,
+  WBC: v => v > 100 ? [v / 1000, "÷1000"] : null
+};
+const ABXL = [
+  ["meropenem", "Meropenem"], ["piperacillin|tazocin|pip[-/ ]?taz|zosyn", "Piperacillin-tazobactam"],
+  ["ceftriaxone", "Ceftriaxone"], ["cefepime", "Cefepime"], ["ceftazidime", "Ceftazidime"],
+  ["cefazolin", "Cefazolin"], ["vancomycin", "Vancomycin"], ["linezolid", "Linezolid"],
+  ["colistin", "Colistin"], ["amikacin", "Amikacin"], ["gentamicin", "Gentamicin"],
+  ["azithromycin", "Azithromycin"], ["levofloxacin", "Levofloxacin"], ["ciprofloxacin", "Ciprofloxacin"],
+  ["metronidazole", "Metronidazole"], ["clindamycin", "Clindamycin"],
+  ["augmentin|amoxicillin[- ]clav\\w*", "Amoxicillin-clavulanate"], ["ampicillin", "Ampicillin"],
+  ["imipenem", "Imipenem"], ["tigecycline", "Tigecycline"], ["fluconazole", "Fluconazole"],
+  ["caspofungin|micafungin", "Echinocandin"], ["acyclovir", "Acyclovir"],
+  ["doxycycline", "Doxycycline"], ["cotrimoxazole|bactrim", "Co-trimoxazole"]
+];
+const ACL = [
+  ["enoxaparin|clexane|lovenox", "Enoxaparin"],
+  ["heparin (?:infusion|drip)", "Unfractionated heparin (infusion)"],
+  ["heparin", "Unfractionated heparin (prophylactic)"],
+  ["dalteparin", "Dalteparin"], ["fondaparinux", "Fondaparinux"], ["warfarin", "Warfarin"],
+  ["apixaban", "Apixaban"], ["rivaroxaban", "Rivaroxaban"], ["dabigatran", "Dabigatran"], ["argatroban", "Argatroban"]
+];
+const PRL = [
+  ["norepinephrine|noradrenaline|noradrenalin|levophed", "Norepinephrine (Noradrenaline)"],
+  ["\\bepinephrine|\\badrenaline", "Epinephrine (Adrenaline)"], ["vasopressin", "Vasopressin"],
+  ["dobutamine", "Dobutamine"], ["dopamine", "Dopamine"], ["phenylephrine", "Phenylephrine"], ["milrinone", "Milrinone"]
+];
+const LNL = [
+  [/central (?:venous )?(?:line|catheter)|\bCVC\b|\bCVL\b/i, "CVC"],
+  [/arterial line|\ba-?line\b/i, "Arterial line"],
+  [/dialysis catheter|permcath/i, "Dialysis catheter"],
+  [/foley|urinary catheter|\bIDC\b/i, "Urinary catheter"],
+  [/\bETT\b|endotracheal tube/i, "ETT"],
+  [/tracheostomy/i, "Tracheostomy"],
+  [/\bNGT\b|\bOGT\b|nasogastric|orogastric|\bng tube\b/i, "NG/OG tube"],
+  [/chest drain|chest tube/i, "Chest drain"]
+];
+const ORGX = /(klebsiella(?:\s+pneumoniae)?|e\.?\s*coli|escherichia\s+coli|pseudomonas(?:\s+aeruginosa)?|acinetobacter(?:\s+baumannii)?|\bmrsa\b|staph(?:ylococcus)?\s+aureus|enterococcus(?:\s+faecalis|\s+faecium)?|\bvre\b|streptococcus\s+\w+|candida(?:\s+\w+)?|enterobacter|proteus|stenotrophomonas|serratia|citrobacter)/i;
+const SPEC = [
+  [/blood cult(?:ure)?s?|blood cx|\bBC\b/i, "Blood"], [/sputum/i, "Sputum"],
+  [/tracheal aspirate/i, "Tracheal aspirate"], [/\bBAL\b|bronchoalveolar/i, "BAL"],
+  [/urine cult(?:ure)?|urine cx/i, "Urine"], [/wound swab/i, "Wound swab"],
+  [/\bCSF\b/i, "CSF"], [/catheter tip/i, "Catheter tip"]
+];
+
+function parseCase(src) {
+  const T = String(src || "").replace(/\r/g, "").replace(/[–—]/g, "-"), I = [];
+  const num = (re, t = T) => { const m = t.match(re); return m ? parseFloat(m[1]) : null; };
+  const add = (label, fields = [], apply = null) => I.push({ label, fields, apply });
+  const pick = (a, t = T) => { for (const [re, v] of a) if (re.test(t)) return v; return null; };
+
+  const MONTHS = {
+    jan: "01", january: "01", feb: "02", february: "02", mar: "03", march: "03",
+    apr: "04", april: "04", may: "05", jun: "06", june: "06", jul: "07", july: "07",
+    aug: "08", august: "08", sep: "09", sept: "09", september: "09",
+    oct: "10", october: "10", nov: "11", november: "11", dec: "12", december: "12"
+  };
+  const normDate = (raw) => {
+    if (!raw) return "";
+    const s = String(raw).trim();
+    let m = s.match(/\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/);
+    if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
+    m = s.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/);
+    if (m) {
+      let a = parseInt(m[1], 10), b = parseInt(m[2], 10), yr = parseInt(m[3], 10);
+      if (yr < 100) yr += 2000;
+      let day = a, mon = b;
+      if (b > 12 && a <= 12) { mon = a; day = b; }
+      else if (a > 12 && b <= 12) { day = a; mon = b; }
+      if (mon >= 1 && mon <= 12 && day >= 1 && day <= 31) {
+        return `${yr}-${String(mon).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      }
+    }
+    m = s.match(/\b([A-Za-z]+)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/);
+    if (m && MONTHS[m[1].toLowerCase()]) {
+      return `${m[3]}-${MONTHS[m[1].toLowerCase()]}-${m[2].padStart(2, "0")}`;
+    }
+    m = s.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+),?\s+(\d{4})\b/);
+    if (m && MONTHS[m[2].toLowerCase()]) {
+      return `${m[3]}-${MONTHS[m[2].toLowerCase()]}-${m[1].padStart(2, "0")}`;
+    }
+    return "";
+  };
+
+  const secStop = "(?=\\n\\s*(?:bed(?:\\s*(?:no|number|label|#))?|patient(?:\\s*name)?|name|pt|age|sex|gender|doa|date\\s*of\\s*admission|adm(?:ission)?\\s*date|admitted|working\\s*diagnosis|dx|diagnosis|diagnoses|impression|assessment|past\\s*medical\\s*history|past\\s*history|pmh|comorbidities|known\\s*case\\s*of|kco|history\\s*of\\s*(?:present\\s*)?illness|hpi|presenting\\s*(?:history|illness)|chief\\s*complaint|events?|icu\\s*course|last\\s*24\\s*h(?:ours)?|overnight|physical\\s*exam(?:ination)?|exam(?:ination)?|vitals?|cns|neuro(?:logical)?|cvs|cardio(?:vascular)?|resp(?:iratory)?|vent(?:ilator)?|abdomen|abd|extremities|infection|sepsis|lines?|tubes?|investigations?|labs?|abg|arterial\\s*blood\\s*gas|radiology|imaging|cxr|ct|echo|medications?|meds|antibiotics?|abx|anticoag(?:ulation)?|cultures?|microbiology|fluid\\s*balance|plan|daily\\s*plan|recommendations?|management)\\s*[:\\-]|$)";
+  const secVal = (hdrRe) => {
+    const rx = new RegExp("(?:^|\\n|\\|)\\s*(?:" + hdrRe + ")\\s*[:\\-]\\s*([\\s\\S]+?)" + secStop, "i");
+    const mm = T.match(rx);
+    return mm ? mm[1].trim() : "";
+  };
+
+  let m = T.match(/(?:^|\n|\|)\s*(?:patient\s*name|pt\s*name|name|pt)\s*[:\-]\s*([^\n|]+)/i);
+  let ptName = m ? m[1].replace(/\s*(?:,|age\b|\d{1,3}\s*(?:y\/o|yo|yrs?|years?|M\b|F\b)).*$/i, "").trim() : "";
+  if (!ptName) {
+    const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
+    const leadName = firstLine.match(/^(?:bed\s*[\w-]+\s*[:\-|]\s*)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})(?=\s*[,|\-\(]|\s+\d{1,3}\s*(?:y\/o|yo|yrs?|years?|M\b|F\b|male|female))/);
+    if (leadName && !/^(working|past|history|diagnosis|patient|admitted|sepsis|acute|chronic|severe|icu|bed|age|sex|date|exam|plan|labs|abg)\b/i.test(leadName[1])) {
+      ptName = leadName[1].trim();
+    }
+  }
+  const bedRaw = T.match(/(?:^|\n|\|)\s*(?:bed(?:\\s*(?:no|number|label|#))?|icu\\s*bed)\s*[:\\-]\\s*([^\n|]+)/i);
+  const bedTag = bedRaw ? bedRaw[1].trim() : "";
+  const combinedBed = ptName && bedTag && !ptName.toLowerCase().includes(bedTag.toLowerCase())
+    ? `${bedTag} - ${ptName}`
+    : (ptName || bedTag);
+  if (combinedBed) {
+    I.detectedBed = combinedBed;
+    add("Bed / Patient name: " + combinedBed, [["bed", combinedBed]]);
+  }
+
+  const ageVal = secVal("age") || ((T.match(/(?:^|\n|\|)\s*age\s*[:\-]\s*([^\n|]+)/i) || [])[1] || "");
+  const age = num(/\b(\d{1,3})\s*(?:[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b)?/i, ageVal)
+    ?? num(/(\d{1,3})\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\b/i)
+    ?? num(/\bage\s*[:=]?\s*(\d{1,3})\b/i);
+  if (age > 0 && age < 120) add("Age " + age + " y", [["age", String(age)]]);
+
+  let sx = (T.match(/\b(male|female|woman|man)\b/i) || [])[1];
+  if (!sx) {
+    const sm = T.match(/(?:sex|gender)\s*[:\-]?\s*(male|female|woman|man|\b[MF]\b)/i) || T.match(/\d{1,3}\s*(?:y\/o|yo|yrs?|years?(?:\s*old)?)?\s*[,-]?\s*([MF])\b/);
+    sx = sm && (sm[1].toUpperCase() === "M" ? "male" : sm[1].toUpperCase() === "F" ? "female" : sm[1]);
+  }
+  if (sx) {
+    sx = /^(male|man)$/i.test(sx) ? "male" : "female";
+    add("Sex: " + sx, [["ventSex", sx]]);
+  }
+
+  const admSec = secVal("(?:date\\s*of\\s*admission|adm(?:ission)?\\s*date|\\bDOA\\b|admitted(?:\\s*on|\\s*date)?)");
+  let admDate = normDate(admSec);
+  if (!admDate) {
+    const admMatch = T.match(/(?:date\s*of\s*admission|adm(?:ission)?\s*date|\bDOA\b|admitted\s*(?:on|date)?)\s*[:\-]?\s*([A-Za-z0-9\/\-\s,]{6,25})/i);
+    if (admMatch) admDate = normDate(admMatch[1]);
+  }
+  if (admDate) add("Admission " + admDate, [["admissionDate", admDate]]);
+
+  const wt = num(/(?:wt|weight)?\s*[:=]?\s*(\d{2,3}(?:\.\d+)?)\s*kg\b/i), ht = num(/(?:ht|height)?\s*[:=]?\s*(\d{3})\s*cm\b/i);
+  if (wt > 30 && wt < 300) add("Weight " + wt + " kg", [["weight", String(wt)]]);
+  if (ht > 100 && ht < 230) add("Height " + ht + " cm", [["heightCm", String(ht)]]);
+
+  const dxFull = secVal("(?:working\\s+)?(?:dx|diagnosis|diagnoses|impression|assessment)");
+  if (dxFull) add("Diagnosis: " + dxFull.replace(/\s+/g, " ").slice(0, 70), [["diagnosis", dxFull]]);
+  else {
+    const firstLine = (T.split("\n").map(x => x.trim()).find(Boolean) || "");
+    const afterDemo = firstLine.replace(/^(?:bed\s*[\w-]+\s*[:\-|]?\s*)?(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3}\s*[,|\-]?\s*)?\d{1,3}\s*[- ]?(?:y\/o|yo|y\.o\.?|yrs?|years?)(?:[- ]?old)?\s*(?:male|female|woman|man|[MF])?\s*(?:with|admitted (?:with|for)|,|-|:)?\s*/i, "").trim();
+    if (afterDemo && afterDemo.length >= 4 && afterDemo.length < 180 && !/^(bp|hr|temp|spo2|ph|na|k|hb|wbc)\b/i.test(afterDemo)) {
+      add("Diagnosis (from summary): " + afterDemo.slice(0, 70), [["diagnosis", afterDemo]]);
+    }
+  }
+
+  const pmhFull = secVal("(?:past\\s*medical\\s*history|past\\s*history|\\bPMH\\b|comorbidities|known\\s*case\\s*of|\\bKCO\\b)");
+  if (pmhFull) add("Past medical history: " + pmhFull.replace(/\s+/g, " ").slice(0, 70), [["pastMedicalHistory", pmhFull.slice(0, 2000)]]);
+
+  let hpiFull = secVal("(?:history\\s*of\\s*(?:present\\s*)?illness|\\bHPI\\b|presenting\\s*(?:history|illness)|chief\\s*complaint)");
+  if (!hpiFull) {
+    m = T.match(/(?:presented with|presenting with|\bc\/o\b|complaining of|admitted (?:with|for))\s*[:\-]?\s*([\s\S]+?)(?=\n\s*[A-Za-z][A-Za-z /]{1,30}\s*[:\-]|$)/i);
+    if (m) hpiFull = m[0].trim();
+  }
+  if (hpiFull) add("History of present illness: " + hpiFull.replace(/\s+/g, " ").slice(0, 70), [["presentIllness", hpiFull.slice(0, 3000)]]);
+
+  const evFull = secVal("(?:events?(?:\\s*in\\s*(?:the\\s*)?last\\s*24\\s*h(?:ours)?)?|icu\\s*course|last\\s*24\\s*h(?:ours)?|overnight)");
+  if (evFull) add("Events: " + evFull.replace(/\s+/g, " ").slice(0, 70), [["events", evFull.slice(0, 2000)]]);
+
+  const examSec = secVal("(?:physical\\s*exam(?:ination)?|exam(?:ination)?|vitals?|cns|neuro(?:logical)?|cvs|cardio(?:vascular)?|resp(?:iratory)?|abdomen|abd|extremities)");
+  const examPool = examSec || T;
+
+  m = T.match(/(?:\bbp\b|blood pressure)\s*[:=]?\s*(\d{2,3})\s*\/\s*(\d{2,3})/i);
+  if (m) add(`BP ${m[1]}/${m[2]}`, [["cardio.vitals.sbp", m[1]], ["cardio.vitals.dbp", m[2]]]);
+  let v = num(/(?:\bhr\b|heart rate|pulse)\s*[:=]?\s*(\d{2,3})/i);
+  if (v > 20 && v < 250) add("HR " + v, [["cardio.vitals.hr", String(v)]]);
+  v = num(/(?:temp(?:erature)?|\bT)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i);
+  if (v >= 95 && v <= 108) add("Temp " + ((v - 32) * 5 / 9).toFixed(1) + " °C", [["temp", String(Math.round((v - 32) * 5 / 9 * 10) / 10)]]);
+  else if (v >= 30 && v <= 43) add("Temp " + v + " °C", [["temp", String(v)]]);
+  v = num(/(?:spo2|spo₂|\bsats?\b|saturation|o2 sat)\s*[:=]?\s*(\d{2,3})/i);
+  if (v >= 50 && v <= 100) add("SpO₂ " + v + "%", [["spo2", String(v)]]);
+  v = num(/\bcvp\s*[:=]?\s*(\d{1,2})/i);
+  if (v !== null && v >= 0 && v < 40) add("CVP " + v, [["cardio.vitals.cvp", String(v)]]);
+
+  const rh = pick([
+    [/atrial fibrillation|\bAF\b|afib/i, "Atrial fibrillation"],
+    [/atrial flutter/i, "Atrial flutter"],
+    [/\bSVT\b/i, "SVT"],
+    [/ventricular tachycardia/i, "VT"],
+    [/sinus rhythm|\bNSR\b/i, "Sinus rhythm"]
+  ], examPool);
+  if (rh) add("Rhythm: " + rh, [["cardio.vitals.rhythm", rh]]);
+
+  const cnsSec = secVal("(?:cns|neuro(?:logical)?)");
+  if (cnsSec) add("CNS exam: " + cnsSec.replace(/\s+/g, " ").slice(0, 60), [["cns", cnsSec.slice(0, 1500)]]);
+
+  const cvsSec = secVal("(?:cvs|cardio(?:vascular)?)");
+  if (cvsSec) add("CVS exam: " + cvsSec.replace(/\s+/g, " ").slice(0, 60), [["cv", cvsSec.slice(0, 1500)]]);
+
+  const respSec = secVal("(?:resp(?:iratory)?|chest\\s*exam)");
+  if (respSec) add("Resp exam: " + respSec.replace(/\s+/g, " ").slice(0, 60), [["resp", respSec.slice(0, 1500)]]);
+
+  const abdSec = secVal("(?:abdomen|abd)");
+  if (abdSec) add("Abdomen exam: " + abdSec.replace(/\s+/g, " ").slice(0, 60), [["abdNotes", abdSec.slice(0, 1500)]]);
+
+  const extSec = secVal("extremities");
+  if (extSec) add("Extremities exam: " + extSec.replace(/\s+/g, " ").slice(0, 60), [["extNotes", extSec.slice(0, 1500)]]);
+
+  if (!cnsSec && !cvsSec && !respSec && !abdSec && !extSec && examSec) {
+    add("Examination notes: " + examSec.replace(/\s+/g, " ").slice(0, 60), [], (p, over) => {
+      if (over || !p.resp) p.resp = examSec.slice(0, 1500);
+    });
+  }
+
+  const vent = /intubat|ventilat|\bETT\b|\bPEEP\b|\bSIMV\b|\bPSV\b/i.test(T);
+  const rs = vent && /intubat|mechanically ventilated|on ventilator|invasive ventilation|\bETT\b/i.test(T)
+    ? "Ventilator"
+    : pick([
+        [/\bHFNC\b|high[- ]flow|\bNIV\b|\bBiPAP\b/i, "HFNC / NIV"],
+        [/nasal cannula|face ?mask|\bNRB\b|non[- ]rebreather|venturi/i, "Oxygen (nasal cannula / mask)"],
+        [/room air|\bon RA\b/i, "Room air"]
+      ]);
+  if (rs) add("Respiratory support: " + rs, [["respSupport", rs]]);
+
+  const bs = pick([
+    [/wheez/i, "Wheeze"], [/crackles|crepitations|crepts/i, "Crackles"],
+    [/bronchial breath/i, "Bronchial breathing"],
+    [/(?:diminished|reduced) air entry/i, "Diminished air entry"],
+    [/absent breath sounds|no air entry/i, "Absent breath sounds"],
+    [/clear chest|vesicular|bilateral equal air entry|normal breath sounds/i, "Normal vesicular"]
+  ], examPool);
+  if (bs) add("Breath sounds: " + bs, [["breathSounds", bs]]);
+
+  if (vent) {
+    const md = pick([
+      [/\bSIMV[- ]?PC\b/i, "SIMV-PC"], [/\bSIMV\b/i, "SIMV-VC"], [/\bPSV\b|pressure support/i, "PSV"],
+      [/\bCPAP\b/i, "CPAP"], [/\bAPRV\b/i, "APRV"],
+      [/\bPC(?:V)?\b|pressure control/i, "PC"], [/\bVC(?:V)?\b|volume control/i, "VC"]
+    ]);
+    if (md) add("Vent mode " + md, [["ventMode", md]]);
+    const S = (label, key, re, lo, hi) => {
+      const x = num(re);
+      if (x !== null && x >= lo && x <= hi) add(label + " " + x, [[key, String(x)]]);
+    };
+    S("VT", "setVT", /(?:\bVT|tidal volume)\s*[:=]?\s*(\d{3})\b/i, 150, 1000);
+    S("PEEP", "setPEEP", /\bpeep\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
+    S("Set RR", "ventRate", /\b(?:set\s*)?RR\s*[:=]?\s*(\d{1,2})\b/i, 6, 40);
+    S("Pplat", "plateauPressure", /(?:pplat|plateau(?: pressure)?)\s*[:=]?\s*(\d{1,2})/i, 5, 60);
+    S("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?|\bPIP\b)\s*[:=]?\s*(\d{1,2})/i, 5, 80);
+    S("Pressure support", "pressureSupport", /(?:\bPS|pressure support)\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
+    m = T.match(/\bI\s*:\s*E\s*[:=]?\s*(1\s*:\s*\d+(?:\.\d)?)/i);
+    if (m) add("I:E " + m[1].replace(/\s+/g, ""), [["ieRatio", m[1].replace(/\s+/g, "")]]);
+  }
+
+  let f2 = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
+  if (f2 > 0) {
+    if (f2 <= 1) f2 *= 100;
+    if (f2 >= 21 && f2 <= 100) add("FiO₂ " + f2 + "%", [["fio2Percent", String(f2)], ["investigations.abg.FiO2", String(f2)]]);
+  }
+
+  const abgSec = secVal("(?:abg|arterial\\s*blood\\s*gas)") || T;
+  const A = (label, key, re, lo, hi) => {
+    const x = num(re, abgSec) ?? num(re, T);
+    if (x !== null && x >= lo && x <= hi) add("ABG " + label + " " + x, [["investigations.abg." + key, String(x)]]);
+  };
+  A("pH", "pH", /\bpH\s*[:=]?\s*([67]\.\d{1,3})/i, 6.5, 7.9);
+  A("PaCO₂", "PaCO2", /(?:^|[^a-z])(?:paco2|pco2|paco₂|pco₂)\s*[:=]?\s*(\d{1,3}(?:\.\d)?)/i, 10, 150);
+  A("HCO₃⁻", "HCO3", /(?:hco3-?|bicarb(?:onate)?)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 3, 60);
+  A("PaO₂", "PaO2", /(?:^|[^a-z])(?:pao2|po2|pao₂|po₂)\s*[:=]?\s*(\d{2,3}(?:\.\d)?)/i, 20, 600);
+  A("Lactate", "Lactate", /(?:lactate|lac)\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i, 0.1, 30);
+  A("Cl⁻", "Cl", /\bcl-?\s*[:=]?\s*(\d{2,3})\b/i, 70, 140);
+  let abgFi = num(/fio2\s*[:=]?\s*(\d+(?:\.\d+)?)/i, abgSec);
+  if (abgFi > 0) {
+    if (abgFi <= 1) abgFi *= 100;
+    if (abgFi >= 21 && abgFi <= 100) add("ABG FiO₂ " + abgFi + "%", [["investigations.abg.FiO2", String(abgFi)]]);
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const cleanedLabs = T.replace(/\d+(?:\.\d+)?\s*(?:mg|g|mcg|µg|ug|ml|units?|iu)\b(?!\/\s*d?l\b)/gi, " ");
+  for (const [name, pat] of Object.entries(LABPAT)) {
+    const mm = cleanedLabs.match(new RegExp("(?:^|[^a-z])(?:" + pat + ")(?:\\s*[:=]?\\s*)(\\d+(?:\\.\\d+)?)", "i"));
+    if (!mm) continue;
+    let x = parseFloat(mm[1]), note = "";
+    const cv = LCONV[name] && LCONV[name](x);
+    if (cv) { x = Math.round(cv[0] * 100) / 100; note = " (" + cv[1] + ")"; }
+    const value = x;
+    add(`${name} ${x}${note}`, [], (p, over) => {
+      const r = p.investigations.laboratory.find(q => q.name === name);
+      if (r && (over || String(r.result).trim() === "")) {
+        r.result = String(value);
+        if (!r.date) r.date = today;
+      }
+      if (name === "Na" && (over || !p.investigations.abg.Na)) p.investigations.abg.Na = String(value);
+      if (name === "WBC") {
+        if (value > 11) setp(p, "sepsisM.WBC high", true);
+        else if (value < 4.5) setp(p, "sepsisM.WBC low", true);
+      }
+      if (name === "CRP" && value > 5) {
+        setp(p, "sepsisM.CRP elevated", true);
+        setp(p, "sepsisMarkerValues.1", String(value));
+      }
+    });
+  }
+
+  const lacVal = num(/lactate\s*[:=]?\s*(\d{1,2}(?:\.\d)?)/i);
+  if (lacVal !== null && lacVal > 2) {
+    add("Sepsis marker: Lactate elevated (" + lacVal + ")", [["sepsisM.Lactate elevated", true], ["sepsisMarkerValues.2", String(lacVal)]]);
+  }
+
+  v = num(/(?:pct|procalcitonin)\s*[:=]?\s*(\d+(?:\.\d+)?)/i);
+  if (v > 0) add("Procalcitonin " + v, [["sepsisM.Procalcitonin elevated", true], ["sepsisMarkerValues.0", String(v)]]);
+
+  m = T.match(/E\s*([1-4])\s*[,\/ ]?\s*V\s*([1-5])\s*[,\/ ]?\s*M\s*([1-6])/i);
+  if (m) add(`GCS E${m[1]} V${m[2]} M${m[3]}`, [["scores.gcsE", m[1]], ["scores.gcsV", m[2]], ["scores.gcsM", m[3]]]);
+  else {
+    v = num(/GCS\s*[:=\/]?\s*(\d{1,2})\b/i);
+    if (v >= 3 && v <= 15) add("GCS " + v + " (total only)", [["cns", "GCS " + v]]);
+  }
+  v = num(/RASS\s*[:=]?\s*([+-]?\d)/i);
+  if (v !== null && v >= -5 && v <= 4) add("RASS " + v, [["scores.rass", String(v)]]);
+
+  const sed = [
+    [/propofol/i, "Propofol"], [/midazolam/i, "Midazolam"],
+    [/dexmedetomidine|precedex/i, "Dexmedetomidine"], [/ketamine/i, "Ketamine"]
+  ].filter(([r]) => r.test(T)).map(x => x[1]);
+  if (sed.length) add("Sedation: " + sed.join(" + "), [["sedation", sed.length > 1 ? "Other / combination" : sed[0]]]);
+
+  const pu = /pupils?|perr?l/i.test(T) ? pick([
+    [/fixed.{0,15}dilated|dilated.{0,15}fixed/i, "Fixed and dilated"],
+    [/pinpoint/i, "Pinpoint"], [/unequal|anisocoria/i, "Unequal"],
+    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l/i, "Equal and reactive"]
+  ]) : null;
+  if (pu) add("Pupils: " + pu, [["pupils", pu]]);
+
+  const sz = pick([
+    [/status epilepticus/i, "Status epilepticus"],
+    [/(?:no|nil|denies)\s+(?:\w+\s)?seizures?/i, "None"],
+    [/seizure/i, "Seizure in last 24 h"]
+  ]);
+  if (sz) add("Seizures: " + sz, [["seizures", sz]]);
+
+  const rad = (name, re) => {
+    const mm = T.match(re);
+    if (mm) add(`${name}: ${mm[1].slice(0, 60)}`, [], (p, over) => {
+      let r = p.investigations.radiology.find(q => q.name.toLowerCase() === name.toLowerCase());
+      if (!r) { r = { name, date: today, result: "" }; p.investigations.radiology.push(r); }
+      if (over || !r.result) { r.result = mm[1].trim(); if (!r.date) r.date = today; }
+    });
+  };
+  rad("CT brain", /ct\s*(?:brain|head)\s*[:\-]\s*([^\n]+)/i);
+  rad("CT chest", /ct\s*(?:chest|thorax)\s*[:\-]\s*([^\n]+)/i);
+  rad("Echo", /echo(?:cardiogram)?\s*[:\-]\s*([^\n]+)/i);
+  rad("U/S", /(?:u\/s|ultrasound|usg)\s*[:\-]\s*([^\n]+)/i);
+  rad("CXR", /(?:cxr|chest x-?ray)\s*[:\-]\s*([^\n]+)/i);
+
+  v = num(/\b(?:lv)?ef\s*[:=]?\s*(\d{2})\s*%/i);
+  if (v >= 5 && v <= 80) add("LVEF " + v + "%", [["cardio.echo.ef", String(v)], ["cardio.echo.enabled", true]]);
+
+  const abdomen = pick([
+    [/rigid/i, "Rigid"], [/guarding|rebound/i, "Guarding / rebound"],
+    [/^(?![\s\S]*non[- ]tender)[\s\S]*\btender/i, "Tender"],
+    [/distend|distension/i, "Distended"], [/soft and lax|soft abdomen/i, "Soft and lax"]
+  ], examPool);
+  if (abdomen) add("Abdomen: " + abdomen, [["palpation", abdomen]]);
+
+  const ext = pick([
+    [/anasarca|generalized edema/i, "Generalized (anasarca)"],
+    [/severe edema/i, "Severe pitting"], [/moderate edema/i, "Moderate pitting"],
+    [/mild edema|pedal edema/i, "Mild pitting"], [/no edema|without edema/i, "None"]
+  ], examPool);
+  if (ext) add("Edema: " + ext, [["edema", ext]]);
+
+  const abxSec = secVal("(?:antibiotics?|antimicrobials?|\\babx\\b)");
+  const abxPool = abxSec || T;
+  const extractAbxDate = (snippet) => {
+    const dt = normDate(snippet);
+    if (dt) return dt;
+    const dayRel = snippet.match(/\b(?:day|d)\s*(\d{1,2})\b/i) || snippet.match(/\bfor\s+(\d{1,2})\s*(?:days?|d)\b/i);
+    if (dayRel) {
+      const dNum = Math.max(1, parseInt(dayRel[1], 10));
+      const dObj = new Date(Date.now() - (dNum - 1) * 86400000);
+      return dObj.toISOString().slice(0, 10);
+    }
+    return today;
+  };
+
+  for (const [re, drug] of ABXL) {
+    const am = abxPool.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n;]*)", "i"));
+    if (!am) continue;
+    const tail = am[1] || "";
+    const dm = tail.match(/\b(\d+(?:\.\d+)?\s*(?:g|mg|mcg|units?|iu))\b/i);
+    const rm = tail.match(/\b(IV|PO|IM|SC|inhaled)\b/i);
+    const fm = tail.match(/\b(q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|stat)\b/i);
+    const startDate = extractAbxDate(tail) || extractAbxDate(am[0]);
+    const dose = dm ? dm[1] : "", route = rm ? rm[1].toUpperCase() : "", frequency = fm ? fm[1] : "";
+    add(`Antibiotic: ${drug}${dose ? " " + dose : ""}${startDate ? " (start " + startDate + ")" : ""}`, [], (p, over) => {
+      const existing = p.abx.find(x => (x.drug || "").toLowerCase() === drug.toLowerCase());
+      if (!existing) {
+        p.abx.push({ drug, dose, route, frequency, date: startDate, indication: "", note: "", editing: false });
+      } else if (over && startDate) {
+        existing.date = startDate;
+      }
+    });
+  }
+
+  for (const [re, drug] of ACL) if (new RegExp(re, "i").test(T)) add("Anticoagulant: " + drug, [], p => {
+    p.acType = "Pharmacological";
+    if (!p.anticoag.some(x => x.drug === drug)) {
+      p.anticoag.push({ drug, dose: "", route: "", frequency: "", date: today, indication: "", editing: false });
+    }
+  });
+
+  for (const [re, drug] of PRL) {
+    const pm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n.;,]*)", "i"));
+    if (!pm) continue;
+    const tail = pm[1] || "";
+    const dm = tail.match(/(\d+(?:\.\d+)?)\s*(mcg\/kg\/min|mcg\/min|mg\/hr|mcg\/hr|units\/min|units\/hr)?/i);
+    const dose = dm ? dm[1] : "";
+    const unit = dm && dm[2] ? dm[2].toLowerCase() : "mcg/kg/min";
+    add(`Vasoactive: ${drug}${dose ? " " + dose + " " + unit : ""}`, [], p => {
+      if (!p.cardio.vasoactive.some(x => x.drug === drug)) {
+        p.cardio.vasoactive.push({ drug, dose, unit, trend: "Stable", targetMap: "", response: "" });
+      }
+    });
+  }
+
+  for (const [re, type] of LNL) if (re.test(T)) add("Line / tube: " + type, [], p => {
+    if (!p.lines.some(x => x.type === type)) {
+      p.lines.push({ type, site: "", size: "", date: today, time: "", note: "", editing: false });
+    }
+  });
+
+  const cxSec = secVal("(?:cultures?|microbiology)");
+  const cxPool = cxSec ? (cxSec + "\n" + T) : T;
+  for (const [re, type] of SPEC) {
+    const sm = cxPool.match(new RegExp("(?:^|[^a-z])(" + re.source + ")\\s*[:\\-]?\\s*([^\\n;]*)", "i"));
+    if (!sm) continue;
+    const tail = (sm[2] || "").trim();
+    const om = tail.match(ORGX);
+    let organism = om ? om[1].trim() : "";
+    if (!organism && tail && !/^(?:pending|no growth|negative|sterile|sent|ordered|awaiting)/i.test(tail)) {
+      organism = tail.split(/[,|(]/)[0].trim().slice(0, 60);
+    }
+    const status = organism ? "Growth" : /no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending";
+    const cxDate = normDate(tail) || today;
+    const suscMatch = tail.match(/(?:sens(?:itive)?|susc(?:eptible)?|s)\s*[:\-]\s*([^;\n]+)/i);
+    const susceptible = suscMatch ? suscMatch[1].trim().slice(0, 80) : "";
+    add(`Culture: ${type}${organism ? " (" + organism + ")" : " [" + status + "]"}`, [], (p, over) => {
+      const ex = p.cultures.find(x => x.type === type);
+      if (!ex) {
+        p.cultures.push({ type, date: cxDate, status, organism, susceptible, editing: false });
+      } else if (over) {
+        if (organism) ex.organism = organism;
+        ex.status = status;
+        if (cxDate) ex.date = cxDate;
+        if (susceptible) ex.susceptible = susceptible;
+      }
+    });
+  }
+
+  const planFull = secVal("(?:daily\\s*plans?|plans?|recommendations?|management)");
+  if (planFull) {
+    const rawItems = planFull
+      .split(/\n+|(?<=\.)\s+(?=[A-Z0-9•\-*])|;\s+/)
+      .map(x => x.replace(/^[-*•\d.)\s]+/, "").trim())
+      .filter(Boolean)
+      .slice(0, 20);
+    if (rawItems.length) {
+      add(`Daily plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
+        rawItems.forEach(text => {
+          if (!p.plans.some(x => x.text.toLowerCase() === text.toLowerCase())) {
+            p.plans.push({ text, done: false });
+          }
+        });
+      });
+    }
+  }
+
+  return I;
+}
+
+/* ---------- Patient data, rendering & interactive actions ---------- */
+function blankPatient(bed) {
+  return {
+    bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", pastMedicalHistory: "", presentIllness: "", events: "",
+    sedation: "", pupils: "", seizures: "", cns: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "",
+    ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "", pressureSupport: "",
+    peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "", ieRatio: "", temp: "", sepsisTime: "",
+    sepsisMarker: "", sepsisValue: "", infection: "", acType: "", acMech: "", other: "", weight: "", duration: "",
+    fluidIn: "", fluidOut: "", plan: "", renal: "", labs: "", palpation: "", bowelSounds: "", feeding: "", stool: "",
+    rbs: "", abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "", skin: "", extNotes: "",
+    checks: {}, scores: {}, sepsisM: {}, sepsisMarkerValues: {}, wean: {}, calc: { inputs: {} },
+    investigations: {
+      laboratory: LAB.map(([name, unit]) => ({ name, date: "", result: "", unit, trend: "", lastResult: "", last2: "", last3: "" })),
+      radiology: RAD.map(name => ({ name, date: "", result: "" })),
+      abg: {}
+    },
+    cardio: { vitals: { targetMap: "65" }, vasoactive: [], ecg: [], biomarkers: [], echo: { enabled: false } },
+    lines: [], abx: [], anticoag: [], cultures: [], meds: [], plans: [], scoreList: [], trend: [], history: []
+  };
+}
+
+function renderList() {
+  const el = $("list");
+  if (!el) return;
+  el.innerHTML = data.length
+    ? data.map((p, i) => `<div class="pt"><button class="g" style="flex:1;text-align:left" onclick="openPatient(${i})">${esc(p.bed || "Bed")}${i === active ? " ✓" : ""}</button></div>`).join("")
+    : '<p class="small">No patients yet. Enter a non-identifying bed label and tap Add patient.</p>';
+}
+
+function renderOutputs() {
+  const p = P();
+  if (!p) return;
+  ensure(p);
+  const put = (id, html) => { const e = $(id); if (e) e.innerHTML = html; };
+
+  put("gcsOut", gcsHTML(p));
+  put("ctBrain", ctBox(p, /ct\s*brain/i, "Last CT brain"));
+  put("ctChest", ctBox(p, /ct\s*chest/i, "Last CT chest"));
+  put("invEcho", ctBox(p, /echo/i, "Last Echo (from Investigations)"));
+  put("abgOut", abgCalc(p));
+  put("ventOut", ventCalc(p));
+  put("cvOut", (() => {
+    const k = cardioCalc(p.cardio.vitals);
+    return `<b>Calculated hemodynamics</b><div class="r">MAP: <b>${k.map === null ? "—" : k.map.toFixed(1) + " mmHg"}</b> · Pulse pressure: <b>${k.pp === null ? "—" : k.pp.toFixed(0) + " mmHg"}</b> · Shock index: <b>${k.si === null ? "—" : k.si.toFixed(2)}</b></div>${k.al.map(x => `<div class="r a">⚠ ${esc(x)}</div>`).join("")}`;
+  })());
+  put("cvRec", recList(cvRecs(p)));
+  put("infRec", recList(infRecs(p)));
+  put("rbsOut", esc(rbsTxt(p)));
+  put("fluidOut2", (() => {
+    const w = parseFloat(p.weight), h = parseFloat(p.duration), out = parseFloat(p.fluidOut), inn = parseFloat(p.fluidIn);
+    const rate = w > 0 && h > 0 && out >= 0 ? out / (w * h) : null;
+    const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
+    return `<div class="r">Fluid balance: <b>${bal === null ? "—" : (bal > 0 ? "+" : "") + bal.toFixed(0) + " mL"}</b></div><div class="r">Urine output rate: <b>${rate === null ? "—" : rate.toFixed(2) + " mL/kg/h"}</b>${rate !== null && rate < 0.5 ? " · <span class='hi'>Below 0.5 mL/kg/h</span>" : ""}</div>`;
+  })());
+  put("scoreOut", scoreHTML(p));
+  put("recScores", recList(recScores(p).map(x => x[0] + ": " + x[1])));
+  put("wnOut", wnHTML(p));
+  put("calcOut", calcHTML(p));
+  put("medOut", medHTML(p));
+
+  const tsel = $("trSel");
+  if (tsel) {
+    if (!window._tr) window._tr = tsel.value;
+    put("trOut", trendHTML(p, tsel.value || window._tr));
+  }
+
+  p.investigations.laboratory.forEach((it, i) => {
+    const e = $("lf" + i);
+    if (e) {
+      const f = labFlag(it, p);
+      e.textContent = f[0];
+      e.className = "fl " + f[1];
+      e.title = f[2];
+    }
+  });
+
+  (p.scoreList || []).forEach((it, i) => {
+    const d = SD[it.name];
+    const st = $("st" + i), si = $("si" + i), sa = $("sa" + i);
+    let val = scoreVal(p, it);
+    if (d && d.c) {
+      const state = scoreState(p, it);
+      val = state.val;
+      if (st) st.textContent = val !== null && val !== "" ? val : "—";
+      if (sa) sa.textContent = `(${state.n}/${d.c.length} components)`;
+    }
+    if (si && d && d.i && val !== null && String(val).trim() !== "") {
+      const msg = d.i(val);
+      si.textContent = msg;
+      si.hidden = !msg;
+    } else if (si) {
+      si.hidden = true;
+    }
+  });
+}
+
+function draw() {
+  if (active === null || !P()) {
+    $("rec").hidden = true;
+    if (activeCardId) closeCardModal();
+    return;
+  }
+  const p = P();
+  ensure(p);
+  $("rec").hidden = false;
+  $("heading").textContent = p.bed || "Patient";
+  const d = dayN(p.admissionDate);
+  const subParts = [
+    p.age && `${p.age}y`,
+    p.ventSex,
+    d > 0 && `ICU Day ${d}`,
+    p.diagnosis && p.diagnosis.slice(0, 60)
+  ].filter(Boolean);
+  $("bedSub").textContent = subParts.join(" · ") || "Open any card below to view or edit clinical details";
+  $("jumpSel").innerHTML = data.map((q, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(q.bed || "Bed " + (i + 1))}</option>`).join("");
+
+  renderSlider();
+  if (activeCardId) {
+    renderModalContent();
+  }
+}
+
+function openPatient(i) {
+  if (!Number.isInteger(i) || i < 0 || i >= data.length) return;
+  if (active !== i && activeCardId) closeCardModal();
+  active = i;
+  draw();
+  renderList();
+  persist();
+}
+
+function addPatient() {
+  const input = $("bed"), bed = input.value.trim();
+  if (!bed) { alert("Enter a non-identifying bed label, such as Bed 01."); input.focus(); return; }
+  if (data.some(p => String(p.bed).toLowerCase() === bed.toLowerCase())) { alert("That bed label already exists."); return; }
+  const p = blankPatient(bed);
+  ensure(p);
+  data.push(p);
+  active = data.length - 1;
+  input.value = "";
+  persist();
+  draw();
+  renderList();
+}
+
+function delPatient() {
+  if (active === null || !P()) return;
+  if (!confirm("Delete " + P().bed + "? You can restore it from Recently deleted.")) return;
+  const p = data[active];
+  toTrash({ kind: "patient", bed: p.bed, item: p });
+  data.splice(active, 1);
+  active = data.length ? Math.min(active, data.length - 1) : null;
+  if (activeCardId) closeCardModal();
+  persist();
+  renderList();
+  draw();
+}
+
+/* ---------- Refined SBAR Handout ---------- */
+function sbarText(p) {
+  ensure(p);
+  const c = p.cardio, v = c.vitals, k = cardioCalc(v), pf = pfOf(p), g = scoreCalc(p), s = p.scores || {};
+  const inn = parseFloat(p.fluidIn), out = parseFloat(p.fluidOut), w = parseFloat(p.weight), dur = parseFloat(p.duration);
+  const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
+  const uop = w > 0 && dur > 0 && out >= 0 ? out / (w * dur) : null;
+  const icuDay = dayN(p.admissionDate);
+
+  const demo = [
+    p.age && `${p.age}y`,
+    p.ventSex,
+    icuDay > 0 ? `ICU Day ${icuDay} (Adm ${p.admissionDate})` : (p.admissionDate && `Adm ${p.admissionDate}`),
+    p.weight && `${p.weight} kg`
+  ].filter(Boolean).join(" · ");
+
+  const abnLabs = p.investigations.laboratory
+    .map(it => {
+      const f = labFlag(it, p);
+      if (f[1] === "hi" || f[1] === "lo") return `${it.name} ${it.result}${f[1] === "hi" ? "↑" : "↓"}`;
+      if (String(it.result).trim() !== "" && ["creat", "urea", "na", "k", "hb", "plts", "wbc", "crp", "inr"].includes(it.name.trim().toLowerCase())) {
+        return `${it.name} ${it.result}`;
+      }
+      return "";
+    })
+    .filter(Boolean);
+
+  const a = p.investigations.abg;
+  const abgParts = [
+    a.pH && `pH ${a.pH}`,
+    a.PaCO2 && `PaCO₂ ${a.PaCO2}`,
+    a.HCO3 && `HCO₃⁻ ${a.HCO3}`,
+    a.PaO2 && `PaO₂ ${a.PaO2}`,
+    a.Lactate && `Lac ${a.Lactate}`
+  ].filter(Boolean);
+
+  const activePressors = c.vasoactive
+    .filter(x => x.trend !== "Stopped" && x.drug)
+    .map(x => `${x.drug}${x.dose ? " " + x.dose + " " + (x.unit || "") : ""}${x.trend ? " (" + x.trend.toLowerCase() + ")" : ""}`);
+
+  const activeAbx = p.abx
+    .filter(x => x.drug)
+    .map(x => {
+      const d = dayN(x.date);
+      return `${x.drug}${x.dose ? " " + x.dose : ""}${x.frequency ? " " + x.frequency : ""}${d ? " [D" + d + "]" : ""}`;
+    });
+
+  const posCultures = p.cultures
+    .filter(x => x.organism || x.status === "Pending")
+    .map(x => `${x.type || "Culture"}: ${x.organism || x.status}${x.susceptible ? " (S: " + x.susceptible + ")" : ""}`);
+
+  const lineList = p.lines
+    .filter(x => x.type)
+    .map(x => {
+      const d = dayN(x.date);
+      return `${x.type}${x.site ? " (" + x.site + ")" : ""}${d ? " D" + d : ""}`;
+    });
+
+  const cnsLine = [
+    g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,
+    s.rass && `RASS ${s.rass}`,
+    p.sedation && p.sedation !== "None" && `Sedation: ${p.sedation}`,
+    p.pupils && `Pupils: ${p.pupils}`,
+    p.seizures && p.seizures !== "None" && p.seizures,
+    p.cns
+  ].filter(Boolean).join(" | ");
+
+  const cvLine = [
+    (v.sbp || v.dbp) && `BP ${v.sbp || "?"}/${v.dbp || "?"}`,
+    k.map !== null && `MAP ${k.map.toFixed(0)} (target ${v.targetMap || 65})`,
+    v.hr && `HR ${v.hr}`,
+    v.rhythm,
+    v.cvp && `CVP ${v.cvp}`,
+    k.si !== null && k.si >= 0.9 && `SI ${k.si.toFixed(2)}`,
+    activePressors.length && `Infusions: ${activePressors.join(", ")}`
+  ].filter(Boolean).join(" | ");
+
+  const respLine = [
+    p.respSupport,
+    p.spo2 && `SpO₂ ${p.spo2}%`,
+    p.breathSounds,
+    p.ventMode && `Mode ${p.ventMode}`,
+    p.setVT && `VT ${p.setVT} mL`,
+    p.ventRate && `RR ${p.ventRate}`,
+    p.setPEEP && `PEEP ${p.setPEEP}`,
+    p.fio2Percent && `FiO₂ ${p.fio2Percent}%`,
+    pf !== null && `P/F ${pf.toFixed(0)}`,
+    p.resp
+  ].filter(Boolean).join(" | ");
+
+  const renalLine = [
+    bal !== null && `Net balance ${bal > 0 ? "+" : ""}${bal.toFixed(0)} mL (In ${inn} / Out ${out})`,
+    uop !== null && `UO ${uop.toFixed(2)} mL/kg/h`,
+    p.feeding && `Feed: ${p.feeding}`,
+    p.rbs && `RBS ${p.rbs}`,
+    p.renal
+  ].filter(Boolean).join(" | ");
+
+  const infLine = [
+    p.temp && `Temp ${p.temp}°C`,
+    mkList(p).length && `Markers: ${mkList(p).join(", ")}`,
+    activeAbx.length && `Abx: ${activeAbx.join("; ")}`,
+    posCultures.length && `Micro: ${posCultures.join("; ")}`,
+    p.infection
+  ].filter(Boolean).join(" | ");
+
+  const vteLine = p.acType === "Pharmacological"
+    ? `VTE: ${p.anticoag.map(x => [x.drug, x.dose, x.frequency].filter(Boolean).join(" ")).join("; ") || "Pharmacological"}`
+    : p.acType === "Mechanical" ? `VTE: Mechanical (${p.acMech || "unspecified"})`
+    : p.acType === "None" ? "VTE: None" : "";
+
+  const openPlans = (p.plans || []).filter(x => x.text && !x.done).map(x => `• [ ] ${x.text}`);
+  const donePlans = (p.plans || []).filter(x => x.text && x.done).map(x => `• [x] ${x.text}`);
+  const tk = CHK.filter(([q]) => (p.checks || {})[q]).length;
+
+  const outLines = [
+    `════════════════════════════════════════`,
+    `ICU HANDOVER — ${p.bed || "BED"}${demo ? " (" + demo + ")" : ""}`,
+    `Generated: ${new Date().toLocaleString()}`,
+    `════════════════════════════════════════`,
+    ``,
+    `S — SITUATION`,
+    `• Diagnosis: ${p.diagnosis || "Not entered"}`,
+    p.events ? `• 24h Events: ${p.events}` : "",
+    g.n > 0 ? `• SOFA: ${g.total}${g.n < 6 ? " (" + g.n + "/6 scored)" : ""}` : "",
+    ``,
+    `B — BACKGROUND`,
+    p.pastMedicalHistory ? `• PMH: ${p.pastMedicalHistory}` : "",
+    p.presentIllness ? `• HPI: ${p.presentIllness}` : "",
+    (!p.pastMedicalHistory && !p.presentIllness) ? `• No background entered` : "",
+    ``,
+    `A — ASSESSMENT`,
+    cnsLine ? `• CNS: ${cnsLine}` : "",
+    cvLine ? `• CVS: ${cvLine}` : "",
+    respLine ? `• Resp: ${respLine}` : "",
+    renalLine ? `• Renal/Fluid: ${renalLine}` : "",
+    infLine ? `• Infection: ${infLine}` : "",
+    abgParts.length ? `• ABG: ${abgParts.join(" · ")}` : "",
+    abnLabs.length ? `• Key Labs: ${abnLabs.join(", ")}` : "",
+    (lineList.length || vteLine) ? `• Lines & VTE: ${[lineList.join(", "), vteLine].filter(Boolean).join(" | ")}` : "",
+    ``,
+    `R — RECOMMENDATION / PLAN`,
+    p.plan ? `• Notes: ${p.plan}` : "",
+    ...openPlans,
+    ...donePlans,
+    (!p.plan && !openPlans.length && !donePlans.length) ? `• No active plan items entered` : "",
+    `• Daily Checklist: ${tk}/${CHK.length} completed`,
+    ``,
+    `Verify all values against the bedside chart.`
+  ];
+
+  return outLines.filter((x, i, arr) => x !== "" && !(x === "" && arr[i - 1] === "")).join("\n");
+}
+
+function makeSBAR() { if (!P()) return; $("sbar").value = sbarText(P()); persist(); }
+function copySBAR() { const t = $("sbar") ? $("sbar").value : (P() ? sbarText(P()) : ""); copyText(t); }
+function copyText(t) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(t).then(() => alert("Copied."), () => shareTxt(t));
+  } else {
+    const a = document.createElement("textarea");
+    a.value = t;
+    document.body.appendChild(a);
+    a.select();
+    try { document.execCommand("copy"); alert("Copied."); } catch (e) { alert("Copy unavailable. Use Share."); }
+    a.remove();
+  }
+}
+
+function showSheet() {
+  if (!data.length) { alert("No patients added yet."); return; }
+  $("sheetTxt").textContent = data.map(sbarText).join("\n\n");
+  $("sheet").hidden = false;
+  $("sheet").scrollIntoView({ behavior: "smooth" });
+}
+function copySheet() { copyText($("sheetTxt").textContent); }
+
+/* ---------- Import Preview & Auto-Import ---------- */
+let _impItems = null, _impAsNew = 0;
+
+function importPreview(asNew) {
+  const txt = $("caseTxt").value.trim();
+  if (!txt) { alert("Paste or dictate case text first."); return; }
+  if (!asNew && (active === null || !P())) { alert("Open a patient first, or choose 'as new bed'."); return; }
+  _impItems = parseCase(txt);
+  _impAsNew = asNew;
+  const out = $("importOut");
+  if (!_impItems.length) {
+    out.innerHTML = `<div class="al">No structured fields detected. Try including labels like Age, Sex, Diagnosis, BP, HR, Labs, ABG, Antibiotics, or Plan.</div>`;
+    return;
+  }
+  out.innerHTML = `<div class="out"><b>Detected ${_impItems.length} item(s):</b>${_impItems.map((it, idx) => `<label class="chk"><input type="checkbox" id="imp_chk_${idx}" checked><span>${esc(it.label)}</span></label>`).join("")}<label class="chk"><input type="checkbox" id="imp_over"><span>Overwrite existing non-empty fields</span></label><button onclick="applyImportPreview()">Apply selected</button></div>`;
+}
+
+function applyImportPreview() {
+  if (!_impItems) return;
+  const over = !!($("imp_over") && $("imp_over").checked);
+  let target;
+  if (_impAsNew) {
+    const bedLabel = _impItems.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
+    let uniqueBed = bedLabel, n = 2;
+    while (data.some(x => String(x.bed).toLowerCase() === uniqueBed.toLowerCase())) {
+      uniqueBed = `${bedLabel} (${n++})`;
+    }
+    target = blankPatient(uniqueBed);
+    ensure(target);
+    data.push(target);
+    active = data.length - 1;
+  } else {
+    target = P();
+    if (!target) return;
+    ensure(target);
+  }
+
+  _impItems.forEach((it, idx) => {
+    const cb = $("imp_chk_" + idx);
+    if (cb && !cb.checked) return;
+    (it.fields || []).forEach(([path, val]) => {
+      if (_impAsNew && path === "bed") return;
+      const cur = getp(target, path);
+      if (over || cur === undefined || cur === null || String(cur).trim() === "" || cur === false) {
+        setp(target, path, val);
+      }
+    });
+    if (typeof it.apply === "function") it.apply(target, over);
+  });
+
+  persist();
+  renderList();
+  draw();
+  $("importOut").innerHTML = `<div class="r">✓ Imported into <b>${esc(target.bed)}</b>.</div>`;
+}
+
+function autoImportCase(asNew) {
+  const txt = $("caseTxt").value.trim();
+  if (!txt) { alert("Paste or dictate case text first."); return; }
+  if (!asNew && (active === null || !P())) { alert("Open a patient first, or choose 'Auto-import as new bed'."); return; }
+  _impItems = parseCase(txt);
+  _impAsNew = asNew;
+  if (!_impItems.length) {
+    $("importOut").innerHTML = `<div class="al">No structured fields detected.</div>`;
+    return;
+  }
+  applyImportPreview();
+}
+
+/* ---------- Backup Export / Import / Update ---------- */
+function exportOne() {
+  if (!P()) return;
+  dlJson(P(), (P().bed || "patient") + ".json");
+}
+function exportAll() {
+  dlJson(data, "icu-rounds-backup-" + new Date().toISOString().slice(0, 10) + ".json");
+}
+function dlJson(obj, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+$("imp").addEventListener("change", function(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const parsed = JSON.parse(r.result);
+      const arr = Array.isArray(parsed) ? parsed : [parsed];
+      let added = 0;
+      arr.forEach(item => {
+        if (item && typeof item === "object" && !Array.isArray(item)) {
+          ensure(item);
+          data.push(item);
+          added++;
+        }
+      });
+      if (added) {
+        active = data.length - 1;
+        persist();
+        renderList();
+        draw();
+        alert(`Imported ${added} patient(s).`);
+      } else {
+        alert("No valid patient records found in file.");
+      }
+    } catch (err) {
+      alert("Could not parse JSON backup file.");
+    }
+    e.target.value = "";
+  };
+  r.readAsText(f);
+});
+
+function forceUpdate() {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => Promise.all(regs.map(r => r.unregister()))).finally(() => location.reload());
+  } else {
+    location.reload();
+  }
+}
+
+/* ---------- Delegated Event Listeners inside Floating Card ---------- */
+$("cards").addEventListener("input", e => {
+  const p = P();
+  if (!p) return;
+  const path = e.target.dataset.p;
+  if (!path) return;
+  const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  setp(p, path, val);
+  if (e.target.classList.contains("trend")) e.target.dataset.v = val;
+  persist();
+  renderOutputs();
+  renderSlider();
+});
+
+$("cards").addEventListener("change", e => {
+  const p = P();
+  if (!p) return;
+  if (e.target.id === "trSel") {
+    window._tr = e.target.value;
+    renderOutputs();
+    return;
+  }
+  const path = e.target.dataset.p;
+  if (!path) return;
+  const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  setp(p, path, val);
+  persist();
+  if (path === "calc.selected" || path.startsWith("sepsisM.") || path === "ventSex" || path === "admissionDate" || path === "diagnosis" || path.startsWith("plans.")) {
+    renderModalContent();
+    draw();
+  } else {
+    renderOutputs();
+    renderSlider();
+  }
+});
+
+$("cards").addEventListener("click", e => {
+  const btn = e.target.closest("[data-a]");
+  if (!btn || !P()) return;
+  const p = P();
+  const [act, a1, a2] = btn.dataset.a.split(":");
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (act === "add") {
+    const sel = $("sel_" + a1);
+    const chosen = sel ? sel.value : "";
+    if (sel && !chosen) { alert("Select an option first."); return; }
+    const arr = ARR(p, a1);
+    if (a1 === "vasoactive") arr.push({ drug: chosen, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", response: "" });
+    else if (a1 === "anticoag") arr.push({ drug: chosen, dose: "", route: "", frequency: "", date: today, indication: "", editing: true });
+    else if (a1 === "abx") arr.push({ drug: "", dose: "", route: "", frequency: "", date: today, indication: "", note: "", editing: true });
+    else if (a1 === "lines") arr.push({ type: "", site: "", size: "", date: today, time: "", note: "", editing: true });
+    else if (a1 === "cultures") arr.push({ type: "", date: today, status: "Pending", organism: "", susceptible: "", editing: true });
+    else if (a1 === "ecg") arr.push({ date: today, time: "", rate: "", pr: "", qrs: "", qtc: "", stt: "", interpretation: "" });
+    else if (a1 === "biomarkers") arr.push({ test: "", date: today, time: "", result: "", unit: "", reference: "", trend: "" });
+    if (sel) sel.value = "";
+  } else if (act === "del") {
+    const idx = parseInt(a2, 10);
+    const arr = ARR(p, a1);
+    if (arr && arr[idx]) {
+      const removed = arr.splice(idx, 1)[0];
+      toTrash({ kind: "item", bed: p.bed, x: a1, item: removed });
+    }
+  } else if (act === "entryedit") {
+    const idx = parseInt(a2, 10);
+    const arr = ARR(p, a1);
+    if (arr && arr[idx]) arr[idx].editing = !arr[idx].editing;
+  } else if (act === "addmed") {
+    p.meds.push({ drug: "", dose: "", route: "", frequency: "", date: today, indication: "", editing: true });
+  } else if (act === "mededit") {
+    const idx = parseInt(a1, 10);
+    if (p.meds[idx]) p.meds[idx].editing = !p.meds[idx].editing;
+  } else if (act === "ac") {
+    p.acType = p.acType === a1 ? "" : a1;
+  } else if (act === "echo") {
+    p.cardio.echo.enabled = (a1 === "on");
+  } else if (act === "addlab") {
+    const nm = prompt("Lab test name:");
+    if (nm && nm.trim()) {
+      const un = prompt("Unit (optional):") || "";
+      p.investigations.laboratory.push({ name: nm.trim(), date: today, result: "", unit: un.trim(), trend: "", lastResult: "", last2: "", last3: "" });
+    }
+  } else if (act === "addrad") {
+    const nm = prompt("Imaging study name (e.g. CXR, CT abdomen):");
+    if (nm && nm.trim()) {
+      p.investigations.radiology.push({ name: nm.trim(), date: today, result: "" });
+    }
+  } else if (act === "snap") {
+    p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
+    p.trend = p.trend.slice(-60);
+  } else if (act === "addscore") {
+    const sc = $("scoreSel").value;
+    if (!sc) { alert("Select a score first."); return; }
+    p.scoreList.push({ name: sc, value: "", note: "", comps: {} });
+  } else if (act === "autosc") {
+    const idx = parseInt(a1, 10);
+    const it = p.scoreList[idx];
+    if (it) {
+      it.comps = {};
+      it.manual = false;
+      const auto = autoScore(it.name, p);
+      if (auto !== null) it.value = String(auto);
+    }
+  } else if (act === "addplan") {
+    p.plans.push({ text: "", done: false });
+  } else if (act === "clearplans") {
+    if (p.plans.length && confirm("Remove all plan items?")) p.plans = [];
+  } else if (act === "tpl") {
+    const k = $("tplSel").value;
+    if (k && TPL[k]) {
+      TPL[k].forEach(text => {
+        if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
+      });
+    }
+  } else if (act === "resetchk") {
+    p.checks = {};
+  } else if (act === "prevsbar") {
+    if (!p.history || !p.history.length) {
+      alert("No archived SBARs yet. Start a New day to archive today's SBAR.");
+    } else {
+      const last = p.history[p.history.length - 1];
+      $("sbar").value = `--- Archived SBAR (${last.d}) ---\n\n` + last.sbar;
+    }
+    persist();
+    return;
+  }
+
+  persist();
+  renderModalContent();
+  draw();
+});
+
+/* ---------- Startup ---------- */
+renderList();
+renderTrash();
+if (data.length) {
+  openPatient(0);
+}
+</script>
+</body>
+</html>
