@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ICU Clinical Handover & SBAR Tracker</title>
+    <title>ICU Clinical Round & SBAR Tracker</title>
     <style>
         :root {
             --bg-app: #f1f5f9;
@@ -59,7 +59,7 @@
         }
 
         .topbar-inner {
-            max-width: 1280px;
+            max-width: 1320px;
             margin: 0 auto;
             display: flex;
             flex-wrap: wrap;
@@ -96,6 +96,33 @@
             align-items: center;
             gap: 0.5rem;
             flex-wrap: wrap;
+        }
+
+        /* Mode Switcher */
+        .mode-switch {
+            display: inline-flex;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.2rem;
+            gap: 0.2rem;
+        }
+
+        .mode-btn {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: #ffffff;
         }
 
         /* Buttons */
@@ -166,7 +193,7 @@
         }
 
         .bed-strip {
-            max-width: 1280px;
+            max-width: 1320px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -222,7 +249,7 @@
 
         /* Main Container & Grid */
         .container {
-            max-width: 1280px;
+            max-width: 1320px;
             margin: 1.25rem auto;
             padding: 0 1.25rem;
             display: grid;
@@ -710,13 +737,48 @@
             color: var(--text-muted);
         }
 
-        /* SBAR Live Preview Card */
+        /* ROUND CHECKLIST & ACTION ITEMS */
+        .round-checklist {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.9rem;
+        }
+
+        @media (min-width: 640px) {
+            .round-checklist {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.65rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-subtle);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .check-item input[type="checkbox"] {
+            accent-color: var(--primary);
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        /* Right Column: Live Round Sheet & SBAR */
         .sticky-preview {
             position: sticky;
             top: 4.5rem;
         }
 
-        .sbar-output {
+        .round-output {
             background: #0f172a;
             color: #e2e8f0;
             font-family: var(--font-mono);
@@ -725,7 +787,7 @@
             padding: 1.1rem;
             border-radius: var(--radius-md);
             white-space: pre-wrap;
-            max-height: 72vh;
+            max-height: 74vh;
             overflow-y: auto;
             border: 1px solid #1e293b;
         }
@@ -769,10 +831,14 @@
 <header class="topbar">
     <div class="topbar-inner">
         <div class="brand">
-            <span class="brand-badge">ICU SBAR</span>
-            <h1>Clinical Handover & Bedside Tracker</h1>
+            <span class="brand-badge">ICU ROUND</span>
+            <h1>Daily ICU Round & Bedside Sheet</h1>
         </div>
         <div class="top-actions">
+            <div class="mode-switch" title="Switch output view">
+                <button type="button" class="mode-btn active" id="modeRoundBtn" onclick="setOutputMode('round')">Round Note</button>
+                <button type="button" class="mode-btn" id="modeSbarBtn" onclick="setOutputMode('sbar')">SBAR</button>
+            </div>
             <button class="btn btn-secondary btn-sm" onclick="openParserModal()">Paste & Auto-Fill</button>
             <button class="btn btn-secondary btn-sm" onclick="addNewBed()">+ Add Bed</button>
             <button class="btn btn-danger-soft btn-sm" onclick="deleteCurrentBed()">Remove Bed</button>
@@ -787,12 +853,12 @@
 
 <!-- Main Workspace -->
 <main class="container">
-    <!-- Left Column: Clinical Entry -->
+    <!-- Left Column: Daily ICU Round Entry -->
     <div>
-        <!-- 1. Patient Identification & Admission -->
+        <!-- 1. Patient & Round Overview -->
         <section class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot"></span>Identification & Admission</div>
+                <div class="card-title"><span class="dot"></span>Patient & Daily Round Overview</div>
             </div>
             <div class="card-body">
                 <div class="form-grid">
@@ -826,20 +892,20 @@
             </div>
         </section>
 
-        <!-- 2. History & ICU Course -->
+        <!-- 2. Overnight Events & Interval Course -->
         <section class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot"></span>History of Illness & ICU Events</div>
+                <div class="card-title"><span class="dot"></span>Overnight Events & Interval Course</div>
             </div>
             <div class="card-body">
                 <div class="form-grid-2">
                     <div class="field">
                         <label>History of Present Illness</label>
-                        <textarea id="hpi" placeholder="Presenting symptoms & initial course..." oninput="updateField('hpi', this.value)"></textarea>
+                        <textarea id="hpi" placeholder="Presenting symptoms & admission summary..." oninput="updateField('hpi', this.value)"></textarea>
                     </div>
                     <div class="field">
-                        <label>Significant ICU Events</label>
-                        <textarea id="events" placeholder="Intubation, lines, procedures, cultures..." oninput="updateField('events', this.value)"></textarea>
+                        <label>Overnight / Interval Events</label>
+                        <textarea id="events" placeholder="Fever spikes, pressor changes, lines, procedures, cultures..." oninput="updateField('events', this.value)"></textarea>
                     </div>
                 </div>
             </div>
@@ -850,7 +916,7 @@
             <div class="card-header" style="background: transparent;">
                 <div class="card-title">
                     <span class="dot"></span>
-                    Examination & Vitals
+                    Bedside Examination & Vitals
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openExamDeck(0)">
                     Open Swipe Cards &rarr;
@@ -858,8 +924,8 @@
             </div>
             <div class="card-body">
                 <div class="field" style="margin-bottom: 0.85rem;" onclick="event.stopPropagation()">
-                    <label>Vital Signs & Hemodynamics</label>
-                    <input type="text" id="vitals" placeholder="BP, MAP, HR, RR, SpO2, Temp, Noradrenaline dose..." oninput="updateField('vitals', this.value)">
+                    <label>24h Vitals, Fluid Balance & Hemodynamics</label>
+                    <input type="text" id="vitals" placeholder="BP, MAP, HR, RR, SpO2, Temp, 24h I/O, UOP, Norad dose..." oninput="updateField('vitals', this.value)">
                 </div>
                 <div class="exam-summary-grid" id="examSummaryGrid">
                     <!-- Populated dynamically with CNS, CVS, Resp, Ventilator, Weaning, Abdomen, Extremities -->
@@ -870,17 +936,17 @@
         <!-- 4. Investigations (Radiology & Labs) -->
         <section class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot"></span>Radiology & Laboratory Investigations</div>
+                <div class="card-title"><span class="dot"></span>Today's Labs, ABG & Radiology</div>
             </div>
             <div class="card-body">
                 <div class="form-grid-2">
                     <div class="field">
                         <label>Radiology</label>
-                        <textarea id="radiology" placeholder="CXR, CT Brain/Chest, Echo, US..." oninput="updateField('radiology', this.value)"></textarea>
+                        <textarea id="radiology" placeholder="CXR, CT Brain/Chest, Echo, POCUS..." oninput="updateField('radiology', this.value)"></textarea>
                     </div>
                     <div class="field">
                         <label>Labs & ABG</label>
-                        <textarea id="labs" placeholder="CBC, RFT, LFT, Electrolytes, CRP/PCT, ABG..." oninput="updateField('labs', this.value)"></textarea>
+                        <textarea id="labs" placeholder="CBC, RFT, LFT, Electrolytes, CRP/PCT, Lactate, ABG..." oninput="updateField('labs', this.value)"></textarea>
                     </div>
                 </div>
             </div>
@@ -889,7 +955,7 @@
         <!-- 5. Medications (With Category Dropdown & Grouped Small-Font Display) -->
         <section class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot"></span>Medications (Grouped by Category)</div>
+                <div class="card-title"><span class="dot"></span>Active Medications (Grouped by Category)</div>
             </div>
             <div class="card-body">
                 <div class="med-builder">
@@ -936,31 +1002,39 @@
             </div>
         </section>
 
-        <!-- 6. Plan -->
+        <!-- 6. Daily ICU Round Plan & Bundle Checks -->
         <section class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot" style="background: var(--warning);"></span>Management Plan</div>
+                <div class="card-title"><span class="dot" style="background: var(--warning);"></span>Round Decisions, Bundle Checks & Plan</div>
             </div>
             <div class="card-body">
+                <div class="round-checklist" id="roundChecklist">
+                    <label class="check-item"><input type="checkbox" id="chk_sbt" onchange="updateCheck('sbt', this.checked)"> Spontaneous Awakening / SBT Assessed</label>
+                    <label class="check-item"><input type="checkbox" id="chk_dvt" onchange="updateCheck('dvt', this.checked)"> DVT Prophylaxis Reviewed</label>
+                    <label class="check-item"><input type="checkbox" id="chk_gi" onchange="updateCheck('gi', this.checked)"> Stress Ulcer / Nutrition Reviewed</label>
+                    <label class="check-item"><input type="checkbox" id="chk_abx" onchange="updateCheck('abx', this.checked)"> Antimicrobial Stewardship / Cultures</label>
+                    <label class="check-item"><input type="checkbox" id="chk_lines" onchange="updateCheck('lines', this.checked)"> Invasive Lines & Foley Necessity</label>
+                    <label class="check-item"><input type="checkbox" id="chk_fluid" onchange="updateCheck('fluid', this.checked)"> Fluid Target & Electrolytes Checked</label>
+                </div>
                 <div class="plan-box">
                     <div class="field">
-                        <label>Active ICU Plan & To-Do</label>
-                        <textarea id="plan" style="background: #ffffff; min-height: 90px;" placeholder="1. Wean sedation...&#10;2. Follow up blood cultures...&#10;3. Target negative fluid balance..." oninput="updateField('plan', this.value)"></textarea>
+                        <label>System-Based Round Plan & Orders</label>
+                        <textarea id="plan" style="background: #ffffff; min-height: 100px;" placeholder="1. Neuro/Sedation: ...&#10;2. Resp/Vent: ...&#10;3. CVS/Fluids: ...&#10;4. ID/Labs: ..." oninput="updateField('plan', this.value)"></textarea>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 
-    <!-- Right Column: Standardized SBAR Handover Summary -->
+    <!-- Right Column: Live ICU Round Note / SBAR -->
     <aside class="sticky-preview">
         <div class="card">
             <div class="card-header">
-                <div class="card-title"><span class="dot" style="background: var(--accent);"></span>Formatted SBAR Summary</div>
-                <button class="btn btn-accent btn-sm" onclick="copySBAR()">Copy Handover</button>
+                <div class="card-title"><span class="dot" style="background: var(--accent);"></span><span id="outputTitle">Daily ICU Round Note</span></div>
+                <button class="btn btn-accent btn-sm" onclick="copyOutput()">Copy Note</button>
             </div>
             <div class="card-body">
-                <div class="sbar-output" id="sbarPreview"></div>
+                <div class="round-output" id="roundPreview"></div>
             </div>
         </div>
     </aside>
@@ -972,7 +1046,7 @@
         <div class="deck-header">
             <div class="deck-top-row">
                 <div class="deck-title-group">
-                    <h2>Systemic Examination</h2>
+                    <h2>Systemic Round Examination</h2>
                     <p>Swipe left/right or tap tabs to navigate systems</p>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="closeExamDeck()">Done</button>
@@ -998,14 +1072,14 @@
         <div class="deck-header">
             <div class="deck-top-row">
                 <div class="deck-title-group">
-                    <h2>Auto-Fill from Raw Note</h2>
-                    <p>Paste raw admission or handover text to extract fields</p>
+                    <h2>Auto-Fill from Round / Clinical Note</h2>
+                    <p>Paste raw text to extract patient & exam fields</p>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="closeParserModal()">Close</button>
             </div>
         </div>
         <div style="padding: 1.25rem; display: flex; flex-direction: column; gap: 0.85rem;">
-            <textarea id="rawNoteInput" style="min-height: 180px;" placeholder="Paste patient note here (Name, Age, Diagnosis, Vitals, Labs, CNS, CVS, Chest...)"></textarea>
+            <textarea id="rawNoteInput" style="min-height: 180px;" placeholder="Paste round or clinical note here (Name, Age, Diagnosis, Vitals, Labs, CNS, CVS, Chest, Vent, Weaning, Abdomen, Extremities...)"></textarea>
             <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
                 <button class="btn btn-secondary" onclick="closeParserModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="parseRawNote()">Extract & Populate</button>
@@ -1039,9 +1113,19 @@
         'Other Medications'
     ];
 
+    const CHECKLIST_ITEMS = [
+        { key: 'sbt', label: 'Spontaneous Awakening / SBT Assessed' },
+        { key: 'dvt', label: 'DVT Prophylaxis Reviewed' },
+        { key: 'gi', label: 'Stress Ulcer / Nutrition Reviewed' },
+        { key: 'abx', label: 'Antimicrobial Stewardship / Cultures' },
+        { key: 'lines', label: 'Invasive Lines & Foley Necessity' },
+        { key: 'fluid', label: 'Fluid Target & Electrolytes Checked' }
+    ];
+
     let beds = [];
     let currentBedIndex = 0;
     let currentSlideIndex = 0;
+    let outputMode = 'round'; // 'round' or 'sbar'
 
     function createEmptyBed(num) {
         return {
@@ -1067,12 +1151,20 @@
             radiology: '',
             labs: '',
             medications: [],
+            checks: {
+                sbt: false,
+                dvt: false,
+                gi: false,
+                abx: false,
+                lines: false,
+                fluid: false
+            },
             plan: ''
         };
     }
 
     function init() {
-        const saved = localStorage.getItem('icu_sbar_beds_v2');
+        const saved = localStorage.getItem('icu_round_beds_v1');
         if (saved) {
             try {
                 beds = JSON.parse(saved);
@@ -1086,18 +1178,21 @@
             sample.ageGender = '62M';
             sample.pmh = 'HTN, T2DM';
             sample.diagnosis = 'Severe CAP / Septic Shock';
-            sample.vitals = 'BP 112/68 (MAP 82) on Norad 0.08 mcg/kg/min, HR 94, SpO2 96%';
-            sample.exam.cns = 'Sedated on Fentanyl, RASS -1, pupils 2mm reactive';
-            sample.exam.ventilator = 'SIMV-VC, TV 440, PEEP 8, FiO2 45%';
+            sample.events = 'Afebrile past 12h; Noradrenaline weaned from 0.15 to 0.06 mcg/kg/min';
+            sample.vitals = 'BP 116/70 (MAP 85) on Norad 0.06, HR 88, SpO2 97%, T 36.8°C, UOP 1.1 mL/kg/hr';
+            sample.exam.cns = 'RASS -1, pupils 2mm reactive, moving all 4 limbs';
+            sample.exam.ventilator = 'SIMV-VC, TV 440, PEEP 8, FiO2 40%';
+            sample.exam.weaning = 'SBT trial scheduled on morning round';
             sample.medications = [
                 { id: 1, category: 'Antibiotics', name: 'Meropenem', dose: '1g IV q8h', start: sample.doa, cause: 'Severe CAP' },
                 { id: 2, category: 'Anticoagulation', name: 'Enoxaparin', dose: '40mg SC q24h', start: sample.doa, cause: 'DVT prophylaxis' },
                 { id: 3, category: 'Fluids', name: 'Ringer Lactate', dose: '60 mL/hr IV', start: sample.doa, cause: 'Maintenance' },
                 { id: 4, category: 'Nebulizers', name: 'Ipratropium / Salbutamol', dose: 'q6h neb', start: sample.doa, cause: 'Bronchospasm' }
             ];
-            sample.plan = '1. Wean Noradrenaline as tolerated
-2. Daily SBT assessment
-3. Follow sputum & blood cultures';
+            sample.checks = { sbt: true, dvt: true, gi: true, abx: false, lines: false, fluid: true };
+            sample.plan = '1. Perform SBT & reassess extubation readiness
+2. Continue weaning Noradrenaline toward off
+3. Review blood & sputum culture sensitivities';
             beds = [sample];
         }
         buildExamSlides();
@@ -1106,11 +1201,19 @@
     }
 
     function saveState() {
-        localStorage.setItem('icu_sbar_beds_v2', JSON.stringify(beds));
+        localStorage.setItem('icu_round_beds_v1', JSON.stringify(beds));
     }
 
     function getCurrentBed() {
         return beds[currentBedIndex];
+    }
+
+    function setOutputMode(mode) {
+        outputMode = mode;
+        document.getElementById('modeRoundBtn').classList.toggle('active', mode === 'round');
+        document.getElementById('modeSbarBtn').classList.toggle('active', mode === 'sbar');
+        document.getElementById('outputTitle').textContent = mode === 'round' ? 'Daily ICU Round Note' : 'Formatted SBAR Handover';
+        renderOutput();
     }
 
     function renderAll() {
@@ -1118,7 +1221,7 @@
         populateForm();
         renderExamSummaryCards();
         renderMedications();
-        renderSBAR();
+        renderOutput();
     }
 
     function renderBedStrip() {
@@ -1163,6 +1266,10 @@
             const el = document.getElementById(f);
             if (el) el.value = b[f] || '';
         });
+        CHECKLIST_ITEMS.forEach(item => {
+            const chk = document.getElementById(`chk_${item.key}`);
+            if (chk) chk.checked = !!(b.checks && b.checks[item.key]);
+        });
         document.getElementById('medStart').value = new Date().toISOString().split('T')[0];
     }
 
@@ -1173,7 +1280,15 @@
         if (field === 'bedNumber' || field === 'patientName') {
             renderBedStrip();
         }
-        renderSBAR();
+        renderOutput();
+    }
+
+    function updateCheck(key, checked) {
+        const b = getCurrentBed();
+        if (!b.checks) b.checks = {};
+        b.checks[key] = checked;
+        saveState();
+        renderOutput();
     }
 
     /* EXAMINATION SUMMARY & SWIPEABLE FLOATING CARDS */
@@ -1235,7 +1350,7 @@
     function closeExamDeck() {
         document.getElementById('examModal').classList.remove('open');
         renderExamSummaryCards();
-        renderSBAR();
+        renderOutput();
     }
 
     function closeExamDeckOnBackdrop(e) {
@@ -1279,7 +1394,7 @@
         b.exam[key] = value;
         saveState();
         renderExamSummaryCards();
-        renderSBAR();
+        renderOutput();
         const idx = EXAM_SYSTEMS.findIndex(s => s.key === key);
         const tab = document.getElementById(`deckTab-${idx}`);
         if (tab) tab.classList.toggle('filled', value.trim().length > 0);
@@ -1349,7 +1464,7 @@
 
         saveState();
         renderMedications();
-        renderSBAR();
+        renderOutput();
     }
 
     function removeMedication(id) {
@@ -1357,7 +1472,7 @@
         b.medications = b.medications.filter(m => m.id !== id);
         saveState();
         renderMedications();
-        renderSBAR();
+        renderOutput();
     }
 
     function renderMedications() {
@@ -1369,7 +1484,6 @@
             return;
         }
 
-        // Group medications by category preserving clinical order
         const grouped = {};
         b.medications.forEach(med => {
             const cat = med.category || 'Other Medications';
@@ -1412,12 +1526,13 @@
         }).join('');
     }
 
-    /* STANDARDIZED SBAR SUMMARY GENERATOR */
-    function renderSBAR() {
+    /* ICU ROUND NOTE & SBAR GENERATOR */
+    function renderOutput() {
         const b = getCurrentBed();
         const lines = [];
+        const headerPrefix = outputMode === 'round' ? 'ICU ROUND' : 'SBAR HANDOVER';
 
-        lines.push(`=== ${b.bedNumber || 'BED'} | ${b.patientName || 'UNNAMED'} (${b.ageGender || '-'}) ===`);
+        lines.push(`=== ${headerPrefix} | ${b.bedNumber || 'BED'} | ${b.patientName || 'UNNAMED'} (${b.ageGender || '-'}) ===`);
         if (b.doa) lines.push(`DOA: ${b.doa}`);
         if (b.pmh) lines.push(`PMH: ${b.pmh}`);
         if (b.diagnosis) lines.push(`DIAGNOSIS: ${b.diagnosis}`);
@@ -1425,10 +1540,9 @@
 HPI:
 ${b.hpi}`);
         if (b.events) lines.push(`
-EVENTS:
+${outputMode === 'round' ? 'OVERNIGHT / INTERVAL EVENTS' : 'EVENTS'}:
 ${b.events}`);
 
-        // Examination & Vitals
         const examEntries = EXAM_SYSTEMS
             .map(s => ({ label: s.label, val: b.exam && b.exam[s.key] ? b.exam[s.key].trim() : '' }))
             .filter(e => e.val);
@@ -1436,7 +1550,7 @@ ${b.events}`);
         if (b.vitals || examEntries.length > 0) {
             lines.push(`
 EXAMINATION & VITALS:`);
-            if (b.vitals) lines.push(`• Vitals: ${b.vitals}`);
+            if (b.vitals) lines.push(`• Vitals / 24h: ${b.vitals}`);
             examEntries.forEach(e => {
                 lines.push(`• ${e.label}: ${e.val}`);
             });
@@ -1446,10 +1560,9 @@ EXAMINATION & VITALS:`);
 RADIOLOGY:
 ${b.radiology}`);
         if (b.labs) lines.push(`
-LABS:
+LABS & ABG:
 ${b.labs}`);
 
-        // Categorized Medications (Antibiotics first, Anticoagulation second, then remaining groups)
         if (b.medications && b.medications.length > 0) {
             lines.push(`
 MEDICATIONS:`);
@@ -1476,21 +1589,28 @@ MEDICATIONS:`);
             });
         }
 
+        const checkedItems = CHECKLIST_ITEMS.filter(item => b.checks && b.checks[item.key]);
+        if (checkedItems.length > 0) {
+            lines.push(`
+ROUND BUNDLE CHECKS:`);
+            checkedItems.forEach(item => lines.push(`  [x] ${item.label}`));
+        }
+
         if (b.plan) {
             lines.push(`
 ------------------------------`);
-            lines.push(`PLAN:
+            lines.push(`ROUND PLAN:
 ${b.plan}`);
         }
 
-        document.getElementById('sbarPreview').textContent = lines.join('
+        document.getElementById('roundPreview').textContent = lines.join('
 ');
     }
 
-    function copySBAR() {
-        const text = document.getElementById('sbarPreview').textContent;
+    function copyOutput() {
+        const text = document.getElementById('roundPreview').textContent;
         navigator.clipboard.writeText(text).then(() => {
-            showToast('SBAR Handover Copied');
+            showToast(outputMode === 'round' ? 'Round Note Copied' : 'SBAR Handover Copied');
         });
     }
 
@@ -1537,7 +1657,8 @@ ${b.plan}`);
         if (rad) b.radiology = rad;
 
         EXAM_SYSTEMS.forEach(sys => {
-            const regex = new RegExp(`(?:${sys.label}|${sys.full})\s*[:\-]\s*([^\n]+)`, 'i');
+            const regex = new RegExp(`(?:${sys.label}|${sys.full})\s*[:\-]\s*([^
+]+)`, 'i');
             const val = extract(regex);
             if (val) b.exam[sys.key] = val;
         });
@@ -1545,7 +1666,7 @@ ${b.plan}`);
         saveState();
         renderAll();
         closeParserModal();
-        showToast('Fields extracted from note');
+        showToast('Fields extracted from round note');
     }
 
     function escapeHtml(str) {
