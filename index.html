@@ -815,16 +815,6 @@ window.addEventListener("error", function(e) {
 <script>
 "use strict";
 
-/* Expose inline-button handlers before startup/rendering */
-Object.assign(window, {
-  addPatient, applyImportPreview, autoImportCase, clearTrash, closeCardModal,
-  copySBAR, copySheet, delPatient, delTrash, dlInfo, exportAll, exportOne,
-  fontStep, forceUpdate, importPreview, jump, makeSBAR, newDay, newDayAll,
-  openCardModal, openPatient, printInfo, restore, selectExamSub, shareTxt,
-  showInfo, showSheet, slideCards, slideExamSub, stepExamSub, stepModal,
-  toggleDark
-});
-
 const KEY = "icu_rounds_data";
 const PREF_KEY = "icu_rounds_prefs";
 let data = [], active = null, bad = false, activeCardId = null, activeExamSubId = "cns";
@@ -2954,16 +2944,16 @@ function parseCase(src) {
       [/\bPC(?:V)?\b|pressure control/i, "PC"], [/\bVC(?:V)?\b|volume control/i, "VC"]
     ]);
     if (md) add("Vent mode " + md, [["ventMode", md]]);
-    const S = (label, key, re, lo, hi) => {
+    const setVent = (label, key, re, lo, hi) => {
       const x = num(re);
       if (x !== null && x >= lo && x <= hi) add(label + " " + x, [[key, String(x)]]);
     };
-    S("VT", "setVT", /(?:\bVT|tidal volume)\s*[:=]?\s*(\d{3})\b/i, 150, 1000);
-    S("PEEP", "setPEEP", /\bpeep\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
-    S("Set RR", "ventRate", /\b(?:set\s*)?RR\s*[:=]?\s*(\d{1,2})\b/i, 6, 40);
-    S("Pplat", "plateauPressure", /(?:pplat|plateau(?: pressure)?)\s*[:=]?\s*(\d{1,2})/i, 5, 60);
-    S("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?|\bPIP\b)\s*[:=]?\s*(\d{1,2})/i, 5, 80);
-    S("Pressure support", "pressureSupport", /(?:\bPS|pressure support)\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
+    setVent("VT", "setVT", /(?:\bVT|tidal volume)\s*[:=]?\s*(\d{3})\b/i, 150, 1000);
+    setVent("PEEP", "setPEEP", /\bpeep\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
+    setVent("Set RR", "ventRate", /\b(?:set\s*)?RR\s*[:=]?\s*(\d{1,2})\b/i, 6, 40);
+    setVent("Pplat", "plateauPressure", /(?:pplat|plateau(?: pressure)?)\s*[:=]?\s*(\d{1,2})/i, 5, 60);
+    setVent("Ppeak", "peakPressure", /(?:ppeak|peak(?: pressure)?|\bPIP\b)\s*[:=]?\s*(\d{1,2})/i, 5, 80);
+    setVent("Pressure support", "pressureSupport", /(?:\bPS|pressure support)\s*[:=]?\s*(\d{1,2})\b/i, 0, 30);
     m = T.match(/\bI\s*:\s*E\s*[:=]?\s*(1\s*:\s*\d+(?:\.\d)?)/i);
     if (m) add("I:E " + m[1].replace(/\s+/g, ""), [["ieRatio", m[1].replace(/\s+/g, "")]]);
   }
@@ -3119,325 +3109,362 @@ function parseCase(src) {
     });
   }
 
-  for (const [re, ac] of ACL) {
-    if (new RegExp("(?:^|[^a-z])(?:" + re + ")\\b", "i").test(T)) {
-      const dm = T.match(new RegExp(re + "\\s*(\\d+\\s*mg(?:\\s*(?:SC|IV|PO))?(?:\\s*(?:OD|BD|q12h|q24h|daily))?)", "i"));
-      const dose = dm ? dm[1].trim() : "";
-      add("Anticoagulant: " + ac + (dose ? " " + dose : ""), [], p => {
-        p.acType = "Pharmacological";
-        if (!p.anticoag.some(x => (x.drug || "").toLowerCase() === ac.toLowerCase())) {
-          p.anticoag.push({ drug: ac, dose, route: "", frequency: "", date: today, indication: "", editing: false });
-        }
-        if (!p.meds.some(x => (x.drug || "").toLowerCase() === ac.toLowerCase())) {
-          p.meds.push({ category: "Anticoagulation / VTE", drug: ac, dose, route: "", frequency: "", date: today, indication: "", renal: "", editing: false });
-        }
-      });
-      break;
-    }
-  }
-
-  for (const [re, pr] of PRL) {
-    if (new RegExp("(?:^|[^a-z])(?:" + re + ")\\b", "i").test(T)) {
-      const dm = T.match(new RegExp(re + "\\s*(?:at|on)?\\s*(\\d+(?:\\.\\d+)?)\\s*(mcg\\/kg\\/min|mcg\\/min|mg\\/hr|units?\\/min)", "i"));
-      add("Vasoactive: " + pr.split(" ")[0] + (dm ? " " + dm[1] + " " + dm[2] : ""), [], p => {
-        if (!p.cardio.vasoactive.some(x => x.drug === pr)) {
-          p.cardio.vasoactive.push({ drug: pr, dose: dm ? dm[1] : "", unit: dm ? dm[2] : "mcg/kg/min", trend: "", targetMap: p.cardio.vitals.targetMap || "65", lastAdjustment: "", response: "" });
-        }
-      });
-    }
-  }
-
-  const medSec = secVal("(?:medications?|meds|drugs?|treatment)");
-  const medPool = medSec || T;
-  const COMMON_MEDS = [
-    ["pantoprazole|omeprazole|esomeprazole|lansoprazole", "Pantoprazole", "GI / PPI / Prokinetics"],
-    ["metoclopramide|domperidone", "Metoclopramide", "GI / PPI / Prokinetics"],
-    ["insulin", "Insulin", "Insulin / Endocrine"],
-    ["furosemide|lasix|torsemide|bumetanide", "Furosemide", "Diuretics"],
-    ["hydrocortisone|methylprednisolone|dexamethasone|prednisolone", "Hydrocortisone", "Steroids / Immunosuppressants"],
-    ["paracetamol|acetaminophen", "Paracetamol", "Other"],
-    ["amlodipine|lisinopril|losartan|valsartan|metoprolol|carvedilol|bisoprolol|amiodarone|digoxin|atorvastatin", null, "Cardiac / Antihypertensive"],
-    ["salbutamol|albuterol|ipratropium|budesonide", null, "Nebulizers / Inhaled"],
-    ["albumin|normal saline|0\\.9%\\s*ns|ringer|lactated ringer|plasmalyte", null, "IV Fluids / Electrolytes"],
-    ["fentanyl|morphine|remifentanil", null, "Sedation / Analgesia"]
-  ];
-  for (const [pat, fixedName, cat] of COMMON_MEDS) {
-    const mm = medPool.match(new RegExp("(?:^|[^a-z])(" + pat + ")\\b([^\\n;]*)", "i"));
-    if (!mm) continue;
-    const drugName = fixedName || (mm[1].charAt(0).toUpperCase() + mm[1].slice(1));
-    const tail = mm[2] || "";
-    const dm = tail.match(/\b(\d+(?:\.\d+)?\s*(?:mg|g|mcg|units?|iu|mEq|mL))\b/i);
-    const rm = tail.match(/\b(IV|PO|IM|SC|inhaled|neb)\b/i);
-    const fm = tail.match(/\b(q\d+h|OD|BD|TDS|QID|daily|twice daily|three times daily|PRN)\b/i);
-    add(`Med (${cat.split("/")[0].trim()}): ${drugName}${dm ? " " + dm[1] : ""}`, [], p => {
-      if (!p.meds.some(x => (x.drug || "").toLowerCase() === drugName.toLowerCase())) {
-        p.meds.push({
-          category: cat,
-          drug: drugName,
-          dose: dm ? dm[1] : "",
-          route: rm ? rm[1].toUpperCase() : "",
-          frequency: fm ? fm[1] : "",
-          date: today,
-          indication: "",
-          renal: "",
-          editing: false
-        });
+  for (const [re, drug] of ACL) {
+    const cm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n;]*)", "i"));
+    if (!cm) continue;
+    const tail = cm[1] || "";
+    const dm = tail.match(/\b(\d+(?:\.\d+)?\s*(?:mg|units?|iu))\b/i);
+    const rm = tail.match(/\b(SC|IV|PO)\b/i);
+    const fm = tail.match(/\b(OD|BD|q12h|q24h|daily|infusion|twice daily)\b/i);
+    const startDate = normDate(tail) || today;
+    const dose = dm ? dm[1] : "", route = rm ? rm[1].toUpperCase() : "", freq = fm ? fm[1] : "";
+    add("Anticoagulant: " + drug + (dose ? " " + dose : ""), [], p => {
+      p.acType = "Pharmacological";
+      if (!p.anticoag.some(x => (x.drug || "").toLowerCase() === drug.toLowerCase())) {
+        p.anticoag.push({ drug, dose, route, frequency: freq, date: startDate, indication: "", editing: false });
+      }
+      if (!p.meds.some(x => (x.drug || "").toLowerCase() === drug.toLowerCase())) {
+        p.meds.push({ category: "Anticoagulation / VTE", drug, dose, route, frequency: freq, date: startDate, indication: "", renal: "", editing: false });
       }
     });
   }
 
-  for (const [re, type] of LNL) {
-    if (re.test(T)) {
-      const dm = T.match(new RegExp(re.source + "\\s*(?:in\\s+(?:the\\s+)?)?(?:right|left)?\\s*(?:IJ|internal jugular|subclavian|femoral|radial|brachial)?\\s*(?:day\\s*(\\d+))?", "i"));
-      const dNum = dm && dm[1] ? Math.max(1, parseInt(dm[1], 10)) : 1;
-      const insDate = new Date(Date.now() - (dNum - 1) * 86400000).toISOString().slice(0, 10);
-      add("Line: " + type + (dNum > 1 ? " (Day " + dNum + ")" : ""), [], p => {
-        if (!p.lines.some(x => x.type === type)) {
-          p.lines.push({ type, site: "", size: "", date: insDate, time: "", note: "", editing: false });
+  for (const [re, drug] of PRL) {
+    const pm = T.match(new RegExp("(?:^|[^a-z])(?:" + re + ")\\b([^\\n;]*)", "i"));
+    if (!pm) continue;
+    const tail = pm[1] || "";
+    const dm = tail.match(/(\d+(?:\.\d+)?)\s*(mcg\/kg\/min|mcg\/min|mg\/hr|mcg\/hr|units\/min|units\/hr)/i);
+    const tr = /wean|tapering|decreas|reduc/i.test(tail) ? "Decreasing" : /increas|escalat|titrat|up/i.test(tail) ? "Increasing" : "Stable";
+    add("Vasopressor: " + drug + (dm ? " " + dm[1] + " " + dm[2] : ""), [], p => {
+      if (!p.cardio.vasoactive.some(x => x.drug === drug)) {
+        p.cardio.vasoactive.push({ drug, dose: dm ? dm[1] : "", unit: dm ? dm[2] : "mcg/kg/min", trend: tr, targetMap: "", lastAdjustment: "", response: "" });
+      }
+    });
+  }
+
+  const medSec = secVal("(?:medications?|meds)");
+  const GENERAL_MEDS = [
+    ["omeprazole|pantoprazole|esomeprazole|lansoprazole", "GI / PPI / Prokinetics"],
+    ["metoclopramide|domperidone|ondansetron", "GI / PPI / Prokinetics"],
+    ["insulin|levemir|lantus|novorapid|actrapid", "Insulin / Endocrine"],
+    ["furosemide|lasix|spironolactone|torsemide|bumetanide", "Diuretics"],
+    ["hydrocortisone|methylprednisolone|dexamethasone|prednisolone", "Steroids / Immunosuppressants"],
+    ["paracetamol|acetaminophen|morphine|fentanyl|tramadol", "Sedation / Analgesia"],
+    ["amlodipine|lisinopril|losartan|valsartan|metoprolol|bisoprolol|carvedilol|amiodarone|digoxin|nitroglycerin|diltiazem", "Cardiac / Antihypertensive"],
+    ["salbutamol|albuterol|ipratropium|budesonide", "Nebulizers / Inhaled"],
+    ["normal saline|0\\.9%\\s*ns|ringer|lactated ringer|albumin|potassium chloride|kcl|magnesium sulfate", "IV Fluids / Electrolytes"]
+  ];
+  if (medSec) {
+    for (const [mre, cat] of GENERAL_MEDS) {
+      const mm = medSec.match(new RegExp("(?:^|[^a-z])(" + mre + ")\\b([^\\n;,]*)", "i"));
+      if (!mm) continue;
+      const dName = mm[1].charAt(0).toUpperCase() + mm[1].slice(1);
+      const rest = (mm[2] || "").trim();
+      const dm = rest.match(/\b(\d+(?:\.\d+)?\s*(?:mg|g|mcg|units?|iu|%))\b/i);
+      const fm = rest.match(/\b(q\d+h|OD|BD|TDS|QID|daily|PRN|infusion|twice daily)\b/i);
+      add(`Med (${cat}): ${dName}${dm ? " " + dm[1] : ""}`, [], p => {
+        if (!p.meds.some(x => (x.drug || "").toLowerCase() === dName.toLowerCase())) {
+          p.meds.push({ category: cat, drug: dName, dose: [dm && dm[1], fm && fm[1]].filter(Boolean).join(" "), route: "", frequency: fm ? fm[1] : "", date: today, indication: "", renal: "", editing: false });
         }
       });
     }
   }
 
-  const org = T.match(ORGX), sp = pick(SPEC);
-  if (org || sp) {
-    add("Culture: " + [sp, org && org[0]].filter(Boolean).join(" — "), [], p => {
-      p.cultures.push({ type: sp || "", date: today, status: org ? "Growth" : "Pending", organism: org ? org[0] : "", susceptible: "", editing: false });
+  for (const [re, type] of LNL) {
+    if (!re.test(T)) continue;
+    const lm = T.match(new RegExp("(?:^|[^a-z])(?:" + re.source + ")\\b([^\\n;]*)", "i"));
+    const site = ((lm && lm[1]) || "").replace(/^\s*(?:in|at|on|via)\s+/i, "").trim().slice(0, 35);
+    add("Line: " + type + (site ? " (" + site + ")" : ""), [], p => {
+      if (!p.lines.some(x => x.type === type && x.site === site)) {
+        p.lines.push({ type, site, size: "", date: today, time: "", note: "", editing: false });
+      }
     });
   }
 
-  const fin = num(/(?:fluid balance|net balance|balance)\s*[:=]?\s*([+-]?\d{2,4})\s*m?l?/i);
-  if (fin !== null && Math.abs(fin) < 10000) add("Fluid balance " + (fin > 0 ? "+" : "") + fin + " mL", [["fluidIn", String(Math.max(0, fin))], ["fluidOut", String(Math.max(0, -fin))]]);
+  if (/cultur|\bcx\b|grown|isolated|mrsa|klebsiella|pseudomonas|e\.?\s*coli|candida|acinetobacter/i.test(T)) {
+    const org = (T.match(ORGX) || [])[0] || "";
+    const sp = pick(SPEC) || "Blood";
+    const st = /pending|awaiting/i.test(T) && !org ? "Pending" : /no growth|sterile|negative/i.test(T) ? "No growth" : org ? "Growth" : "";
+    const su = (T.match(/(?:sens(?:itive)?|susc(?:eptible)?)\s*(?:to)?\s*[:\-]?\s*([a-z0-9 ,\/+-]{2,45})/i) || [])[1] || "";
+    if (org || st) add(`Culture (${sp}): ${org || st}`, [], p => {
+      p.cultures.push({ type: sp, date: today, status: st, organism: org, susceptible: su.trim(), editing: false });
+    });
+  }
+
+  const fb = num(/(?:fluid balance|net balance)\s*[:=]?\s*([+-]?\d{1,4})\s*m?l/i);
+  if (fb !== null) add(`Fluid balance ${fb > 0 ? "+" : ""}${fb} mL`, [], (p, over) => {
+    if (over || !p.fluidOut) {
+      p.fluidIn = String(Math.max(0, fb));
+      p.fluidOut = "0";
+      p.duration = "24";
+    }
+  });
 
   const planSec = secVal("(?:plan|daily\\s*plan|recommendations?|management)");
-  let pl = planSec
-    ? planSec.split(/\n|;|\u2022|\d+[\.)]\s*/).map(s => s.replace(/^[\-\*\d\.)]+\s*/, "").trim()).filter(s => s.length >= 3)
-    : [];
-  if (!pl.length && /\bplan\s*[:\-]/i.test(T)) {
-    pl = T.split(/\bplan\s*[:\-]/i)[1].split(/\n|;|\u2022/).map(s => s.replace(/^[\-\*\d\.)]+\s*/, "").trim()).filter(s => s.length >= 3);
-  }
+  const planLines = (planSec ? planSec.split(/\n|;+/) : T.split("\n")).map(s => s.replace(/^\s*(?:[-*•\d]+[\.)])\s*/, "").trim());
+  const pl = planLines.filter(l => /^(?:start|stop|hold|wean|continue|review|repeat|check|order|send|keep|target|titrate|consult|consider|monitor|correct|adjust|switch|de-?escalate|obtain|perform|avoid|maintain)\b/i.test(l) && l.length < 160);
   if (pl.length) add(pl.length + " plan item(s)", [], p => {
-    pl.slice(0, 20).forEach(x => {
-      if (!p.plans.some(q => (q.text || "").toLowerCase() === x.toLowerCase())) p.plans.push({ text: x, done: false });
-    });
+    pl.forEach(t => { if (!p.plans.some(x => x.text === t)) p.plans.push({ text: t, done: false }); });
   });
+
+  const extraNotes = [
+    hpiFull && ("HPI: " + hpiFull.replace(/\s+/g, " ").slice(0, 140)),
+    evFull && ("Events: " + evFull.replace(/\s+/g, " ").slice(0, 140))
+  ].filter(Boolean);
+  if (extraNotes.length) {
+    add("Summary note (" + extraNotes.length + " part(s))", [], (p, over) => {
+      if (over || !p.other) p.other = extraNotes.join("\n");
+    });
+  }
 
   return I;
 }
 
-function applyImport(p, items, over, detectedBed) {
+function applyImport(p, items, over, isNewBed = false) {
   ensure(p);
-  if (over && detectedBed && (!p.bed || /^bed\s*\d+$/i.test(p.bed.trim()))) {
-    p.bed = detectedBed;
+  if (isNewBed && items.detectedBed) {
+    p.bed = items.detectedBed;
   }
-  items.forEach(it => {
-    it.fields.forEach(([k, v]) => {
-      if (over || !getp(p, k)) setp(p, k, v);
-    });
+  for (const it of items) {
+    for (const [k, v] of it.fields) {
+      if (!over && getp(p, k)) continue;
+      setp(p, k, v);
+    }
     if (it.apply) it.apply(p, over);
-  });
+  }
   p._syncing = true;
   try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
 }
 
-function importPreview(asNew) {
+function autoImportCase(newBed) {
+  const txt = $("caseTxt").value;
+  if (!txt.trim()) { alert("Paste or type a case summary first."); return; }
+  if (!newBed && (active === null || !P())) {
+    alert("No patient is open. Use 'Auto-import as new bed' or open a patient first.");
+    return;
+  }
+  const items = parseCase(txt);
+  const p = newBed ? blank(items.detectedBed || nextBedLabel()) : P();
+  applyImport(p, items, true, newBed);
+  if (newBed) {
+    data.push(p);
+    active = data.length - 1;
+  }
+  persist();
+  renderList();
+  openPatient(active);
+  $("importOut").innerHTML = `<div class="out"><div class="r"><b>Auto-imported ${items.length} item(s)</b> into <b>${esc(p.bed)}</b>. Open any card above to review and verify against the clinical chart.</div></div>`;
+}
+
+function importPreview(newBed) {
   const txt = $("caseTxt").value;
   if (!txt.trim()) { alert("Paste or type a case first."); return; }
-  if (!asNew && (active === null || !P())) { alert("Open a patient bed first, or choose Preview as new bed."); return; }
-  window._imp = { items: parseCase(txt), asNew };
-  const n = window._imp.items.length;
-  $("importOut").innerHTML = n
-    ? `<div class="out"><b>Found (${n}):</b><ul>${window._imp.items.map(x => `<li>${esc(x.label)}</li>`).join("")}</ul><label class="chk"><input type="checkbox" id="impOver"><span>Overwrite existing values in matching fields</span></label><button class="pri" onclick="applyImportPreview()">Apply to ${asNew ? "new bed" : esc(P().bed)}</button></div>`
-    : `<div class="out">Nothing recognised. Check formatting (for example "BP 110/70, HR 98, Hb 8.2, Na 138, K 4.1, Creat 1.4").</div>`;
+  if (!newBed && (active === null || !P())) {
+    alert("No patient is open. Use 'Preview as new bed' or open a patient first.");
+    return;
+  }
+  const items = parseCase(txt);
+  window._imp = { items, newBed };
+  $("importOut").innerHTML = items.length
+    ? `<div class="out"><div class="small">Found ${items.length} item(s)${items.detectedBed ? " · Detected: <b>" + esc(items.detectedBed) + "</b>" : ""}. Untick any you do not want.</div>${items.map((it, i) => `<label class="chk"><input type="checkbox" class="impc" value="${i}" checked><span>${esc(it.label)}</span></label>`).join("")}<label class="chk"><input type="checkbox" id="impOver"${newBed ? " checked" : ""}><span>Overwrite existing values</span></label><button class="pri" onclick="applyImportPreview()">${newBed ? "Create bed" : "Apply to patient"}</button></div>`
+    : `<div class="out"><span class="small">Nothing recognized. Try plain words like age, sex, diagnosis, BP, HR, SpO₂, pH, PaCO₂, HCO₃⁻, Na, K, creatinine, Hb, WBC, platelets, drug names, lines, cultures, or plan items.</span></div>`;
 }
 
 function applyImportPreview() {
-  const w = window._imp;
-  if (!w) return;
+  if (!window._imp) return;
+  const { items, newBed } = window._imp;
+  const chosen = [...document.querySelectorAll(".impc:checked")].map(c => items[+c.value]).filter(Boolean);
+  if (items.detectedBed) chosen.detectedBed = items.detectedBed;
   const over = $("impOver") && $("impOver").checked;
-  let p;
-  if (w.asNew) {
-    const baseLabel = w.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    p = { bed: baseLabel };
-    ensure(p);
-    applyImport(p, w.items, 1, w.detectedBed);
-    data.push(p);
-    active = data.length - 1;
-  } else {
-    p = P();
-    applyImport(p, w.items, over, w.detectedBed);
-  }
+  const p = newBed ? blank(chosen.detectedBed || nextBedLabel()) : P();
+  if (!p) return;
+  applyImport(p, chosen, over, newBed);
+  if (newBed) { data.push(p); active = data.length - 1; }
   persist();
   renderList();
   openPatient(active);
-  $("importOut").innerHTML = `<div class="r">Applied ${w.items.length} item(s). Review the cards to verify.</div>`;
   window._imp = null;
-}
-
-function autoImportCase(asNew) {
-  const txt = $("caseTxt").value;
-  if (!txt.trim()) { alert("Paste or type a case first."); return; }
-  if (!asNew && (active === null || !P())) {
-    asNew = 1;
-  }
-  const parsed = parseCase(txt);
-  let p;
-  if (asNew) {
-    const baseLabel = parsed.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    p = { bed: baseLabel };
-    ensure(p);
-    applyImport(p, parsed, 1, parsed.detectedBed);
-    data.push(p);
-    active = data.length - 1;
-  } else {
-    p = P();
-    applyImport(p, parsed, 1, parsed.detectedBed);
-  }
-  persist();
-  renderList();
-  openPatient(active);
-  $("importOut").innerHTML = `<div class="r"><b>Auto-imported ${parsed.length} item(s)</b> into <b>${esc(p.bed)}</b>. All fields, labs, ABG, antibiotics, and plan items are synced.</div>`;
+  $("importOut").innerHTML = `<div class="small">Imported into ${esc(p.bed)}. Check the cards.</div>`;
 }
 
 /* ---------- SBAR & handover sheet ---------- */
 function sbarText(p) {
   ensure(p);
-  const c = p.cardio, v = c.vitals, k = cardioCalc(v), s = p.scores || {}, g = scoreCalc(p), a = p.investigations.abg, pf = pfOf(p), d = dayN(p.admissionDate);
-  const cg = crcl(p);
-  const L = [];
-  const add = (t, b) => { if (b) L.push(t + ":\n" + b); };
-
-  const sitParts = [
-    p.bed,
-    p.age && p.age + " y",
-    p.ventSex,
-    d > 0 && "ICU day " + d
-  ].filter(Boolean);
-  add("S — Situation / Bed & Demographics", sitParts.join(" · ") || p.bed);
-
-  if (p.diagnosis) add("Diagnosis", p.diagnosis);
-  if (p.pastMedicalHistory) add("Past Medical History (PMH)", p.pastMedicalHistory);
-  add("B — Background / History of Illness", p.presentIllness);
-  add("Events (last 24 h)", p.events);
-
-  const ex = [];
-  if (g.gcs !== null) ex.push("GCS " + g.gcs + (s.gcsE ? ` (E${s.gcsE}V${s.gcsV}M${s.gcsM})` : ""));
-  if (s.rass) ex.push("RASS " + s.rass);
-  if (p.sedation && p.sedation !== "None") ex.push("Sedation: " + p.sedation);
-  if (p.pupils) ex.push("Pupils: " + p.pupils);
-  if (v.sbp && v.dbp) ex.push(`BP ${v.sbp}/${v.dbp} mmHg`);
-  if (k.map !== null) ex.push(`MAP ${k.map.toFixed(0)} mmHg (target ${v.targetMap || 65})`);
-  if (v.hr) ex.push(`HR ${v.hr} bpm` + (v.rhythm ? ` (${v.rhythm})` : ""));
-  if (k.si !== null) ex.push(`Shock index ${k.si.toFixed(2)}`);
-  if (p.temp) ex.push(`Temp ${p.temp} °C`);
-  if (p.spo2) ex.push(`SpO₂ ${p.spo2}%`);
-  if (p.respSupport) ex.push("Resp: " + p.respSupport + (p.breathSounds ? ` · ${p.breathSounds}` : ""));
-  if (p.ventMode) ex.push("Vent: " + [p.ventMode, p.setVT && `VT ${p.setVT} mL`, p.setPEEP && `PEEP ${p.setPEEP}`, p.fio2Percent && `FiO₂ ${p.fio2Percent}%`, pf !== null && `P/F ${pf.toFixed(0)}`].filter(Boolean).join(", "));
-  if (p.palpation || p.feeding || p.rbs) ex.push("Abdomen: " + [p.palpation, p.bowelSounds && `BS ${p.bowelSounds}`, p.feeding, p.rbs && `RBS ${p.rbs}`].filter(Boolean).join(" · "));
-  if (p.edema || p.pulses || p.capRefill) ex.push("Extremities: " + [p.edema, p.pulses && `Pulses ${p.pulses}`, p.capRefill && `CRT ${p.capRefill}`].filter(Boolean).join(" · "));
-  [p.cns, p.cv, p.resp, p.ausc, p.abdNotes, p.extNotes, p.renal, p.other].filter(Boolean).forEach(x => ex.push(x));
-  add("A — Assessment / Examination & Vitals", ex.join("\n"));
-
-  const rad = p.investigations.radiology.filter(r => r.result || r.date).map(r => `${r.name}${r.date ? " (" + r.date + ")" : ""}: ${r.result || "pending"}`);
-  if (rad.length) add("Radiology", rad.join("\n"));
-
-  const lb = p.investigations.laboratory.filter(it => String(it.result).trim() !== "").map(it => {
+  const c = p.cardio, v = c.vitals, k = cardioCalc(v), s = p.scores || {}, g = scoreCalc(p), a = p.investigations.abg;
+  const lines = [];
+  const add = (l, x) => { if (x) lines.push(`${l}: ${x}`); };
+  const abn = p.investigations.laboratory.map(it => {
     const f = labFlag(it, p);
-    const fl = f[1] === "hi" ? " [HIGH]" : f[1] === "lo" ? " [LOW]" : "";
-    const tr = it.trend === "up" ? " ↑" : it.trend === "down" ? " ↓" : it.trend === "stable" ? " →" : "";
-    return `${it.name}: ${it.result} ${it.unit || ""}${fl}${tr}`.trim();
-  });
-  if (cg !== null) lb.push(`Calculated CrCl (Cockcroft–Gault): ${cg.toFixed(1)} mL/min`);
-  if (a.pH || a.PaCO2 || a.HCO3 || a.PaO2 || a.Lactate) {
-    lb.push("ABG: " + ["pH", "PaCO2", "HCO3", "PaO2", "FiO2", "Lactate"].filter(x => a[x]).map(x => `${x} ${a[x]}`).join(" · "));
-  }
-  if (lb.length) add("Labs & ABG", lb.join("\n"));
+    return f[1] === "hi" || f[1] === "lo" ? `${it.name} ${it.result} ${it.unit} (${f[0]})` : "";
+  }).filter(Boolean);
+  const open = p.plans.filter(x => x.text && !x.done).map(x => x.text);
 
-  const vas = c.vasoactive.filter(d => d.drug).map(d => `• ${d.drug}${d.dose ? " " + d.dose + " " + (d.unit || "") : ""}${d.trend ? " [" + d.trend + "]" : ""}`);
-  const abxList = p.abx.filter(x => x.drug).map(x => {
-    const dNum = dayN(x.date);
-    return `• ${x.drug}${x.dose ? " " + x.dose : ""}${x.route ? " " + x.route : ""}${x.frequency ? " " + x.frequency : ""} | Start: ${x.date || "—"}${dNum ? " (Day " + dNum + ")" : ""} | Cause: ${x.indication || "—"}`;
-  });
-  const acList = p.anticoag.filter(x => x.drug).map(x => {
-    const dNum = dayN(x.date);
-    return `• ${x.drug}${x.dose ? " " + x.dose : ""}${x.route ? " " + x.route : ""}${x.frequency ? " " + x.frequency : ""} | Start: ${x.date || "—"}${dNum ? " (Day " + dNum + ")" : ""}${x.indication ? " | Cause: " + x.indication : ""}`;
-  });
-  const remMeds = p.meds.filter(m => {
-    const nm = (m.drug || "").trim().toLowerCase();
-    const inAbx = p.abx.some(a => (a.drug || "").trim().toLowerCase() === nm);
-    const inAc = p.anticoag.some(ac => (ac.drug || "").trim().toLowerCase() === nm);
-    return m.drug && !inAbx && !inAc;
-  }).map(m => `• [${m.category || "Other"}] ${m.drug}${m.dose ? " — " + m.dose : ""}${m.route ? " " + m.route : ""}${m.frequency ? " " + m.frequency : ""}${m.indication ? " (" + m.indication + ")" : ""}`);
-
-  const medSections = [];
-  if (vas.length) medSections.push("Vasoactive infusions:\n" + vas.join("\n"));
-  if (abxList.length) medSections.push("Antibiotics (start date, dose, cause):\n" + abxList.join("\n"));
-  if (acList.length) medSections.push("Anticoagulation (start date, regimen):\n" + acList.join("\n"));
-  if (remMeds.length) medSections.push("Remaining medications:\n" + remMeds.join("\n"));
-  if (medSections.length) add("Medications", medSections.join("\n\n"));
-
-  const lines = p.lines.filter(x => x.type || x.site).map(x => `• ${x.type || "Line"}${x.site ? " (" + x.site + ")" : ""}${x.size ? " " + x.size : ""}${x.date ? " · Day " + dayN(x.date) : ""}`);
-  if (lines.length) add("Lines & Tubes", lines.join("\n"));
-
-  const cx = p.cultures.filter(x => x.type || x.organism).map(x => `• ${x.type || "Culture"}: ${x.status || ""}${x.organism ? " — " + x.organism : ""}${x.susceptible ? " (Sens: " + x.susceptible + ")" : ""}`);
-  if (cx.length) add("Cultures", cx.join("\n"));
-
-  const planSegments = [];
-  if (p.plan) planSegments.push("Clinical plan:\n" + p.plan);
-  const openPlans = p.plans.filter(x => x.text && !x.done).map(x => "• [ ] " + x.text);
-  const donePlans = p.plans.filter(x => x.text && x.done).map(x => "• [x] " + x.text);
-  if (openPlans.length) planSegments.push("Active action items:\n" + openPlans.join("\n"));
-  if (donePlans.length) planSegments.push("Completed items:\n" + donePlans.join("\n"));
-  if (p.infection) planSegments.push("Infection / source control plan:\n" + p.infection);
-  if (g.n > 0) planSegments.push(`Severity scores:\n• SOFA: ${g.total}${g.n < 6 ? " (partial " + g.n + "/6)" : ""}`);
-  add("R — Recommendations / Plan", planSegments.join("\n\n"));
-
-  return L.join("\n\n----------------------------------------\n\n");
+  lines.push(`=== SBAR HANDOVER · ${p.bed || "Bed"} ===`);
+  add("Situation", [p.age && p.age + " y", p.ventSex, dayN(p.admissionDate) > 0 && "ICU day " + dayN(p.admissionDate), p.diagnosis].filter(Boolean).join(", "));
+  add("Background", [p.pastMedicalHistory && "PMH: " + p.pastMedicalHistory, p.presentIllness && "HPI: " + p.presentIllness, p.events && "24h events: " + p.events].filter(Boolean).join(" | "));
+  add("Vitals", [v.sbp && v.dbp && `BP ${v.sbp}/${v.dbp}`, k.map !== null && `MAP ${k.map.toFixed(0)} (target ${v.targetMap || 65})`, v.hr && `HR ${v.hr} ${v.rhythm || ""}`, p.temp && `T ${p.temp}°C`, p.spo2 && `SpO₂ ${p.spo2}%`, k.si !== null && `SI ${k.si.toFixed(2)}`].filter(Boolean).join(", "));
+  add("Vasopressors", c.vasoactive.filter(d => d.trend !== "Stopped" && d.drug).map(d => `${d.drug} ${d.dose || ""} ${d.unit || ""} (${d.trend || ""})`).join("; "));
+  add("Neuro / Sedation", [g.gcs !== null && `GCS ${g.gcs}`, s.rass && `RASS ${s.rass}`, p.sedation && p.sedation !== "None" && p.sedation, p.pupils, p.cns].filter(Boolean).join(", "));
+  add("Resp / Vent", [p.respSupport, p.ventMode, p.setVT && `VT ${p.setVT}`, p.setPEEP && `PEEP ${p.setPEEP}`, p.fio2Percent && `FiO₂ ${p.fio2Percent}%`, pfOf(p) !== null && `P/F ${pfOf(p).toFixed(0)}`, p.breathSounds, p.resp].filter(Boolean).join(", "));
+  add("Abdomen / Fluid", [p.palpation, p.feeding, p.rbs && `RBS ${p.rbs}`, (parseFloat(p.fluidIn) >= 0 && parseFloat(p.fluidOut) >= 0) && `Net ${(parseFloat(p.fluidIn) - parseFloat(p.fluidOut)) > 0 ? "+" : ""}${(parseFloat(p.fluidIn) - parseFloat(p.fluidOut)).toFixed(0)} mL`, p.abdNotes].filter(Boolean).join(", "));
+  add("Infection / Abx", [p.abx.filter(x => x.drug).map(x => `${x.drug} ${x.dose || ""} (D${dayN(x.date) || "?"})`).join(", "), p.cultures.filter(x => x.organism || x.status).map(x => `${x.type || "Cx"}: ${x.organism || x.status}`).join("; "), p.infection].filter(Boolean).join(" | "));
+  add("Lines", p.lines.map(x => `${x.type || "Line"} ${x.site || ""} (D${dayN(x.date) || "?"})`).join(", "));
+  add("Anticoagulation", p.acType === "Pharmacological" ? p.anticoag.map(x => `${x.drug} ${x.dose || ""}`).join(", ") : p.acType);
+  add("Labs & ABG", [abn.join(", "), crcl(p) !== null && `CrCl ${crcl(p).toFixed(0)} mL/min`, a.pH && `ABG pH ${a.pH} PaCO₂ ${a.PaCO2 || "—"} HCO₃ ${a.HCO3 || "—"} Lac ${a.Lactate || "—"}`, p.investigations.radiology.filter(r => r.result).map(r => `${r.name}: ${r.result}`).join("; "), p.labs].filter(Boolean).join(" | "));
+  add("Scores", [g.n > 0 && `SOFA ${g.total}${g.n < 6 ? "*" : ""}`, ...p.scoreList.filter(x => !["SOFA", "GCS", "RASS"].includes(x.name)).map(x => `${x.name} ${scoreVal(p, x)}`)].filter(Boolean).join(", "));
+  add("Plan", [p.plan, open.join("; ")].filter(Boolean).join(" | "));
+  return lines.join("\n");
 }
 
 function makeSBAR() {
-  if (!P()) return;
-  $("sbar").value = sbarText(P());
+  if (active === null || !P()) return;
+  const t = sbarText(P());
+  P().sbar = t;
+  persist();
+  if ($("sbar")) $("sbar").value = t;
 }
 
 function copySBAR() {
-  const t = $("sbar");
-  if (!t || !t.value) { alert("Generate SBAR first."); return; }
-  navigator.clipboard.writeText(t.value).then(() => alert("Copied SBAR."), () => {
-    t.select();
-    document.execCommand("copy");
-    alert("Copied SBAR.");
-  });
+  const s = $("sbar") ? $("sbar").value : "";
+  if (!s) { alert("Generate SBAR first."); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(s).then(() => alert("Copied."), () => alert("Copy failed; select and copy manually."));
+  else alert("Clipboard not available; select and copy manually.");
 }
 
 function showSheet() {
-  if (!data.length) { alert("No patients yet."); return; }
-  $("sheetTxt").textContent = data.map(sbarText).join("\n\n========================================\n\n");
+  if (!data.length) { alert("No patients added yet."); return; }
+  $("sheetTxt").textContent = data.map(sbarText).join("\n\n" + "=".repeat(36) + "\n\n");
   $("sheet").hidden = false;
   $("sheet").scrollIntoView({ behavior: "smooth" });
 }
 
 function copySheet() {
-  const t = $("sheetTxt").textContent;
-  navigator.clipboard.writeText(t).then(() => alert("Copied handover sheet."), () => alert("Could not copy automatically."));
+  const s = $("sheetTxt").textContent;
+  if (!s) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(s).then(() => alert("Copied."), () => alert("Copy failed."));
+  else alert("Clipboard not available.");
 }
 
-/* ---------- Patient list, modal & UI actions ---------- */
-function renderList() {
-  const b = $("list");
-  b.innerHTML = data.length
-    ? data.map((p, i) => {
-        const g = scoreCalc(p), k = cardioCalc(p.cardio.vitals), d = dayN(p.admissionDate);
-        const s = [p.age && p.age + "y", d > 0 && "D" + d, p.diagnosis, k.map !== null && "MAP " + k.map.toFixed(0), g.n && "SOFA " + g.total + (g.n < 6 ? "*" : "")].filter(Boolean).join(" · ");
-        return `<div class="pt"><span><b>${esc(p.bed || "Bed")}</b>${s ? " — " + esc(s) : ""}</span><button class="pri" onclick="openPatient(${i})">Open</button><button class="x" onclick="delPatient(${i})">Delete</button></div>`;
-      }).join("")
-    : '<p class="small">No patients yet. Add a bed below or import a backup.</p>';
+/* ---------- Live outputs & updates ---------- */
+function renderOutputs() {
+  const p = P();
+  if (!p) return;
+  ensure(p);
+
+  if ($("gcsOut")) $("gcsOut").innerHTML = gcsHTML(p);
+  if ($("ctBrain")) $("ctBrain").innerHTML = ctBox(p, /ct\s*(brain|head)/i, "CT brain");
+  if ($("ctChest")) $("ctChest").innerHTML = ctBox(p, /ct\s*(chest|thorax)/i, "CT chest");
+  if ($("invEcho")) $("invEcho").innerHTML = ctBox(p, /echo/i, "Echo");
+  if ($("ventOut")) $("ventOut").innerHTML = ventCalc(p);
+  if ($("wnOut")) $("wnOut").innerHTML = wnHTML(p);
+  if ($("rbsOut")) $("rbsOut").innerHTML = rbsTxt(p);
+  if ($("abgOut")) $("abgOut").innerHTML = abgCalc(p);
+  if ($("scoreOut")) $("scoreOut").innerHTML = scoreHTML(p);
+  if ($("recScores")) $("recScores").innerHTML = recScores(p).map(r => `<div class="r"><b>${esc(r[0])}:</b> ${esc(r[1])}</div>`).join("") || "No additional score suggested by current entries.";
+  if ($("cvRec")) $("cvRec").innerHTML = recList(cvRecs(p));
+  if ($("infRec")) $("infRec").innerHTML = recList(infRecs(p));
+  if ($("acRec")) $("acRec").innerHTML = recList(anticoagRecs(p));
+  if ($("medOut")) $("medOut").innerHTML = medHTML(p);
+  if ($("crclAutoBox")) $("crclAutoBox").innerHTML = crclAutoHTML(p);
+
+  if ($("fluidOut2")) {
+    const w = parseFloat(p.weight), h = parseFloat(p.duration), i = parseFloat(p.fluidIn), o = parseFloat(p.fluidOut);
+    const bal = isFinite(i) && isFinite(o) ? i - o : null;
+    const rate = o >= 0 && h > 0 ? o / h : null;
+    const perKg = rate !== null && w > 0 ? rate / w : null;
+    $("fluidOut2").innerHTML = [
+      bal !== null ? `Net balance: <b>${bal > 0 ? "+" : ""}${bal.toFixed(0)} mL</b>` : "Net balance: —",
+      rate !== null ? `Output rate: <b>${rate.toFixed(1)} mL/h</b>` : "Output rate: —",
+      perKg !== null ? `Per kg: <b>${perKg.toFixed(2)} mL/kg/h</b>` : ""
+    ].filter(Boolean).join(" · ");
+  }
+
+  if ($("cvOut")) {
+    const k = cardioCalc(p.cardio.vitals), t = parseFloat(p.cardio.vitals.targetMap || 65);
+    $("cvOut").innerHTML = (k.al.length ? `<div class="al"><b>Alert:</b> ${esc(k.al.join(" "))}</div>` : "") +
+      `MAP: <b>${k.map !== null ? k.map.toFixed(1) + " mmHg" : "—"}</b> (target ${t} mmHg) · Shock index: <b>${k.si !== null ? k.si.toFixed(2) : "—"}</b> · Pulse pressure: <b>${k.pp !== null ? k.pp.toFixed(0) + " mmHg" : "—"}</b>`;
+  }
+
+  p.investigations.laboratory.forEach((it, i) => {
+    const el = $("lf" + i);
+    if (!el) return;
+    const [tx, cl, rf] = labFlag(it, p);
+    el.textContent = tx;
+    el.className = "fl " + cl;
+    el.title = rf;
+  });
+
+  if ($("trOut")) {
+    const s = $("trSel");
+    if (s) window._tr = s.value;
+    $("trOut").innerHTML = trendHTML(p, window._tr || (s && s.value) || "");
+  }
+
+  if ($("calcOut")) $("calcOut").innerHTML = calcHTML(p);
+
+  (p.scoreList || []).forEach((it, i) => {
+    const d = SD[it.name];
+    if (!d) return;
+    const st = d.c ? scoreState(p, it) : null;
+    const v = st ? st.val : scoreVal(p, it);
+    const t = $("st" + i);
+    if (t) t.textContent = v !== null && v !== "" ? v : "—";
+    const inf = $("si" + i);
+    if (inf) {
+      const m = d.i && v !== null && v !== "" ? d.i(v) : "";
+      inf.hidden = !m;
+      inf.textContent = m;
+    }
+    const a = $("sa" + i);
+    if (a) a.textContent = st ? (st.n ? `(${st.n}/${d.vals.length} from patient data)` : "(enter values)") : (autoScore(it.name, p) !== null ? "(from patient data)" : "");
+  });
+
+  if (active !== null && P()) {
+    const d = dayN(P().admissionDate);
+    const subParts = [
+      P().age && P().age + " y",
+      P().ventSex,
+      d > 0 && "ICU Day " + d,
+      P().diagnosis
+    ].filter(Boolean);
+    if ($("bedSub")) $("bedSub").textContent = subParts.join(" · ") || "Tap any card below to view and edit clinical details";
+    renderSlider();
+  }
+}
+
+/* ---------- Patient CRUD & rendering ---------- */
+function blank(bed) {
+  return {
+    bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", pastMedicalHistory: "",
+    presentIllness: "", events: "", cns: "", sedation: "", pupils: "", seizures: "",
+    cv: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "",
+    ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "",
+    pressureSupport: "", peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "",
+    ieRatio: "", palpation: "", bowelSounds: "", feeding: "", stool: "", rbs: "",
+    abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "",
+    skin: "", extNotes: "", temp: "", sepsisTime: "", sepsisMarker: "", sepsisM: {},
+    sepsisMarkerValues: {}, infection: "", labs: "", acType: "", acMech: "",
+    renal: "", other: "", weight: "", duration: "", fluidIn: "", fluidOut: "",
+    calc: { selected: "", inputs: {} }, plan: "", sbar: "", checks: {}, scores: {},
+    wean: {}, lines: [], abx: [], anticoag: [], plans: [], scoreList: [],
+    cultures: [], meds: [], trend: [], history: [],
+    investigations: {
+      laboratory: LAB.map(([n, u]) => ({ name: n, date: "", result: "", unit: u, trend: "", lastResult: "", last2: "", last3: "" })),
+      radiology: RAD.map(n => ({ name: n, date: "", result: "" })),
+      abg: {}
+    },
+    cardio: { vitals: { targetMap: "65" }, ecg: [], biomarkers: [], vasoactive: [], echo: { enabled: false } }
+  };
+}
+
+function nextBedLabel() {
+  const num = data.length + 1;
+  return `Bed ${String(num).padStart(2, "0")}`;
 }
 
 function addPatient() {
-  const bed = $("bed").value.trim();
-  if (!bed) { alert("Enter a bed label."); return; }
-  const p = { bed };
+  const b = $("bed").value.trim() || nextBedLabel();
+  const p = blank(b);
   ensure(p);
   data.push(p);
   $("bed").value = "";
@@ -3446,351 +3473,268 @@ function addPatient() {
   openPatient(data.length - 1);
 }
 
-function openPatient(i) {
-  if (i < 0 || i >= data.length) return;
-  active = i;
+function renderList() {
+  $("list").innerHTML = data.length
+    ? data.map((p, i) => {
+        ensure(p);
+        const icuDay = dayN(p.admissionDate);
+        const summary = [p.age && p.age + "y", p.ventSex, icuDay > 0 && "D" + icuDay, p.diagnosis].filter(Boolean).join(" · ");
+        return `<div class="pt"><span><b>${esc(p.bed || "Bed")}</b>${summary ? ` <span class="small">(${esc(summary)})</span>` : ""}</span><button class="g sm" onclick="openPatient(${i})">Open</button><button class="x sm" onclick="delPatient(${i})">Delete</button></div>`;
+      }).join("")
+    : '<p class="small">No patients yet.</p>';
+}
+
+function draw() {
   const p = P();
+  if (!p) return;
   ensure(p);
+  $("heading").textContent = p.bed || "Bed";
+  $("jumpSel").innerHTML = data.map((q, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(q.bed || "Bed " + (i + 1))}</option>`).join("");
+  renderOutputs();
+  if (activeCardId) renderModalContent();
+}
+
+function openPatient(i) {
+  if (!data[i]) return;
+  active = i;
+  activeCardId = null;
+  if ($("cardModal")) $("cardModal").hidden = true;
+  document.body.style.overflow = "";
   $("rec").hidden = false;
   $("infoBox").hidden = true;
-  $("heading").textContent = p.bed;
-  const d = dayN(p.admissionDate);
-  $("bedSub").textContent = [p.age && p.age + " yrs", p.ventSex, d > 0 && "ICU Day " + d, p.diagnosis].filter(Boolean).join(" · ") || "Tap any clinical module card below to open";
-  $("jumpSel").innerHTML = data.map((q, k2) => `<option value="${k2}"${k2 === i ? " selected" : ""}>${esc(q.bed)}</option>`).join("");
-  renderSlider();
-  if (activeCardId) renderModalContent();
-  renderOutputs();
+  draw();
   $("rec").scrollIntoView({ behavior: "smooth" });
 }
 
 function delPatient(i) {
-  if (i === undefined) i = active;
-  if (i === null || !data[i]) return;
-  const p = data[i];
-  if (!confirm("Delete " + (p.bed || "this patient") + "? You can restore it from Recently deleted.")) return;
+  const idx = typeof i === "number" ? i : active;
+  if (idx === null || !data[idx]) return;
+  const p = data[idx];
+  if (!confirm("Delete " + (p.bed || "this patient") + "? You can restore from Recently deleted.")) return;
   toTrash({ kind: "patient", bed: p.bed, item: p });
-  data.splice(i, 1);
-  persist();
-  if (!data.length) {
+  data.splice(idx, 1);
+  if (active === idx) {
     active = null;
-    closeCardModal();
+    activeCardId = null;
+    if ($("cardModal")) $("cardModal").hidden = true;
+    document.body.style.overflow = "";
     $("rec").hidden = true;
-  } else {
-    openPatient(Math.min(i, data.length - 1));
-  }
-  renderList();
-}
-
-function draw() {
-  if (active === null || !P()) return;
-  ensure(P());
-  const d = dayN(P().admissionDate);
-  $("heading").textContent = P().bed;
-  $("bedSub").textContent = [P().age && P().age + " yrs", P().ventSex, d > 0 && "ICU Day " + d, P().diagnosis].filter(Boolean).join(" · ") || "Tap any clinical module card below to open";
-  $("jumpSel").innerHTML = data.map((q, k2) => `<option value="${k2}"${k2 === active ? " selected" : ""}>${esc(q.bed)}</option>`).join("");
-  renderSlider();
-  if (activeCardId) renderModalContent();
-  renderOutputs();
-}
-
-function renderOutputs() {
-  const p = P();
-  if (!p) return;
-  const set = (id, h) => { const el = $(id); if (el) el.innerHTML = h; };
-
-  p.investigations.laboratory.forEach((it, i) => {
-    const f = labFlag(it, p), el = $("lf" + i);
-    if (el) {
-      el.textContent = f[0];
-      el.className = "fl " + f[1];
-      el.title = f[2];
-    }
-    const inp = document.querySelector(`[data-p="investigations.laboratory.${i}.result"]`);
-    if (inp) inp.classList.toggle("abn", f[1] === "hi" || f[1] === "lo");
-  });
-
-  set("crclAutoBox", crclAutoHTML(p));
-
-  const k = cardioCalc(p.cardio.vitals);
-  set("cvOut", `${k.al.length ? `<div class="al">${esc(k.al.join(" "))}</div>` : ""}MAP: <b>${k.map !== null ? k.map.toFixed(1) + " mmHg" : "—"}</b> · Shock index: <b>${k.si !== null ? k.si.toFixed(2) : "—"}</b> · Pulse pressure: <b>${k.pp !== null ? k.pp.toFixed(0) + " mmHg" : "—"}</b>`);
-  set("cvRec", recList(cvRecs(p)));
-  set("infRec", recList(infRecs(p)));
-  set("acRec", recList(anticoagRecs(p)));
-  set("ventOut", ventCalc(p));
-  set("abgOut", abgCalc(p));
-  set("scoreOut", scoreHTML(p));
-  set("gcsOut", gcsHTML(p));
-  set("ctBrain", ctBox(p, /ct\s*brain/i, "CT brain"));
-  set("ctChest", ctBox(p, /ct\s*chest/i, "CT chest"));
-  set("invEcho", ctBox(p, /echo/i, "Echo"));
-  set("rbsOut", rbsTxt(p));
-  set("wnOut", wnHTML(p));
-  set("medOut", medHTML(p));
-  set("calcOut", calcHTML(p));
-
-  set("recScores", (() => {
-    const r = recScores(p);
-    return r.length
-      ? r.map(([n, why]) => `<div class="r"><b>${esc(n)}:</b> ${esc(why)} <button class="sm" data-a="addrec:${esc(n)}">+ Add</button></div>`).join("")
-      : `<span class="small">None suggested from current entries.</span>`;
-  })());
-
-  (p.scoreList || []).forEach((it, i) => {
-    const d = SD[it.name], a = $("sa" + i);
-    if (a) a.textContent = !it.manual && autoScore(it.name, p) !== null ? "(auto)" : "";
-    if (!d || !d.c) return;
-    const st = scoreState(p, it);
-    st.vals.forEach((v, j) => {
-      const inp = document.querySelector(`[data-p="scoreList.${i}.comps.${j}"]`);
-      if (inp && document.activeElement !== inp) inp.placeholder = v === null ? "auto: —" : "auto: " + v;
-    });
-    const t = $("st" + i), inf = $("si" + i);
-    if (t) t.textContent = st.val === null ? "—" : st.val + (st.n < st.vals.length ? ` (partial: ${st.n}/${st.vals.length})` : "");
-    if (inf) {
-      const m = d.i ? d.i(st.val) : "";
-      inf.hidden = !m;
-      inf.textContent = m;
-    }
-  });
-
-  const ts = $("trSel");
-  if (ts) {
-    window._tr = ts.value;
-    set("trOut", trendHTML(p, ts.value));
-  }
-}
-
-/* Event delegation for all dynamic inputs & actions inside modal & page */
-$("cards").addEventListener("input", e => {
-  const el = e.target, path = el.dataset.p;
-  if (!path || active === null || !P()) return;
-  const v = el.type === "checkbox" ? el.checked : el.value;
-  setp(P(), path, v);
-  if (el.classList.contains("trend")) el.dataset.v = v;
-  if (path.startsWith("meds.") || path.startsWith("abx.") || path.startsWith("anticoag.")) {
-    P()._syncing = true;
-    try { syncMedicationsAcrossCards(P()); } finally { P()._syncing = false; }
+  } else if (active > idx) {
+    active--;
   }
   persist();
-  renderOutputs();
-  renderSlider();
   renderList();
-});
+  if (active !== null) draw();
+}
 
-$("cards").addEventListener("change", e => {
-  const el = e.target, path = el.dataset.p;
-  if (path && active !== null && P()) {
-    setp(P(), path, el.type === "checkbox" ? el.checked : el.value);
-    if (el.classList.contains("trend")) el.dataset.v = el.value;
-    if (path.startsWith("meds.") || path.startsWith("abx.") || path.startsWith("anticoag.")) {
-      P()._syncing = true;
-      try { syncMedicationsAcrossCards(P()); } finally { P()._syncing = false; }
-    }
-    persist();
-    renderList();
+/* ---------- Delegated input & action handlers ---------- */
+function onEdit(e) {
+  const t = e.target, path = t.dataset.p;
+  if (!path || active === null || !P()) return;
+  const p = P();
+  ensure(p);
+  const v = t.type === "checkbox" ? t.checked : t.value;
+  setp(p, path, v);
+  if (t.classList.contains("trend")) t.dataset.v = v;
+
+  if (!p._syncing && (/^(meds|abx|anticoag)\.\d+\./.test(path))) {
+    p._syncing = true;
+    try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
   }
-  if (path && (path.startsWith("sepsisM.") || path === "calc.selected" || path.startsWith("scores.") || path.startsWith("wean.") || path.startsWith("plans."))) {
+
+  if (t.type === "checkbox" && path.startsWith("plans.")) {
+    t.closest(".pi").classList.toggle("done", t.checked);
+  }
+  if (path.startsWith("sepsisM.")) {
     renderModalContent();
-  } else {
-    renderOutputs();
+    return;
   }
-  renderSlider();
-});
+  if (path === "calc.selected" || path.startsWith("calc.inputs.")) {
+    if ($("calcOut")) $("calcOut").innerHTML = calcHTML(p);
+    renderSlider();
+    return;
+  }
+  if (path.startsWith("meds.") || path.startsWith("abx.") || path.startsWith("anticoag.")) {
+    renderModalContent();
+    return;
+  }
+  renderOutputs();
+  persist();
+}
+
+$("cards").addEventListener("input", onEdit);
+$("cards").addEventListener("change", onEdit);
 
 $("cards").addEventListener("click", e => {
-  const b = e.target.closest("button");
-  if (!b || !b.dataset.a || active === null || !P()) return;
+  const b = e.target.closest("button[data-a]");
+  if (!b || active === null || !P()) return;
   const p = P();
   ensure(p);
   const [a, x, y] = b.dataset.a.split(":");
 
   if (a === "add") {
-    const sel = $("sel_" + x), obj = { editing: true };
+    const sel = $("sel_" + x), o = {};
     if (sel && sel.value) {
-      if (x === "vasoactive" || x === "abx" || x === "anticoag") obj.drug = sel.value;
-      else obj.type = sel.value;
+      o[LISTS[x].sel === "Type" ? "type" : "drug"] = sel.value;
       sel.value = "";
     }
-    if (LISTS[x] && LISTS[x].days && !obj.date) {
-      obj.date = new Date().toISOString().slice(0, 10);
-    }
-    ARR(p, x).push(obj);
-    if (x === "abx" || x === "anticoag") {
-      p._syncing = true;
-      try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
-    }
-    persist();
-    renderModalContent();
-    renderSlider();
-    renderList();
-  } else if (a === "del") {
-    const arr = ARR(p, x), idx = +y, removed = arr[idx];
-    if (!removed) return;
-    toTrash({ kind: "item", bed: p.bed, x, item: removed });
-    arr.splice(idx, 1);
-    persist();
-    renderModalContent();
-    renderSlider();
-    renderList();
-  } else if (a === "entryedit") {
-    const arr = ARR(p, x), idx = +y;
-    if (!arr[idx]) return;
-    arr[idx].editing = !arr[idx].editing;
-    if (!arr[idx].editing && (x === "abx" || x === "anticoag")) {
-      p._syncing = true;
-      try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
-    }
-    persist();
-    renderModalContent();
-    renderSlider();
-    renderList();
-  } else if (a === "echo") {
-    p.cardio.echo.enabled = (x === "on");
-    persist();
-    renderModalContent();
-  } else if (a === "addlab") {
-    p.investigations.laboratory.push({ name: "Lab", date: "", result: "", unit: "", trend: "", lastResult: "", last2: "", last3: "" });
-    persist();
-    renderModalContent();
-  } else if (a === "addrad") {
-    p.investigations.radiology.push({ name: "Imaging", date: "", result: "" });
-    persist();
-    renderModalContent();
-  } else if (a === "addmed") {
-    p.meds.push({ category: "Other", drug: "", dose: "", route: "", frequency: "", date: new Date().toISOString().slice(0, 10), indication: "", renal: "", editing: true });
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "mededit") {
-    const idx = +x;
-    if (!p.meds[idx]) return;
-    p.meds[idx].editing = !p.meds[idx].editing;
+    if (x === "vasoactive") o.unit = "mcg/kg/min";
+    if (x === "abx" || x === "lines" || x === "anticoag") o.date = new Date().toISOString().slice(0, 10);
+    if (x === "abx" || x === "lines" || x === "anticoag" || x === "cultures") o.editing = true;
+    ARR(p, x).push(o);
     p._syncing = true;
     try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
-    persist();
-    renderModalContent();
-    renderSlider();
-    renderList();
+  } else if (a === "del") {
+    const arr = ARR(p, x), i = +y, removed = arr[i];
+    if (!removed) return;
+    if (x === "abx" && removed.drug) {
+      p.meds = (p.meds || []).filter(m => (m.drug || "").trim().toLowerCase() !== String(removed.drug).trim().toLowerCase());
+      p.plans = (p.plans || []).filter(pl => !(pl.text || "").toLowerCase().startsWith(("antibiotic: " + removed.drug).toLowerCase()));
+    } else if (x === "anticoag" && removed.drug) {
+      p.meds = (p.meds || []).filter(m => (m.drug || "").trim().toLowerCase() !== String(removed.drug).trim().toLowerCase());
+    } else if (x === "meds" && removed.drug) {
+      p.abx = (p.abx || []).filter(ab => (ab.drug || "").trim().toLowerCase() !== String(removed.drug).trim().toLowerCase());
+      p.anticoag = (p.anticoag || []).filter(ac => (ac.drug || "").trim().toLowerCase() !== String(removed.drug).trim().toLowerCase());
+      p.plans = (p.plans || []).filter(pl => !(pl.text || "").toLowerCase().startsWith(("antibiotic: " + removed.drug).toLowerCase()));
+    }
+    toTrash({ kind: "item", bed: p.bed, x, item: removed });
+    arr.splice(i, 1);
+  } else if (a === "mededit") {
+    const i = +x;
+    if (p.meds[i]) {
+      p.meds[i].editing = !p.meds[i].editing;
+      p._syncing = true;
+      try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
+    }
+  } else if (a === "entryedit") {
+    const arr = ARR(p, x), i = +y;
+    if (arr && arr[i]) {
+      arr[i].editing = !arr[i].editing;
+      p._syncing = true;
+      try { syncMedicationsAcrossCards(p); } finally { p._syncing = false; }
+    }
+  } else if (a === "addmed") {
+    p.meds.push({ category: "Other", drug: "", dose: "", route: "", frequency: "", indication: "", renal: "", editing: true });
   } else if (a === "ac") {
-    p.acType = (p.acType === x) ? "" : x;
-    persist();
-    renderModalContent();
-    renderSlider();
+    p.acType = x;
+  } else if (a === "echo") {
+    p.cardio.echo.enabled = x === "on";
+  } else if (a === "addlab") {
+    p.investigations.laboratory.push({ name: "", date: "", result: "", unit: "", trend: "", lastResult: "", last2: "", last3: "" });
+  } else if (a === "addrad") {
+    p.investigations.radiology.push({ name: "", date: "", result: "" });
+  } else if (a === "snap") {
+    p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
+    p.trend = p.trend.slice(-60);
+  } else if (a === "addplan") {
+    p.plans.push({ text: "", done: false });
+  } else if (a === "clearplans") {
+    if (!p.plans.length || !confirm("Remove all plan items?")) return;
+    p.plans.forEach(it => toTrash({ kind: "item", bed: p.bed, x: "plans", item: it }));
+    p.plans = [];
+  } else if (a === "tpl") {
+    const k = $("tplSel").value;
+    if (!k) return;
+    (TPL[k] || []).forEach(t => {
+      if (!p.plans.some(x => x.text === t)) p.plans.push({ text: t, done: false });
+    });
+    $("tplSel").value = "";
+  } else if (a === "resetchk") {
+    if (!confirm("Uncheck all daily checklist items?")) return;
+    p.checks = {};
+  } else if (a === "prevsbar") {
+    const h = (p.history || []).slice(-1)[0];
+    if (!h) { alert("No earlier SBAR saved yet. Use New day to archive one."); return; }
+    $("sbar").value = `(${h.d})\n` + h.sbar;
+    return;
   } else if (a === "addscore") {
     const n = $("scoreSel").value;
     if (!n) return;
     const v = autoScore(n, p);
-    p.scoreList.push({ name: n, value: v ?? "", manual: v === null, note: "", comps: {} });
+    p.scoreList.push({ name: n, value: v ?? "", note: "", comps: {}, manual: false });
     $("scoreSel").value = "";
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "addrec") {
-    const n = b.dataset.a.slice(7), v = autoScore(n, p);
-    p.scoreList.push({ name: n, value: v ?? "", manual: v === null, note: "", comps: {} });
-    persist();
-    renderModalContent();
-    renderSlider();
   } else if (a === "autosc") {
-    const it = p.scoreList[+x], v = autoScore(it.name, p);
-    it.comps = {};
-    if (v !== null) { it.value = v; it.manual = false; }
-    persist();
-    renderModalContent();
-  } else if (a === "addplan") {
-    p.plans.push({ text: "", done: false });
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "clearplans") {
-    if (!p.plans.length) return;
-    if (!confirm("Remove all plan items for " + (p.bed || "this patient") + "?")) return;
-    p.plans.forEach(item => toTrash({ kind: "item", bed: p.bed, x: "plans", item }));
-    p.plans = [];
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "tpl") {
-    const k = $("tplSel").value;
-    if (!k) return;
-    TPL[k].forEach(t => { if (!p.plans.some(q => q.text === t)) p.plans.push({ text: t, done: false }); });
-    $("tplSel").value = "";
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "resetchk") {
-    p.checks = {};
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "snap") {
-    p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
-    p.trend = p.trend.slice(-60);
-    persist();
-    renderModalContent();
-    renderSlider();
-  } else if (a === "prevsbar") {
-    const h = p.history.slice(-1)[0];
-    alert(h ? h.d + "\n\n" + h.sbar : "No previous SBAR saved yet. Use New day at the end of a day.");
+    const it = p.scoreList[+x], d = SD[it.name];
+    if (d && d.c) it.comps = {};
+    else { it.manual = false; it.value = autoScore(it.name, p) ?? ""; }
   }
+
+  persist();
+  renderModalContent();
+  renderSlider();
 });
 
-/* ---------- Export, import & service worker update ---------- */
-function dl(o, fn) {
-  const u = URL.createObjectURL(new Blob([JSON.stringify(o, null, 2)], { type: "application/json" }));
+/* ---------- Export, import backup & app update ---------- */
+function dl(obj, name) {
   const a = document.createElement("a");
-  a.href = u;
-  a.download = fn;
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+  a.download = name;
   document.body.append(a);
   a.click();
   a.remove();
-  setTimeout(() => URL.revokeObjectURL(u), 2000);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
 }
-const exportOne = () => { if (active !== null && P()) dl(P(), (P().bed || "patient") + ".json"); };
-const exportAll = () => dl({ app: "icu-rounds", exported: new Date().toISOString(), patients: data }, "icu-rounds-backup.json");
 
-$("imp").onchange = e => {
+function exportAll() {
+  dl({ exported: new Date().toISOString(), patients: data }, "icu-rounds-backup.json");
+}
+
+function exportOne() {
+  if (active === null || !P()) return;
+  dl({ exported: new Date().toISOString(), patients: [P()] }, (P().bed || "patient") + ".json");
+}
+
+function forceUpdate() {
+  if (!confirm("Update the app now? Your patient data stays on this device.")) return;
+  const go = () => location.reload();
+  if (!("serviceWorker" in navigator)) { go(); return; }
+  let done = false;
+  const finish = () => { if (!done) { done = true; go(); } };
+  setTimeout(finish, 4000);
+  navigator.serviceWorker.getRegistrations().then(rs => {
+    if (!rs.length) { finish(); return; }
+    let left = rs.length;
+    rs.forEach(r => r.unregister().then(() => { if (--left === 0) finish(); }, finish));
+  }, finish);
+}
+
+$("imp").addEventListener("change", e => {
   const f = e.target.files[0];
   if (!f) return;
   const r = new FileReader();
   r.onload = () => {
     try {
-      const o = JSON.parse(r.result), list = Array.isArray(o) ? o : o.patients;
+      const j = JSON.parse(r.result), list = Array.isArray(j) ? j : j.patients;
       if (!Array.isArray(list)) throw 0;
-      const valid = list.filter(q => q && typeof q === "object" && !Array.isArray(q));
-      if (!valid.length) throw 0;
-      valid.forEach(ensure);
-      data = data.concat(valid);
+      const clean = list.filter(x => x && typeof x === "object" && !Array.isArray(x));
+      if (!clean.length) { alert("No valid patient records found in this file."); return; }
+      clean.forEach(ensure);
+      data.push(...clean);
       persist();
       renderList();
-      alert("Imported " + valid.length + ".");
+      alert("Added " + clean.length + " patient(s).");
     } catch (err) {
-      alert("Not a valid backup file.");
+      alert("Could not read this file.");
     }
-    e.target.value = "";
   };
   r.readAsText(f);
-};
+  e.target.value = "";
+});
 
-async function forceUpdate() {
-  if (!confirm("Update the app now? Your saved patients and preferences are kept.")) return;
-  try {
-    if ("serviceWorker" in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r => r.unregister()));
-    }
-    if ("caches" in window) {
-      const keys = await caches.keys();
-      await Promise.all(keys.map(k => caches.delete(k)));
-    }
-  } catch (e) {}
-  location.reload(true);
-}
+/* Expose inline-button handlers cleanly after all declarations */
+Object.assign(window, {
+  addPatient, applyImportPreview, autoImportCase, clearTrash, closeCardModal,
+  copySBAR, copySheet, delPatient, delTrash, dlInfo, exportAll, exportOne,
+  fontStep, forceUpdate, importPreview, jump, makeSBAR, newDay, newDayAll,
+  openCardModal, openPatient, printInfo, restore, selectExamSub, shareTxt,
+  showInfo, showSheet, slideCards, slideExamSub, stepExamSub, stepModal,
+  toggleDark
+});
 
 data.forEach(ensure);
 renderList();
 renderTrash();
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
 </script>
 </body>
 </html>
