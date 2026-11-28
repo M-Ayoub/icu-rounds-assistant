@@ -361,10 +361,8 @@ window.addEventListener("error", function(e) {
   var d = document.createElement("div");
   d.style.cssText = "background:#fde8e7;color:#a3211b;padding:10px;font-size:13px;word-break:break-word;white-space:pre-wrap";
   var m = "Page error: " + e.message + " (" + String(e.filename || "").split("/").pop() + " line " + e.lineno + ":" + e.colno + ")";
-  try { if (e.error && e.error.stack) m += "
-" + String(e.error.stack).slice(0, 400); } catch (x) {}
-  d.textContent = m + "
-";
+  try { if (e.error && e.error.stack) m += "\n" + String(e.error.stack).slice(0, 400); } catch (x) {}
+  d.textContent = m + "\n";
   var b = document.createElement("button");
   b.textContent = "Save a copy of stored data";
   b.onclick = function() {
@@ -1646,4 +1644,4 @@ const CALC_DEFS = {
   map: { label: "Mean arterial pressure (MAP)", fields: [["sbp", "Systolic BP (mmHg)"], ["dbp", "Diastolic BP (mmHg)"]], run: v => { const s = +v.sbp, d = +v.dbp; if (!(s > 0 && d > 0 && s >= d)) return null; const x = (s + 2 * d) / 3; return [x.toFixed(1) + " mmHg", x < 65 ? "Below the commonly used initial target of 65 mmHg; interpret against the patient's perfusion and individualized target." : "Compare with the prescribed patient-specific MAP target and assess perfusion."]; } },
   shock: { label: "Shock index", fields: [["hr", "Heart rate (beats/min)"], ["sbp", "Systolic BP (mmHg)"]], run: v => { const h = +v.hr, s = +v.sbp; if (!(h > 0 && s > 0)) return null; const x = h / s; return [x.toFixed(2), x >= 0.9 ? "Elevated in many adult contexts; assess for shock and interpret with age, pregnancy, medications and clinical findings." : "A value below 0.9 does not exclude shock; assess perfusion and trends."]; } },
   pf: { label: "PaO₂ / FiO₂ ratio (P/F)", fields: [["pao2", "PaO₂ (mmHg)"], ["fio2", "FiO₂ (%)"]], run: v => { const p = +v.pao2, f = +v.fio2; if (!(p > 0 && f >= 21 && f <= 100)) return null; const x = p / (f / 100); return [x.toFixed(0) + " mmHg", x <= 100 ? "Severe oxygenation impairment range; ARDS severity requires the full Berlin criteria and PEEP/CPAP context." : x <= 200 ? "Moderate oxygenation impairment range; interpret with ARDS criteria and PEEP/CPAP." : x <= 300 ? "Mild oxygenation impairment range; interpret with the full clinical context." : "Not in the P/F oxygenation impairment thresholds; this alone does not exclude respiratory failure."]; } },
-  ibw: { label: "Ideal body weight and lung-protective VT", fields: [["sex", "Sex", "select", ["male", "female"]], ["height", "Height (cm)"], ["vt", "Set tidal volume (mL)"]], run: v => { const h = +v.height, vt = +v.vt; if (!(h > 100 && h < 230) || !v.sex) return null; const x = (v.sex === "male" ? 50 : 45.5) + .91 * (h - 152.4), r = vt > 0 ? `; current VT ${vt} mL = ${(vt / x).toFixed(1)} mL/kg PBW` : ""; return [x.toFixed(1) + " kg PBW" + r, vt > 0 ? (vt / x > 8 ? "VT is above 8 mL/kg PBW; review against lung-protective ventilation targets." : vt / x < 4 ? "VT is below 4 mL/kg PBW; confirm this is intended and clinically appropriate." : "Common ARD
+  ibw: { label: "Ideal body weight and lung-protective VT", fields: [["sex", "Sex", "select", ["male", "female"]], ["height", "Height (cm)"], ["vt", "Set tidal volume (mL)"]], run: v => { const h = +v.height, vt = +v.vt; if (!(h > 100 && h < 230) || !v.sex) return null; const x = (v.sex === "male" ? 50 : 45.5) + .91 * (h - 152.4), r = vt > 0 ? `; current VT ${vt} mL = ${(vt / x).toFixed(1)} mL/kg PBW` : ""; return [x.toFixed(1) + " kg PBW" + r, vt > 0 ? (vt / x > 8 ? "VT is above 8 mL/kg PBW; review against lung-protective ventilation targets." : vt / x < 4 ? "VT is below 4 mL/kg PBW; confirm this is intended and clinically appropriate." : "Common A
