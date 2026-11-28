@@ -26,8 +26,13 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;backgr
 header{background:linear-gradient(135deg,#123047 0%,#1f577e 100%);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(18,48,71,.16)}
 header h2{margin:0 0 2px;letter-spacing:-.2px}
 header small{opacity:.82}
-header button{min-height:36px;margin:0 0 0 4px;padding:6px 11px;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.2)}
-header button:hover{background:rgba(255,255,255,.26)}
+header button{
+  min-height:36px;margin:0 0 0 4px;padding:6px 13px;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.26);border-radius:99px;
+  color:#fff;box-shadow:none;
+}
+header button:hover{background:rgba(255,255,255,.28);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
 main{max-width:860px;margin:auto;padding:14px}
 @media(min-width:1040px){main{max-width:980px}}
 
@@ -35,16 +40,74 @@ section{background:var(--surface);border-radius:18px;padding:18px;margin:14px 0;
 h3{margin:0 0 10px;font-size:18px;letter-spacing:-.2px}
 h4{margin:16px 0 6px;color:var(--accent-deep);font-size:15px}
 label{display:block;font-weight:600;font-size:calc(var(--fs) - 2px);margin-top:10px}
-input,textarea,select{width:100%;padding:10px 12px;margin-top:4px;border:1px solid #c6d4e1;border-radius:10px;font:inherit;font-size:var(--fs);background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input,textarea,select{width:100%;padding:10px 12px;margin-top:4px;border:1px solid #c6d4e1;border-radius:12px;font:inherit;font-size:var(--fs);background:#fff;color:var(--ink);transition:border-color .15s,box-shadow .15s}
 textarea{min-height:70px}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(43,117,163,.16)}
-button{padding:10px 15px;min-height:42px;background:linear-gradient(135deg,#196387 0%,#124666 100%);color:#fff;border:0;border-radius:10px;margin:4px 4px 4px 0;font:inherit;font-weight:600;cursor:pointer;transition:transform .12s ease,box-shadow .15s ease,opacity .15s}
-button:hover{box-shadow:0 4px 12px rgba(20,91,120,.22)}
-button:active{transform:scale(.98)}
-button.x{background:linear-gradient(135deg,#b82e29 0%,#8f1e1a 100%)}
-button.g{background:#e7eff6;color:#163852;border:1px solid #cfdce8}
-button.g:hover{background:#dce7f1;box-shadow:none}
-button.sm{min-height:34px;padding:4px 12px;margin:0;font-size:13px}
+
+/* ---------- Card-Matched Pill & Translucent Buttons ---------- */
+button{
+  padding:10px 16px;
+  min-height:42px;
+  background:radial-gradient(circle at 22% 18%, #ffffff 0%, #f1f6fb 65%, #e3eef7 100%);
+  color:#132d42;
+  border:1px solid rgba(190,213,232,.9);
+  border-radius:16px;
+  margin:5px 5px 5px 0;
+  font:inherit;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(24,58,88,.08), inset 0 1px 0 rgba(255,255,255,.95);
+  transition:transform .2s cubic-bezier(.22,.68,0,1.2), box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+}
+button:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  color:#ffffff;
+  border-color:rgba(147,209,242,.6);
+  box-shadow:0 10px 22px rgba(23,67,99,.24);
+}
+button:active{transform:translateY(0) scale(.98)}
+
+/* Primary / Featured CTA buttons */
+button.pri{
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  color:#ffffff;
+  border-color:rgba(147,209,242,.55);
+  box-shadow:0 8px 20px rgba(23,67,99,.22), inset 0 1px 0 rgba(255,255,255,.25);
+}
+button.pri:hover{
+  background:linear-gradient(145deg,#468ab5 0%,#2b668f 55%,#1f4f72 100%);
+  box-shadow:0 12px 26px rgba(23,67,99,.32);
+}
+
+/* Secondary / Soft glass buttons */
+button.g{
+  background:radial-gradient(circle at 22% 18%, #ffffff 0%, #f4f8fc 70%, #e9f1f8 100%);
+  color:#1f4868;
+  border:1px solid #d2e1ee;
+}
+button.g:hover{
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  color:#ffffff;
+  border-color:rgba(147,209,242,.6);
+}
+
+/* Destructive / Danger buttons matching card orbs */
+button.x{
+  background:radial-gradient(circle at 22% 18%, #fff7f7 0%, #fde8e7 75%, #fad7d5 100%);
+  color:#a82420;
+  border:1px solid #f2b8b5;
+  box-shadow:0 6px 14px rgba(184,46,41,.08), inset 0 1px 0 rgba(255,255,255,.9);
+}
+button.x:hover{
+  background:linear-gradient(145deg,#e53935 0%,#b71c1c 100%);
+  color:#ffffff;
+  border-color:#ff8a80;
+  box-shadow:0 10px 22px rgba(183,28,28,.28);
+}
+
+button.sm{min-height:34px;padding:5px 12px;margin:0;font-size:12.5px;border-radius:12px}
 
 .warn{background:#fff5d6;border:1px solid #f0dc9c;color:#5c4508;padding:12px 14px;border-radius:12px;font-size:13px;line-height:1.5}
 .pt{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #e6edf4}
@@ -53,28 +116,39 @@ button.sm{min-height:34px;padding:4px 12px;margin:0;font-size:13px}
 .pt button{margin:0}
 
 /* Keep collapsible sub-details inside floating modals clean */
-details{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin:10px 0;overflow:visible;box-shadow:0 2px 8px rgba(18,48,71,.05)}
-details>summary{list-style:none;padding:13px 15px;background:linear-gradient(135deg,#17496b 0%,#266891 100%);color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;gap:10px;border-radius:13px;transition:box-shadow .18s ease}
+details{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin:10px 0;overflow:visible;box-shadow:0 4px 12px rgba(18,48,71,.05)}
+details>summary{
+  list-style:none;padding:13px 16px;
+  background:radial-gradient(circle at 22% 18%, #ffffff 0%, #f1f6fb 65%, #e4eef7 100%);
+  color:#132d42;border:1px solid rgba(190,213,232,.7);
+  font-weight:800;font-size:14.5px;cursor:pointer;display:flex;align-items:center;gap:10px;border-radius:15px;
+  transition:all .2s ease;
+}
+details>summary:hover, details[open]>summary{
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  color:#ffffff;border-color:rgba(147,209,242,.55);
+}
 details>summary::-webkit-details-marker{display:none}
-details>summary::after{content:"+";margin-left:auto}
-details[open]>summary{border-radius:13px 13px 6px 6px}
+details>summary::after{content:"+";margin-left:auto;font-size:17px}
+details[open]>summary{border-radius:15px 15px 6px 6px}
 details[open]>summary::after{content:"−"}
-.body{padding:6px 14px 14px}
+.body{padding:8px 14px 14px}
 .body details{margin:10px 0 0}
-.body details>summary{background:#2f6485;padding:11px 14px;font-size:14px}
-.body details.sub>summary{background:#e8f0f7;color:#123047}
+.body details>summary{padding:11px 14px;font-size:14px}
+.body details.sub>summary{background:#eef5fb;color:#123047;border-color:#d4e3f0}
+.body details.sub[open]>summary{background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 100%);color:#fff}
 
 /* Bed workspace header & navigation */
 #rec{background:linear-gradient(180deg,#f5f9fd 0%,#ffffff 100%);border:1px solid #d8e5f1;padding:20px}
-#navRow{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.85);padding:6px;margin:0 0 14px;border-radius:14px;border:1px solid #dce7f2;box-shadow:0 2px 10px rgba(18,48,71,.04)}
-#navRow button{flex:0 0 44px;margin:0;border-radius:10px}
-#navRow select{flex:1;min-width:0;margin:0;border-radius:10px;font-weight:700;border-color:transparent;background:transparent}
+#navRow{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.85);padding:6px;margin:0 0 14px;border-radius:16px;border:1px solid #dce7f2;box-shadow:0 4px 12px rgba(18,48,71,.05)}
+#navRow button{flex:0 0 44px;margin:0;border-radius:12px}
+#navRow select{flex:1;min-width:0;margin:0;border-radius:12px;font-weight:700;border-color:transparent;background:transparent}
 .bed-hero{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:14px}
 .bed-hero h3{margin:0;font-size:22px;color:#102b40}
 .bed-sub{font-size:13px;color:var(--muted);margin-top:3px}
 .slider-hint{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
 
-/* ---------- Medical Card Slider (inspired by reference design) ---------- */
+/* ---------- Medical Card Slider ---------- */
 .slider-shell{position:relative;margin:4px -6px 16px;padding:6px}
 .card-slider{
   display:flex;
@@ -141,7 +215,7 @@ details[open]>summary::after{content:"−"}
 }
 .organ-wrap svg{width:88px;height:88px;overflow:visible}
 
-/* Top-right status / action orb matching reference */
+/* Top-right status / action orb */
 .status-orb{
   width:38px;
   height:38px;
@@ -208,7 +282,7 @@ details[open]>summary::after{content:"−"}
 
 .slider-controls{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
 .slider-nav-btns{display:flex;gap:6px}
-.slider-nav-btns button{min-height:34px;padding:4px 12px;margin:0;border-radius:99px;font-size:13px}
+.slider-nav-btns button{min-height:34px;padding:4px 13px;margin:0;border-radius:99px;font-size:14px}
 
 /* ---------- Floating Modal Card ---------- */
 .modal-backdrop{
@@ -230,8 +304,8 @@ details[open]>summary::after{content:"−"}
 
 .floating-card{
   width:100%;
-  max-width:780px;
-  max-height:89vh;
+  max-width:800px;
+  max-height:90vh;
   display:flex;
   flex-direction:column;
   background:var(--surface);
@@ -257,14 +331,124 @@ details[open]>summary::after{content:"−"}
 .floating-head h3{margin:0;font-size:18px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .floating-head small{display:block;font-size:12px;opacity:.82}
 .floating-head-actions{display:flex;align-items:center;gap:6px;flex:none}
-.floating-head-actions button{min-height:36px;padding:5px 11px;margin:0;border-radius:99px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px}
-.floating-head-actions button:hover{background:rgba(255,255,255,.3)}
+.floating-head-actions button{min-height:36px;padding:5px 12px;margin:0;border-radius:99px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;box-shadow:none}
+.floating-head-actions button:hover{background:rgba(255,255,255,.3);transform:translateY(-1px)}
 .floating-close{width:36px;padding:0!important;font-size:18px;line-height:1}
 
 .floating-body{
   padding:16px 20px 24px;
   overflow-y:auto;
   flex:1;
+}
+
+/* ---------- Inner Examination Swipeable Sub-Cards ---------- */
+.exam-sub-bar{
+  background:linear-gradient(180deg,#f2f7fc 0%,#e9f1f9 100%);
+  border:1px solid #d5e3f0;
+  border-radius:20px;
+  padding:12px;
+  margin-bottom:14px;
+}
+.exam-sub-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+  padding:0 4px;
+}
+.exam-sub-top span{font-size:12px;font-weight:700;color:#48657e}
+.exam-sub-slider{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  padding:4px 2px 10px;
+  -webkit-overflow-scrolling:touch;
+}
+.exam-sub-slider::-webkit-scrollbar{height:6px}
+.exam-sub-slider::-webkit-scrollbar-track{background:#dce7f2;border-radius:99px}
+.exam-sub-slider::-webkit-scrollbar-thumb{background:#9ab6cf;border-radius:99px}
+
+.exam-sub-card{
+  flex:0 0 174px;
+  min-height:158px;
+  scroll-snap-align:start;
+  position:relative;
+  border-radius:20px;
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  cursor:pointer;
+  border:1px solid rgba(255,255,255,.95);
+  background:radial-gradient(circle at 22% 18%, #ffffff 0%, #f1f6fb 65%, #e4eef7 100%);
+  box-shadow:0 8px 18px rgba(24,58,88,.08), inset 0 1px 0 rgba(255,255,255,.95);
+  transition:transform .22s cubic-bezier(.22,.68,0,1.2), box-shadow .22s ease, background .22s ease, border-color .22s ease;
+  user-select:none;
+}
+.exam-sub-card:hover, .exam-sub-card.is-active{
+  transform:translateY(-4px);
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  border-color:rgba(147,209,242,.6);
+  box-shadow:0 14px 26px rgba(23,67,99,.25);
+}
+.exam-sub-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.exam-sub-icon{width:54px;height:54px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 6px 10px rgba(19,74,110,.16))}
+.exam-sub-icon svg{width:50px;height:50px}
+.exam-sub-card .status-orb{width:30px;height:30px;font-size:12px}
+.exam-sub-title{font-size:13.5px;font-weight:800;color:#132d42;line-height:1.2;margin-top:6px}
+.exam-sub-meta{font-size:11px;color:#4f6b82;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.exam-sub-card:hover .exam-sub-title, .exam-sub-card.is-active .exam-sub-title{color:#fff}
+.exam-sub-card:hover .exam-sub-meta, .exam-sub-card.is-active .exam-sub-meta{color:#d8ecfa}
+.exam-sub-card:hover .status-orb, .exam-sub-card.is-active .status-orb{background:#fff;color:#16486b}
+
+.exam-detail-pane{
+  background:var(--surface);
+  border:1px solid #dce6f0;
+  border-radius:18px;
+  padding:14px 16px;
+  box-shadow:0 6px 18px rgba(18,48,71,.05);
+}
+.exam-detail-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding-bottom:10px;
+  margin-bottom:8px;
+  border-bottom:1px solid #e6eef5;
+}
+.exam-detail-head h4{margin:0;font-size:16px;color:#103954}
+
+/* ---------- Medication Category Badges & Group Headers ---------- */
+.med-group-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:14px 0 6px;
+  padding:6px 11px;
+  border-radius:11px;
+  background:#eaf3fa;
+  border:1px solid #d3e3f1;
+  color:#154363;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.med-cat-pill{
+  display:inline-block;
+  font-size:10.5px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:99px;
+  background:#e1eff9;
+  color:#16527a;
+  border:1px solid #c3ddf0;
+  letter-spacing:.2px;
+  vertical-align:middle;
 }
 
 .bed-actions-bar{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px;border-top:1px solid #e2ebf3}
@@ -278,9 +462,9 @@ details[open]>summary::after{content:"−"}
 .abg-grid input{font-size:12px;padding:6px 4px;margin-top:0;min-width:0;text-align:center}
 .abg-grid .abg-prev{background:#f3f6f8}
 
-.med-row{border:1px solid #dce6ed;border-radius:10px;padding:9px;margin:7px 0;background:#f7fafc}
+.med-row{border:1px solid #dce6ed;border-radius:14px;padding:10px 12px;margin:7px 0;background:#f7fafc}
 .med-summary{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-width:0}
-.med-summary .med-name{font-size:17px;font-weight:900;color:#102f45;letter-spacing:.1px;min-width:70px;flex:1 1 35%;overflow-wrap:anywhere}
+.med-summary .med-name{font-size:16px;font-weight:900;color:#102f45;letter-spacing:.1px;min-width:70px;flex:1 1 35%;overflow-wrap:anywhere;display:flex;flex-wrap:wrap;align-items:center;gap:7px}
 .med-summary .med-details{font-size:12px;color:#526879;flex:1 1 100%;order:3;min-width:0;line-height:1.55;overflow-wrap:anywhere}
 .med-summary button{flex:none}
 .med-details .entry-value{font-size:14px;font-weight:800;color:#103954}
@@ -289,7 +473,7 @@ details[open]>summary::after{content:"−"}
 .med-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px}
 .med-grid label{min-width:0}
 .med-grid input,.med-grid select,.med-grid textarea{padding:7px;font-size:13px}
-.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:7px 9px;margin:5px 0;background:#eaf5fb;border-radius:8px;font-size:12px;color:#103954}
+.abx-copy-row{display:grid;grid-template-columns:minmax(90px,1fr) minmax(90px,auto) minmax(100px,1fr);gap:7px;align-items:center;padding:8px 10px;margin:5px 0;background:#eaf5fb;border-radius:10px;font-size:12px;color:#103954}
 .abx-copy-row b,.abx-copy-row span{overflow-wrap:anywhere}
 
 @media(max-width:480px){
@@ -298,6 +482,7 @@ details[open]>summary::after{content:"−"}
   .abg-grid input{font-size:11px;padding:6px 2px}
   .abg-name{font-size:11px;padding:6px 3px}
   .med-card{flex:0 0 196px;min-height:220px;padding:15px}
+  .exam-sub-card{flex:0 0 154px;min-height:146px;padding:12px}
   .floating-card{max-height:93vh;border-radius:20px}
 }
 
@@ -314,9 +499,9 @@ details[open]>summary::after{content:"−"}
 .trend[data-v=up]{color:#16833d}
 .trend[data-v=down]{color:#d62828}
 
-.ent{background:#f4f8fb;border:1px solid #dce6ed;border-radius:10px;padding:6px 10px 10px;margin:10px 0}
-.out{background:#f2f6f9;border-radius:10px;padding:10px;margin-top:10px;font-size:var(--fs);line-height:1.5;overflow-x:auto}
-.r{padding:7px;margin:5px 0;border-radius:7px;background:#fff;border-left:4px solid #315f91;font-size:var(--fs)}
+.ent{background:#f4f8fb;border:1px solid #dce6ed;border-radius:14px;padding:8px 12px 12px;margin:10px 0}
+.out{background:#f2f6f9;border-radius:12px;padding:10px;margin-top:10px;font-size:var(--fs);line-height:1.5;overflow-x:auto}
+.r{padding:7px;margin:5px 0;border-radius:8px;background:#fff;border-left:4px solid #315f91;font-size:var(--fs)}
 .r.a{border-color:#c62828;background:#fff0ef}
 table{border-collapse:collapse;font-size:var(--fs);min-width:430px;width:100%;background:#fff}
 td,th{border:1px solid #dce5eb;padding:6px;text-align:left;vertical-align:top}
@@ -324,7 +509,7 @@ th{background:#123047;color:#fff}
 .w{color:#b45309;font-weight:700}
 .gd{color:#18733b;font-weight:700}
 .small{font-size:12px;color:#647b8c;line-height:1.5}
-.al{background:#fff0ef;color:#a12622;border-left:4px solid #c62828;padding:7px;margin:5px 0;border-radius:6px;font-size:13px}
+.al{background:#fff0ef;color:#a12622;border-left:4px solid #c62828;padding:7px;margin:5px 0;border-radius:8px;font-size:13px}
 .chk{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:8px}
 .chk input{width:auto;margin:0}
 .chk:has(input[type=checkbox]:checked){opacity:.38}
@@ -353,12 +538,17 @@ pre{white-space:pre-wrap;font:13px/1.55 system-ui}
 .chip span{padding:7px 12px;border:1px solid #9fb3c2;border-radius:18px;font-size:13px;font-weight:600;cursor:pointer}
 .chip input:checked+span{background:#145b78;color:#fff;border-color:#145b78}
 .seg{display:flex;gap:6px;margin:8px 0}
-.seg button{flex:1;margin:0;background:#dde6ed;color:#123047}
-.seg button.on{background:#145b78;color:#fff}
+.seg button{flex:1;margin:0;border-radius:14px}
+.seg button.on{
+  background:linear-gradient(145deg,#3e7ca3 0%,#265a7e 55%,#1b4563 100%);
+  color:#fff;
+  border-color:rgba(147,209,242,.6);
+  box-shadow:0 8px 18px rgba(23,67,99,.24);
+}
 
 .calc-select{margin:4px 0 10px}
 .calc-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
-.calc-result{border:1px solid #c9dce8;border-left:5px solid #145b78;background:#eef6fa;border-radius:10px;padding:12px;margin-top:12px}
+.calc-result{border:1px solid #c9dce8;border-left:5px solid #145b78;background:#eef6fa;border-radius:12px;padding:12px;margin-top:12px}
 .calc-result .calc-value{font-size:22px;font-weight:900;color:#103954;overflow-wrap:anywhere}
 .calc-result .calc-rec{margin-top:8px;font-size:13px;line-height:1.5}
 
@@ -367,21 +557,26 @@ pre{white-space:pre-wrap;font:13px/1.55 system-ui}
 
 /* ---------- Dark Mode ---------- */
 body.dark{background:linear-gradient(180deg,#0d141c 0%,#121b24 100%);color:#e6edf3}
-body.dark section,body.dark details,body.dark .ent,body.dark table,body.dark #navRow{background:#19232d;color:#e6edf3;border-color:#2a3846}
+body.dark section,body.dark details,body.dark .ent,body.dark table,body.dark #navRow,body.dark .exam-detail-pane{background:#19232d;color:#e6edf3;border-color:#2a3846}
 body.dark #rec{background:linear-gradient(180deg,#16202b 0%,#1b2632 100%);border-color:#2b3b4b}
+body.dark .exam-sub-bar{background:linear-gradient(180deg,#15202b 0%,#1a2734 100%);border-color:#2b3d4f}
+body.dark .exam-sub-top span{color:#9eb8ce}
+body.dark .exam-detail-head{border-color:#2a3846}
+body.dark .exam-detail-head h4{color:#b8e4ff}
 body.dark .bed-hero h3{color:#e6edf3}
-body.dark .med-card{
+body.dark .med-card, body.dark .exam-sub-card{
   background:radial-gradient(circle at 22% 18%, #243444 0%, #1a2633 65%, #141e29 100%);
   border-color:#2e4154;
   box-shadow:0 12px 26px rgba(0,0,0,.32);
 }
-body.dark .med-card:hover, body.dark .med-card:focus-visible, body.dark .med-card.is-featured{
+body.dark .med-card:hover, body.dark .med-card:focus-visible, body.dark .med-card.is-featured,
+body.dark .exam-sub-card:hover, body.dark .exam-sub-card.is-active{
   background:linear-gradient(145deg,#2d668a 0%,#1d4a68 55%,#14364e 100%);
   border-color:#5ba5d1;
 }
-body.dark .med-card-title{color:#eef5fc}
+body.dark .med-card-title, body.dark .exam-sub-title{color:#eef5fc}
 body.dark .med-card-kicker{color:#8eb4d1}
-body.dark .med-card-meta{color:#a8bfd3}
+body.dark .med-card-meta, body.dark .exam-sub-meta{color:#a8bfd3}
 body.dark .status-orb.idle{background:#253647;color:#b8e4ff}
 body.dark .floating-card{background:#18222c;border-color:#304254}
 body.dark input,body.dark textarea,body.dark select{background:#0f171e;color:#e6edf3;border-color:#33424f}
@@ -393,35 +588,75 @@ body.dark .med-row{background:#202d38;border-color:#3b4c5b}
 body.dark .med-summary .med-name{color:#b8e4ff}
 body.dark .med-summary .med-details{color:#b5c5d1}
 body.dark .med-edit{border-color:#3b4c5b}
+body.dark .med-group-head{background:#1c3144;border-color:#2c4861;color:#b8e4ff}
+body.dark .med-cat-pill{background:#1d3f57;border-color:#305d7d;color:#bfe6ff}
 body.dark .abx-copy-row{background:#18394b;color:#d6efff}
 body.dark .warn{background:#3b3216;color:#ffe9a8;border-color:#5c4d1f}
 body.dark td,body.dark th{border-color:#2f3d4a}
 body.dark .small{color:#9fb0bf}
-body.dark .body details.sub>summary{background:#26384a;color:#e6edf3}
+body.dark details>summary{
+  background:radial-gradient(circle at 22% 18%, #243444 0%, #1a2633 65%, #141e29 100%);
+  color:#eef5fc;border-color:#2e4154;
+}
+body.dark details>summary:hover, body.dark details[open]>summary{
+  background:linear-gradient(145deg,#2d668a 0%,#1d4a68 55%,#14364e 100%);
+  color:#ffffff;border-color:#5ba5d1;
+}
+body.dark .body details.sub>summary{background:#26384a;color:#e6edf3;border-color:#33495e}
 body.dark .pt{border-color:#2a3744}
 body.dark h4{color:#9fd3f0}
 body.dark .abn{background:#4a1d1d!important;color:#ff8a80!important}
-body.dark .seg button{background:#26384a;color:#e6edf3}
-body.dark .seg button.on{background:#2b7a9c;color:#fff}
 body.dark .chip span{border-color:#46607a}
 body.dark .calc-result{background:#1b3342;border-color:#34566b}
 body.dark .calc-result .calc-value{color:#b8e4ff}
 body.dark .abg-name{background:#1d4a63;color:#d6efff}
 body.dark .abg-grid .abg-prev{background:#15202b}
 body.dark .med-details .entry-value{color:#b8e4ff}
-body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
+
+/* Dark mode card-matched buttons */
+body.dark button{
+  background:radial-gradient(circle at 22% 18%, #243444 0%, #1a2633 65%, #141e29 100%);
+  color:#eef5fc;
+  border-color:#2e4154;
+  box-shadow:0 6px 16px rgba(0,0,0,.32);
+}
+body.dark button:hover{
+  background:linear-gradient(145deg,#2d668a 0%,#1d4a68 55%,#14364e 100%);
+  color:#ffffff;
+  border-color:#5ba5d1;
+}
+body.dark button.pri, body.dark .seg button.on{
+  background:linear-gradient(145deg,#2d668a 0%,#1d4a68 55%,#14364e 100%);
+  color:#ffffff;
+  border-color:#5ba5d1;
+}
+body.dark button.g{
+  background:radial-gradient(circle at 22% 18%, #21303f 0%, #17222e 70%, #121b25 100%);
+  color:#dce8f2;
+  border-color:#2c3e50;
+}
+body.dark button.x{
+  background:radial-gradient(circle at 22% 18%, #3c1f22 0%, #2d1619 75%, #241013 100%);
+  color:#ff9e96;
+  border-color:#692c30;
+}
+body.dark button.x:hover{
+  background:linear-gradient(145deg,#c62828 0%,#8e1717 100%);
+  color:#ffffff;
+  border-color:#ff8a80;
+}
 </style>
 </head>
 <body>
 <header>
   <div>
     <h2>ICU Rounds Assistant</h2>
-    <small>Offline organizer for rounds · v19</small>
+    <small>Offline organizer for rounds · v21</small>
   </div>
   <div>
-    <button class="g" onclick="toggleDark()" aria-label="Toggle dark mode">🌓</button>
-    <button class="g" onclick="fontStep(-1)" aria-label="Decrease font size">A−</button>
-    <button class="g" onclick="fontStep(1)" aria-label="Increase font size">A+</button>
+    <button onclick="toggleDark()" aria-label="Toggle dark mode">🌓</button>
+    <button onclick="fontStep(-1)" aria-label="Decrease font size">A−</button>
+    <button onclick="fontStep(1)" aria-label="Increase font size">A+</button>
   </div>
 </header>
 <main>
@@ -431,15 +666,15 @@ body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
     <h3>Patients / beds</h3>
     <div id="list"></div>
     <label>Bed label<input id="bed" placeholder="Example: Bed 01"></label>
-    <button onclick="addPatient()">Add patient</button>
+    <button class="pri" onclick="addPatient()">Add patient</button>
     <button class="g" onclick="showSheet()">Handover sheet (all beds)</button>
     <button class="g" onclick="newDayAll()">☀️ New day (all beds)</button>
     <details class="imp">
       <summary>📥 Import case from text</summary>
       <div class="body">
         <textarea id="caseTxt" style="min-height:150px" placeholder="Paste or dictate the case: age, sex, diagnosis, PMH, HPI, vitals, labs, ABG, ventilator, drugs, cultures, plan..."></textarea>
-        <button onclick="autoImportCase(0)">⚡ Auto-import to open patient</button>
-        <button onclick="autoImportCase(1)">⚡ Auto-import as new bed</button>
+        <button class="pri" onclick="autoImportCase(0)">⚡ Auto-import to open patient</button>
+        <button class="pri" onclick="autoImportCase(1)">⚡ Auto-import as new bed</button>
         <button class="g" onclick="importPreview(0)">Preview for open patient</button>
         <button class="g" onclick="importPreview(1)">Preview as new bed</button>
         <div id="importOut"></div>
@@ -475,15 +710,15 @@ body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
     </div>
 
     <div class="bed-actions-bar">
-      <button onclick="newDay()">☀️ New day</button>
+      <button class="pri" onclick="newDay()">☀️ New day</button>
       <button onclick="showInfo()">🖼️ Patient infographic</button>
-      <button onclick="exportOne()">Export this patient</button>
+      <button class="g" onclick="exportOne()">Export this patient</button>
       <button class="x" onclick="delPatient()">Delete patient</button>
     </div>
 
     <div id="infoBox" hidden style="margin-top:14px">
       <div id="infoSvg"></div>
-      <button onclick="dlInfo()">Download PNG</button>
+      <button class="pri" onclick="dlInfo()">Download PNG</button>
       <button onclick="dlInfo(1)">Share image</button>
       <button class="g" onclick="printInfo()">Print / PDF</button>
       <button class="g" onclick="$('infoBox').hidden=true">Close</button>
@@ -492,7 +727,7 @@ body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
 
   <section>
     <h3>Backup</h3>
-    <button onclick="exportAll()">Export all patients</button>
+    <button class="pri" onclick="exportAll()">Export all patients</button>
     <button class="g" onclick="$('imp').click()">Import backup</button>
     <button class="g" onclick="forceUpdate()">↻ Update app (keeps your data)</button>
     <input id="imp" type="file" accept=".json,application/json" hidden>
@@ -506,7 +741,7 @@ body.dark button.g{background:#253442;color:#dce8f2;border-color:#35495c}
 
   <section id="sheet" hidden>
     <h3>Handover sheet</h3>
-    <button onclick="window.print()">Print / save as PDF</button>
+    <button class="pri" onclick="window.print()">Print / save as PDF</button>
     <button class="g" onclick="copySheet()">Copy all</button>
     <button class="g" onclick="shareTxt($('sheetTxt').textContent)">Share</button>
     <button class="g" onclick="$('sheet').hidden=true">Close</button>
@@ -572,13 +807,14 @@ Object.assign(window, {
   addPatient, applyImportPreview, autoImportCase, clearTrash, closeCardModal,
   copySBAR, copySheet, delPatient, delTrash, dlInfo, exportAll, exportOne,
   fontStep, forceUpdate, importPreview, jump, makeSBAR, newDay, newDayAll,
-  openCardModal, openPatient, printInfo, restore, shareTxt, showInfo,
-  showSheet, slideCards, stepModal, toggleDark
+  openCardModal, openPatient, printInfo, restore, selectExamSub, shareTxt,
+  showInfo, showSheet, slideCards, slideExamSub, stepExamSub, stepModal,
+  toggleDark
 });
 
 const KEY = "icu_rounds_data";
 const PREF_KEY = "icu_rounds_prefs";
-let data = [], active = null, bad = false, activeCardId = null;
+let data = [], active = null, bad = false, activeCardId = null, activeExamSubId = "cns";
 
 try {
   const s = localStorage.getItem(KEY);
@@ -652,6 +888,7 @@ applyPrefs();
 /* ---------- Translucent 3D-Style Medical SVG Artwork ---------- */
 const ORGAN_SVGS = {
   dx: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gDx" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6ed3cf"/><stop offset="100%" stop-color="#1d6fa5"/></linearGradient></defs><rect x="20" y="14" width="56" height="68" rx="14" fill="url(#gDx)" opacity=".88"/><rect x="34" y="8" width="28" height="12" rx="6" fill="#a7f3d0"/><path d="M32 36h32M32 48h24M32 60h28" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"/></svg>`,
+  exam: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gExm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="55%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1e40af"/></linearGradient></defs><path d="M30 22v22a16 16 0 0 0 32 0V22" stroke="url(#gExm)" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M46 60v10a12 12 0 0 0 24 0V54" stroke="#38bdf8" stroke-width="5.5" stroke-linecap="round" fill="none"/><circle cx="70" cy="48" r="8" fill="#6ee7b7" opacity=".95"/><circle cx="70" cy="48" r="3.5" fill="#fff"/></svg>`,
   cns: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gBr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="52%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#1d4ed8"/></linearGradient></defs><path d="M46 18c-12 0-22 9-22 21 0 4 1 8 3 11-3 3-4 7-4 12 0 11 9 18 20 18h3V18z" fill="url(#gBr)" opacity=".92"/><path d="M50 18c12 0 22 9 22 21 0 4-1 8-3 11 3 3 4 7 4 12 0 11-9 18-20 18h-3V18z" fill="url(#gBr)" opacity=".82"/><path d="M33 34c5 0 8 4 8 8M31 52c6 0 10 4 10 9M63 34c-5 0-8 4-8 8M65 52c-6 0-10 4-10 9" stroke="#e0f2fe" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".85"/></svg>`,
   cv: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gHt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#38bdf8"/><stop offset="55%" stop-color="#0284c7"/><stop offset="100%" stop-color="#1e3a8a"/></linearGradient></defs><path d="M44 24V12h8v12M56 26l8-9 6 5-8 9" stroke="#5eead4" stroke-width="5" stroke-linecap="round"/><path d="M48 80C26 66 18 51 18 37c0-10 8-17 17-17 6 0 11 3 13 8 2-5 7-8 13-8 9 0 17 7 17 17 0 14-8 29-30 43z" fill="url(#gHt)" opacity=".92"/><path d="M26 48h11l5-10 7 20 6-13h15" stroke="#a7f3d0" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`,
   resp: `<svg viewBox="0 0 96 96"><defs><linearGradient id="gLu" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0369a1"/></linearGradient></defs><path d="M48 14v24M48 38L34 50M48 38l14 12" stroke="#7dd3fc" stroke-width="5" stroke-linecap="round"/><path d="M42 26c-14 4-24 22-24 42 0 8 5 12 13 12h11V26z" fill="url(#gLu)" opacity=".9"/><path d="M54 26c14 4 24 22 24 42 0 8-5 12-13 12H54V26z" fill="url(#gLu)" opacity=".82"/></svg>`,
@@ -694,6 +931,21 @@ const TR = ["", "Increasing", "Stable", "Decreasing"];
 const DRUGS = [
   "Norepinephrine (Noradrenaline)", "Epinephrine (Adrenaline)", "Vasopressin",
   "Dobutamine", "Dopamine", "Phenylephrine", "Milrinone", "Other"
+];
+
+const MED_CATEGORIES = [
+  "Antibiotics / Antimicrobials",
+  "IV Fluids / Electrolytes",
+  "Nebulizers / Inhaled",
+  "Vasopressors / Inotropes",
+  "Sedation / Analgesia",
+  "Anticoagulation / VTE",
+  "Cardiac / Antihypertensive",
+  "GI / PPI / Prokinetics",
+  "Insulin / Endocrine",
+  "Diuretics",
+  "Steroids / Immunosuppressants",
+  "Other"
 ];
 
 const LISTS = {
@@ -750,6 +1002,7 @@ const LISTS = {
   meds: {
     r: 1, days: 1, n: "Medication", t: "Medication list",
     f: [
+      ["category", "Type / Group", "sel", ["", ...MED_CATEGORIES]],
       ["drug", "Drug"], ["dose", "Dose / route / frequency"], ["date", "Start date", "date"],
       ["indication", "Indication"], ["renal", "Renal dose review", "sel", ["", "Not needed", "Needs review", "Reviewed"]]
     ]
@@ -863,6 +1116,7 @@ function ensure(p) {
 
   p.meds.forEach(m => {
     if (!m || typeof m !== "object") return;
+    if (m.category === undefined) m.category = "Other";
     if (m.route === undefined) m.route = "";
     if (m.frequency === undefined) m.frequency = "";
     if (m.indication === undefined) m.indication = "";
@@ -949,14 +1203,209 @@ function editableEntriesHTML(name, heading = true) {
   return `${heading ? `<h4>${esc(L.t)}</h4>` : ""}${top}${rows}<button data-a="add:${name}">+ Add ${title.toLowerCase()}</button>`;
 }
 
-/* ---------- Modular Section Cards (for Slider + Floating Card Modal) ---------- */
-function getCardModules(p) {
+/* ---------- Examination Sub-Cards (Nested Swipeable Slider inside Examination Modal) ---------- */
+function getExamSubModules(p) {
   ensure(p);
   const c = p.cardio, v = c.vitals, k = cardioCalc(v), s = p.scores || {}, g = scoreCalc(p);
-  const a = p.investigations.abg, pf = pfOf(p), w = p.wean || {};
+  const pf = pfOf(p), w = p.wean || {};
   const sv = (k2, val) => String(getp(p, "scores." + k2)) === val ? " selected" : "";
   const gs = (k2, l, arr) => `<label>${esc(l)}<select data-p="scores.${k2}"><option value=""></option>${arr.map((t, i) => `<option value="${i + 1}"${sv(k2, String(i + 1))}>${i + 1} – ${esc(t)}</option>`).join("")}</select></label>`;
   const RS = ["+4 Combative", "+3 Very agitated", "+2 Agitated", "+1 Restless", "0 Alert and calm", "-1 Drowsy", "-2 Light sedation", "-3 Moderate sedation", "-4 Deep sedation", "-5 Unarousable"];
+
+  return [
+    {
+      id: "cns",
+      title: "CNS & Sedation",
+      meta: [g.gcs !== null && `GCS ${g.gcs}`, s.rass && `RASS ${s.rass}`, p.sedation && p.sedation !== "None" && p.sedation].filter(Boolean).join(" · ") || "GCS, RASS, pupils",
+      status: (g.gcs !== null && g.gcs <= 8) || p.seizures === "Status epilepticus" ? "warn" : (g.gcs !== null || s.rass ? "ok" : "idle"),
+      badge: g.gcs !== null ? String(g.gcs) : "+",
+      render: () =>
+        `<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE", "Eye opening", ["None", "To pain", "To voice", "Spontaneous"])}${gs("gcsV", "Verbal (intubated: estimate)", ["None", "Incomprehensible sounds", "Inappropriate words", "Confused", "Oriented"])}${gs("gcsM", "Motor", ["None", "Extension", "Abnormal flexion", "Withdrawal", "Localizes", "Obeys"])}</div><div id="gcsOut" class="out"></div>` +
+        `<details class="sub" open><summary>Sedation and neurological status</summary><div class="body"><div class="g2">${fld(["sedation", "Sedation agent", "sel", ["", "None", "Propofol", "Midazolam", "Dexmedetomidine", "Ketamine", "Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t => { const val = t.split(" ")[0]; return `<option value="${val}"${String(getp(p, "scores.rass")) === val ? " selected" : ""}>${esc(t)}</option>`; }).join("")}</select></label>${fld(["pupils", "Pupils", "sel", ["", "Equal and reactive", "Equal, sluggish", "Unequal", "Fixed and dilated", "Pinpoint", "Other"]])}${fld(["seizures", "Seizures", "sel", ["", "None", "Seizure in last 24 h", "On antiepileptics, seizure-free", "Status epilepticus"]])}</div></div></details>` +
+        `<h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>` +
+        T("CNS notes (delirium, etc.)", "cns", "area")
+    },
+    {
+      id: "cv",
+      title: "Cardiovascular",
+      meta: [k.map !== null && `MAP ${k.map.toFixed(0)}`, v.hr && `HR ${v.hr}`, c.vasoactive.length && `${c.vasoactive.length} pressor(s)`].filter(Boolean).join(" · ") || "Vitals, pressors, ECG",
+      status: k.al.length ? "warn" : (k.map !== null || v.hr ? "ok" : "idle"),
+      badge: k.al.length ? "!" : (k.map !== null ? k.map.toFixed(0) : "+"),
+      render: () =>
+        `<div id="cvOut" class="out"></div>` +
+        S("Vitals and hemodynamics", grid([
+          ["sbp", "SBP (mmHg)", "number"], ["dbp", "DBP (mmHg)", "number"],
+          ["hr", "Heart rate (bpm)", "number"], ["cvp", "CVP (mmHg)", "number"],
+          ["targetMap", "MAP target (mmHg)", "number"],
+          ["rhythm", "Rhythm", "sel", ["", "Sinus rhythm", "Atrial fibrillation", "Atrial flutter", "SVT", "VT", "Paced rhythm", "Other"]]
+        ], "cardio.vitals"), 1) +
+        S(`Vasopressors and inotropes (${c.vasoactive.length})`, listHTML("vasoactive", 1), c.vasoactive.length > 0) +
+        S(`ECG (${c.ecg.length})`, listHTML("ecg", 1)) +
+        S(`Cardiac biomarkers (${c.biomarkers.length})`, listHTML("biomarkers", 1)) +
+        S("Echocardiography", `<div id="invEcho" class="out"></div>` + (c.echo.enabled ? `<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO, "cardio.echo")}` : `<button data-a="echo:on">+ Add echo</button>`)) +
+        `<h4>Recommendations</h4><div id="cvRec" class="out"></div>` +
+        T("Additional cardiovascular notes", "cv", "area")
+    },
+    {
+      id: "resp",
+      title: "Respiratory",
+      meta: [p.respSupport, p.spo2 && `SpO₂ ${p.spo2}%`, p.breathSounds].filter(Boolean).join(" · ") || "Support, SpO₂, chest",
+      status: parseFloat(p.spo2) < 92 ? "warn" : (p.respSupport || p.spo2 ? "ok" : "idle"),
+      badge: p.spo2 ? `${p.spo2}%` : "+",
+      render: () =>
+        grid([
+          ["respSupport", "Respiratory support", "sel", ["", "Room air", "Oxygen (nasal cannula / mask)", "HFNC / NIV", "Ventilator"]],
+          ["spo2", "SpO₂ (%)", "number"],
+          ["breathSounds", "Breath sounds", "sel", ["", "Normal vesicular", "Wheeze", "Crackles", "Coarse crackles", "Bronchial breathing", "Diminished air entry", "Absent breath sounds", "Stridor", "Pleural rub"]]
+        ]) +
+        T("Auscultation notes", "ausc", "area") +
+        T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)", "resp", "area") +
+        `<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`
+    },
+    {
+      id: "vent",
+      title: "Ventilator",
+      meta: [p.ventMode, p.setVT && `VT ${p.setVT}`, p.setPEEP && `PEEP ${p.setPEEP}`, pf !== null && `P/F ${pf.toFixed(0)}`].filter(Boolean).join(" · ") || "PBW, driving pressure",
+      status: (pf !== null && pf <= 150) || parseFloat(p.plateauPressure) > 30 ? "warn" : (p.ventMode ? "ok" : "idle"),
+      badge: p.ventMode || "+",
+      render: () =>
+        T("Ventilator mode", "ventMode", "sel", ["", "VC", "PC", "SIMV-VC", "SIMV-PC", "PSV", "CPAP", "APRV", "Other"]) +
+        grid([
+          ["heightCm", "Height (cm)", "number"], ["ventRate", "Set RR (/min)", "number"],
+          ["setVT", "Set VT (mL)", "number"], ["fio2Percent", "FiO₂ (%)", "number"],
+          ["setPEEP", "Set PEEP (cmH₂O)", "number"], ["pressureSupport", "Pressure support", "number"],
+          ["peakPressure", "Peak pressure", "number"], ["plateauPressure", "Plateau pressure", "number"],
+          ["totalPeep", "Total PEEP", "number"], ["paO2", "PaO₂ (mmHg)", "number"],
+          ["ieRatio", "I:E ratio"]
+        ]) +
+        `<p class="small">Sex is set in Diagnosis & Events. If PaO₂ or FiO₂ are empty here, the ABG values are used.</p><div id="ventOut" class="out"></div>`
+    },
+    {
+      id: "wean",
+      title: "Weaning",
+      meta: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length} criteria` + (w.sbt ? ` · ${w.sbt}` : ""),
+      status: w.sbt === "Passed" ? "ok" : (w.sbt === "Failed" ? "warn" : (WCRIT.some((_, i) => w["c" + i]) ? "ok" : "idle")),
+      badge: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length}`,
+      render: () =>
+        WCRIT.map((t, i) => `<label class="chk"><input type="checkbox" data-p="wean.c${i}"${w["c" + i] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") +
+        grid([
+          ["rr", "Spontaneous RR (/min)", "number"], ["vt", "Spontaneous VT (mL)", "number"],
+          ["sbt", "SBT result", "sel", ["", "Not done", "Passed", "Failed"]],
+          ["leak", "Cuff leak test", "sel", ["", "Not done", "Leak present", "No leak"]]
+        ], "wean") +
+        `<div id="wnOut" class="out"></div>`
+    },
+    {
+      id: "abd",
+      title: "Abdomen",
+      meta: [p.palpation, p.feeding, p.rbs && `RBS ${p.rbs}`].filter(Boolean).join(" · ") || "Palpation, feeding, RBS",
+      status: parseFloat(p.rbs) > 180 || parseFloat(p.rbs) < 70 ? "warn" : (p.palpation || p.feeding || p.rbs ? "ok" : "idle"),
+      badge: p.rbs ? p.rbs : "+",
+      render: () =>
+        grid([
+          ["palpation", "Palpation", "sel", ["", "Soft and lax", "Distended", "Tense", "Tender", "Guarding / rebound", "Rigid"]],
+          ["bowelSounds", "Bowel sounds", "sel", ["", "Present", "Hypoactive", "Absent", "Hyperactive"]],
+          ["feeding", "Feeding", "sel", ["", "Oral", "Enteral (NG/OG)", "Parenteral", "Enteral + parenteral", "Nil by mouth"]],
+          ["stool", "Stool", "sel", ["", "Passed stool", "Not passed", "Diarrhea", "Constipated"]],
+          ["rbs", "RBS (mg/dL)", "number"]
+        ]) +
+        `<div id="rbsOut" class="small"></div>` +
+        T("Abdomen notes", "abdNotes", "area")
+    },
+    {
+      id: "ext",
+      title: "Extremities",
+      meta: [p.edema && `Edema: ${p.edema}`, p.capRefill && `CRT ${p.capRefill}`, p.limbTemp].filter(Boolean).join(" · ") || "Edema, pulses, skin",
+      status: p.dvtSigns === "Yes" || p.capRefill === ">3 s" ? "warn" : (p.edema || p.pulses ? "ok" : "idle"),
+      badge: p.dvtSigns === "Yes" ? "!" : (p.edema ? "✓" : "+"),
+      render: () =>
+        grid([
+          ["edema", "Edema", "sel", ["", "None", "Mild pitting", "Moderate pitting", "Severe pitting", "Generalized (anasarca)"]],
+          ["pulses", "Peripheral pulses", "sel", ["", "Present", "Weak", "Absent"]],
+          ["capRefill", "Capillary refill", "sel", ["", "<2 s", "2–3 s", ">3 s"]],
+          ["limbTemp", "Skin / limb temperature", "sel", ["", "Warm", "Cool", "Mottled"]],
+          ["dvtSigns", "Calf swelling / tenderness", "sel", ["", "No", "Yes"]],
+          ["skin", "Skin integrity", "sel", ["", "Intact", "Pressure injury", "Rash", "Wound"]]
+        ]) +
+        T("Extremities notes", "extNotes", "area")
+    }
+  ];
+}
+
+function selectExamSub(subId) {
+  activeExamSubId = subId;
+  renderModalContent();
+  setTimeout(() => {
+    const el = document.querySelector(`.exam-sub-card[data-sub="${subId}"]`);
+    if (el) el.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, 10);
+}
+
+function slideExamSub(dir) {
+  const el = $("examSubSlider");
+  if (el) el.scrollBy({ left: dir * 360, behavior: "smooth" });
+}
+
+function stepExamSub(dir) {
+  if (!P()) return;
+  const subs = getExamSubModules(P());
+  const idx = subs.findIndex(x => x.id === activeExamSubId);
+  const next = subs[((idx === -1 ? 0 : idx) + dir + subs.length) % subs.length];
+  selectExamSub(next.id);
+}
+
+function renderExamHub(p) {
+  const subs = getExamSubModules(p);
+  const current = subs.find(x => x.id === activeExamSubId) || subs[0];
+  activeExamSubId = current.id;
+
+  const sliderCards = subs.map(s => `
+    <div class="exam-sub-card${s.id === current.id ? " is-active" : ""}" role="button" tabindex="0" data-sub="${s.id}"
+         onclick="selectExamSub('${s.id}')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectExamSub('${s.id}')}">
+      <div class="exam-sub-card-top">
+        <div class="exam-sub-icon">${ORGAN_SVGS[s.id] || ORGAN_SVGS.exam}</div>
+        <span class="status-orb ${s.status}">${esc(s.badge)}</span>
+      </div>
+      <div>
+        <div class="exam-sub-title">${esc(s.title)}</div>
+        <div class="exam-sub-meta">${esc(s.meta)}</div>
+      </div>
+    </div>
+  `).join("");
+
+  return `
+    <div class="exam-sub-bar">
+      <div class="exam-sub-top">
+        <span>Swipe or tap system card (${subs.findIndex(x => x.id === current.id) + 1}/${subs.length})</span>
+        <div class="slider-nav-btns">
+          <button class="g" onclick="slideExamSub(-1)" aria-label="Scroll systems left">‹</button>
+          <button class="g" onclick="slideExamSub(1)" aria-label="Scroll systems right">›</button>
+        </div>
+      </div>
+      <div id="examSubSlider" class="exam-sub-slider">${sliderCards}</div>
+    </div>
+    <div class="exam-detail-pane">
+      <div class="exam-detail-head">
+        <h4>${esc(current.title)}</h4>
+        <div class="slider-nav-btns">
+          <button class="g" onclick="stepExamSub(-1)">◀ Prev system</button>
+          <button class="g" onclick="stepExamSub(1)">Next system ▶</button>
+        </div>
+      </div>
+      ${current.render()}
+    </div>
+  `;
+}
+
+/* ---------- Modular Section Cards (for Main Slider + Floating Card Modal) ---------- */
+function getCardModules(p) {
+  ensure(p);
+  const g = scoreCalc(p);
+  const a = p.investigations.abg;
+  const examSubs = getExamSubModules(p);
+  const examWarnCount = examSubs.filter(s => s.status === "warn").length;
+  const examOkCount = examSubs.filter(s => s.status === "ok").length;
 
   const abnLabCount = p.investigations.laboratory.filter(it => {
     const f = labFlag(it, p);
@@ -986,127 +1435,13 @@ function getCardModules(p) {
         T("Events in last 24 hours", "events", "area")
     },
     {
-      id: "cns",
-      kicker: "Neurology",
-      title: "CNS & Sedation",
-      meta: [g.gcs !== null && `GCS ${g.gcs}`, s.rass && `RASS ${s.rass}`, p.sedation && p.sedation !== "None" && p.sedation].filter(Boolean).join(" · ") || "GCS, RASS, pupils, CT brain",
-      status: (g.gcs !== null && g.gcs <= 8) || p.seizures === "Status epilepticus" ? "warn" : (g.gcs !== null || s.rass ? "ok" : "idle"),
-      badge: g.gcs !== null ? String(g.gcs) : "+",
-      render: () =>
-        `<h4>Glasgow Coma Scale</h4><div class="g2">${gs("gcsE", "Eye opening", ["None", "To pain", "To voice", "Spontaneous"])}${gs("gcsV", "Verbal (intubated: estimate)", ["None", "Incomprehensible sounds", "Inappropriate words", "Confused", "Oriented"])}${gs("gcsM", "Motor", ["None", "Extension", "Abnormal flexion", "Withdrawal", "Localizes", "Obeys"])}</div><div id="gcsOut" class="out"></div>` +
-        `<details class="sub" open><summary>Sedation and neurological status</summary><div class="body"><div class="g2">${fld(["sedation", "Sedation agent", "sel", ["", "None", "Propofol", "Midazolam", "Dexmedetomidine", "Ketamine", "Other / combination"]])}<label>RASS<select data-p="scores.rass"><option value=""></option>${RS.map(t => { const val = t.split(" ")[0]; return `<option value="${val}"${String(getp(p, "scores.rass")) === val ? " selected" : ""}>${esc(t)}</option>`; }).join("")}</select></label>${fld(["pupils", "Pupils", "sel", ["", "Equal and reactive", "Equal, sluggish", "Unequal", "Fixed and dilated", "Pinpoint", "Other"]])}${fld(["seizures", "Seizures", "sel", ["", "None", "Seizure in last 24 h", "On antiepileptics, seizure-free", "Status epilepticus"]])}</div></div></details>` +
-        `<h4>Last CT brain (from Investigations)</h4><div id="ctBrain" class="out"></div>` +
-        T("CNS notes (delirium, etc.)", "cns", "area")
-    },
-    {
-      id: "cv",
-      kicker: "Hemodynamics",
-      title: "Cardiovascular",
-      meta: [k.map !== null && `MAP ${k.map.toFixed(0)}`, v.hr && `HR ${v.hr}`, c.vasoactive.length && `${c.vasoactive.length} pressor(s)`].filter(Boolean).join(" · ") || "Vitals, pressors, ECG, echo",
-      status: k.al.length ? "warn" : (k.map !== null || v.hr ? "ok" : "idle"),
-      badge: k.al.length ? "!" : (k.map !== null ? k.map.toFixed(0) : "+"),
-      render: () =>
-        `<div id="cvOut" class="out"></div>` +
-        S("Vitals and hemodynamics", grid([
-          ["sbp", "SBP (mmHg)", "number"], ["dbp", "DBP (mmHg)", "number"],
-          ["hr", "Heart rate (bpm)", "number"], ["cvp", "CVP (mmHg)", "number"],
-          ["targetMap", "MAP target (mmHg)", "number"],
-          ["rhythm", "Rhythm", "sel", ["", "Sinus rhythm", "Atrial fibrillation", "Atrial flutter", "SVT", "VT", "Paced rhythm", "Other"]]
-        ], "cardio.vitals"), 1) +
-        S(`Vasopressors and inotropes (${c.vasoactive.length})`, listHTML("vasoactive", 1), c.vasoactive.length > 0) +
-        S(`ECG (${c.ecg.length})`, listHTML("ecg", 1)) +
-        S(`Cardiac biomarkers (${c.biomarkers.length})`, listHTML("biomarkers", 1)) +
-        S("Echocardiography", `<div id="invEcho" class="out"></div>` + (c.echo.enabled ? `<button class="g" data-a="echo:off">Hide echo</button>${grid(ECHO, "cardio.echo")}` : `<button data-a="echo:on">+ Add echo</button>`)) +
-        `<h4>Recommendations</h4><div id="cvRec" class="out"></div>` +
-        T("Additional cardiovascular notes", "cv", "area")
-    },
-    {
-      id: "resp",
-      kicker: "Pulmonary",
-      title: "Respiratory Exam",
-      meta: [p.respSupport, p.spo2 && `SpO₂ ${p.spo2}%`, p.breathSounds].filter(Boolean).join(" · ") || "Support, SpO₂, auscultation",
-      status: parseFloat(p.spo2) < 92 ? "warn" : (p.respSupport || p.spo2 ? "ok" : "idle"),
-      badge: p.spo2 ? `${p.spo2}%` : "+",
-      render: () =>
-        grid([
-          ["respSupport", "Respiratory support", "sel", ["", "Room air", "Oxygen (nasal cannula / mask)", "HFNC / NIV", "Ventilator"]],
-          ["spo2", "SpO₂ (%)", "number"],
-          ["breathSounds", "Breath sounds", "sel", ["", "Normal vesicular", "Wheeze", "Crackles", "Coarse crackles", "Bronchial breathing", "Diminished air entry", "Absent breath sounds", "Stridor", "Pleural rub"]]
-        ]) +
-        T("Auscultation notes", "ausc", "area") +
-        T("Respiratory notes (mode, VT, RR, PEEP, FiO₂, P/F...)", "resp", "area") +
-        `<h4>Last CT chest (from Investigations)</h4><div id="ctChest" class="out"></div>`
-    },
-    {
-      id: "vent",
-      kicker: "Mechanical Vent",
-      title: "Ventilator Monitor",
-      meta: [p.ventMode, p.setVT && `VT ${p.setVT}`, p.setPEEP && `PEEP ${p.setPEEP}`, pf !== null && `P/F ${pf.toFixed(0)}`].filter(Boolean).join(" · ") || "PBW, driving pressure, P/F",
-      status: (pf !== null && pf <= 150) || parseFloat(p.plateauPressure) > 30 ? "warn" : (p.ventMode ? "ok" : "idle"),
-      badge: p.ventMode || "+",
-      render: () =>
-        T("Ventilator mode", "ventMode", "sel", ["", "VC", "PC", "SIMV-VC", "SIMV-PC", "PSV", "CPAP", "APRV", "Other"]) +
-        grid([
-          ["heightCm", "Height (cm)", "number"], ["ventRate", "Set RR (/min)", "number"],
-          ["setVT", "Set VT (mL)", "number"], ["fio2Percent", "FiO₂ (%)", "number"],
-          ["setPEEP", "Set PEEP (cmH₂O)", "number"], ["pressureSupport", "Pressure support", "number"],
-          ["peakPressure", "Peak pressure", "number"], ["plateauPressure", "Plateau pressure", "number"],
-          ["totalPeep", "Total PEEP", "number"], ["paO2", "PaO₂ (mmHg)", "number"],
-          ["ieRatio", "I:E ratio"]
-        ]) +
-        `<p class="small">Sex is set in Diagnosis & Events. If PaO₂ or FiO₂ are empty here, the ABG values are used.</p><div id="ventOut" class="out"></div>`
-    },
-    {
-      id: "wean",
-      kicker: "Extubation",
-      title: "Weaning Check",
-      meta: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length} criteria` + (w.sbt ? ` · SBT: ${w.sbt}` : ""),
-      status: w.sbt === "Passed" ? "ok" : (w.sbt === "Failed" ? "warn" : (WCRIT.some((_, i) => w["c" + i]) ? "ok" : "idle")),
-      badge: `${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length}`,
-      render: () =>
-        WCRIT.map((t, i) => `<label class="chk"><input type="checkbox" data-p="wean.c${i}"${w["c" + i] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("") +
-        grid([
-          ["rr", "Spontaneous RR (/min)", "number"], ["vt", "Spontaneous VT (mL)", "number"],
-          ["sbt", "SBT result", "sel", ["", "Not done", "Passed", "Failed"]],
-          ["leak", "Cuff leak test", "sel", ["", "Not done", "Leak present", "No leak"]]
-        ], "wean") +
-        `<div id="wnOut" class="out"></div>`
-    },
-    {
-      id: "abd",
-      kicker: "GI & Metabolic",
-      title: "Abdomen & Glucose",
-      meta: [p.palpation, p.feeding, p.rbs && `RBS ${p.rbs}`].filter(Boolean).join(" · ") || "Palpation, feeding, stool, RBS",
-      status: parseFloat(p.rbs) > 180 || parseFloat(p.rbs) < 70 ? "warn" : (p.palpation || p.feeding || p.rbs ? "ok" : "idle"),
-      badge: p.rbs ? p.rbs : "+",
-      render: () =>
-        grid([
-          ["palpation", "Palpation", "sel", ["", "Soft and lax", "Distended", "Tense", "Tender", "Guarding / rebound", "Rigid"]],
-          ["bowelSounds", "Bowel sounds", "sel", ["", "Present", "Hypoactive", "Absent", "Hyperactive"]],
-          ["feeding", "Feeding", "sel", ["", "Oral", "Enteral (NG/OG)", "Parenteral", "Enteral + parenteral", "Nil by mouth"]],
-          ["stool", "Stool", "sel", ["", "Passed stool", "Not passed", "Diarrhea", "Constipated"]],
-          ["rbs", "RBS (mg/dL)", "number"]
-        ]) +
-        `<div id="rbsOut" class="small"></div>` +
-        T("Abdomen notes", "abdNotes", "area")
-    },
-    {
-      id: "ext",
-      kicker: "Perfusion & Skin",
-      title: "Extremities",
-      meta: [p.edema && `Edema: ${p.edema}`, p.capRefill && `CRT ${p.capRefill}`, p.limbTemp].filter(Boolean).join(" · ") || "Edema, pulses, perfusion, skin",
-      status: p.dvtSigns === "Yes" || p.capRefill === ">3 s" ? "warn" : (p.edema || p.pulses ? "ok" : "idle"),
-      badge: p.dvtSigns === "Yes" ? "!" : (p.edema ? "✓" : "+"),
-      render: () =>
-        grid([
-          ["edema", "Edema", "sel", ["", "None", "Mild pitting", "Moderate pitting", "Severe pitting", "Generalized (anasarca)"]],
-          ["pulses", "Peripheral pulses", "sel", ["", "Present", "Weak", "Absent"]],
-          ["capRefill", "Capillary refill", "sel", ["", "<2 s", "2–3 s", ">3 s"]],
-          ["limbTemp", "Skin / limb temperature", "sel", ["", "Warm", "Cool", "Mottled"]],
-          ["dvtSigns", "Calf swelling / tenderness", "sel", ["", "No", "Yes"]],
-          ["skin", "Skin integrity", "sel", ["", "Intact", "Pressure injury", "Rash", "Wound"]]
-        ]) +
-        T("Extremities notes", "extNotes", "area")
+      id: "exam",
+      kicker: "Systems Exam (7)",
+      title: "Examination",
+      meta: "CNS · CVS · Resp · Vent · Wean · Abd · Ext",
+      status: examWarnCount > 0 ? "warn" : (examOkCount > 0 ? "ok" : "idle"),
+      badge: examWarnCount > 0 ? `${examWarnCount}!` : `${examOkCount}/7`,
+      render: () => renderExamHub(p)
     },
     {
       id: "inf",
@@ -1156,7 +1491,7 @@ function getCardModules(p) {
       badge: String((p.trend || []).length || "+"),
       render: () => {
         const keys = [...new Set([...(p.trend || []).flatMap(e => Object.keys(e.v)), ...Object.keys(snap(p))])];
-        return `<select id="trSel" aria-label="Trend parameter">${keys.map(k2 => `<option value="${esc(k2)}"${k2 === (window._tr || keys[0]) ? " selected" : ""}>${esc(k2)}</option>`).join("")}</select><button data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`;
+        return `<select id="trSel" aria-label="Trend parameter">${keys.map(k2 => `<option value="${esc(k2)}"${k2 === (window._tr || keys[0]) ? " selected" : ""}>${esc(k2)}</option>`).join("")}</select><button class="pri" data-a="snap">Save snapshot now</button><div id="trOut" class="out"></div><p class="small">Snapshots are also saved by New day. The chart shows saved snapshots plus current values.</p>`;
       }
     },
     {
@@ -1252,7 +1587,7 @@ function getCardModules(p) {
       status: "ok",
       badge: "↗",
       render: () =>
-        `<button onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:260px" placeholder="SBAR appears here...">${esc(sbarText(p))}</textarea>`
+        `<button class="pri" onclick="makeSBAR()">Generate SBAR</button><button class="g" onclick="copySBAR()">Copy</button><button class="g" onclick="shareTxt($('sbar').value)">Share</button><button class="g" data-a="prevsbar">Yesterday's SBAR</button><textarea id="sbar" style="min-height:260px" placeholder="SBAR appears here...">${esc(sbarText(p))}</textarea>`
     }
   ];
 }
@@ -1326,12 +1661,17 @@ function renderModalContent() {
   if (!mod) return;
 
   const savedScroll = body.scrollTop;
+  const savedSubScroll = $("examSubSlider") ? $("examSubSlider").scrollLeft : 0;
   const openSubs = [...body.querySelectorAll("details")].map(d => d.open);
 
   $("modalTitle").textContent = mod.title;
   $("modalSub").textContent = `${p.bed || "Bed"} · ${mod.kicker}`;
   $("modalIcon").innerHTML = ORGAN_SVGS[mod.id] || ORGAN_SVGS.dx;
   body.innerHTML = mod.render();
+
+  if ($("examSubSlider") && savedSubScroll) {
+    $("examSubSlider").scrollLeft = savedSubScroll;
+  }
 
   [...body.querySelectorAll("details")].forEach((d, i) => {
     if (openSubs[i] !== undefined) d.open = openSubs[i];
@@ -1613,15 +1953,39 @@ const mkList = p => {
   return out;
 };
 
+/* ---------- Categorized Medications Rendering ---------- */
 const medsHTML = p => {
   const antibiotics = (p.abx || []).filter(x => x.drug || x.date || x.dose);
   const abxHTML = `<h4>Antibiotics from Infection card</h4><p class="small">Read-only copy. Edit antibiotic details in the Infection card.</p>${antibiotics.length ? antibiotics.map(x => `<div class="abx-copy-row"><b>${esc(x.drug || "Antibiotic")}</b><span>${esc(x.date || "Start date not entered")}</span><span>${esc([x.dose, x.route, x.frequency].filter(Boolean).join(" ") || "Dose not entered")}</span></div>`).join("") : `<p class="small">No antibiotics entered in the Infection card.</p>`}`;
-  const meds = (p.meds || []).map((m, i) => {
-    const details = [m.dose, m.route, m.frequency, m.indication].filter(Boolean).map(esc).join(" · ");
-    const editor = m.editing ? `<div class="med-edit"><div class="med-grid">${[["drug", "Medication name"], ["dose", "Dose"], ["route", "Route"], ["frequency", "Frequency"], ["indication", "Indication (optional)"]].map(([k, l]) => fld([k, l], "meds." + i)).join("")}</div><button class="g sm" data-a="mededit:${i}">Done</button></div>` : "";
-    return `<div class="med-row"><div class="med-summary"><span class="med-name">${esc(m.drug || "New medication")}</span><span class="med-details">${details || "Details not entered"}</span><button class="g sm" data-a="mededit:${i}">Edit</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove medication">×</button></div>${editor}</div>`;
-  }).join("");
-  return abxHTML + `<h4>Other medications</h4>${meds}<button data-a="addmed">+ Add medication</button>`;
+
+  const medList = p.meds || [];
+  const groups = new Map();
+  MED_CATEGORIES.forEach(cat => groups.set(cat, []));
+  medList.forEach((m, i) => {
+    const cat = m.category && MED_CATEGORIES.includes(m.category) ? m.category : "Other";
+    groups.get(cat).push({ m, i });
+  });
+
+  let groupedMedsHTML = "";
+  groups.forEach((items, cat) => {
+    if (!items.length) return;
+    groupedMedsHTML += `<div class="med-group-head"><span>${esc(cat)}</span><span>${items.length}</span></div>`;
+    items.forEach(({ m, i }) => {
+      const details = [m.dose, m.route, m.frequency, m.indication].filter(Boolean).map(esc).join(" · ");
+      const catBadge = `<span class="med-cat-pill">${esc(cat)}</span>`;
+      const editor = m.editing ? `<div class="med-edit"><div class="med-grid">${[
+        ["category", "Medication type / group", "sel", MED_CATEGORIES],
+        ["drug", "Medication name"],
+        ["dose", "Dose"],
+        ["route", "Route"],
+        ["frequency", "Frequency"],
+        ["indication", "Indication (optional)"]
+      ].map(spec => fld(spec, "meds." + i)).join("")}</div><button class="pri sm" data-a="mededit:${i}">Done</button></div>` : "";
+      groupedMedsHTML += `<div class="med-row"><div class="med-summary"><span class="med-name"><span>${esc(m.drug || "New medication")}</span>${catBadge}</span><span class="med-details">${details || "Details not entered"}</span><button class="g sm" data-a="mededit:${i}">Edit</button><button class="x sm" data-a="del:meds:${i}" aria-label="Remove medication">×</button></div>${editor}</div>`;
+    });
+  });
+
+  return abxHTML + `<h4>Categorized medications</h4>` + (groupedMedsHTML || `<p class="small">No medications added yet.</p>`) + `<button class="pri" data-a="addmed">+ Add medication</button>`;
 };
 
 function acHTML(p) {
@@ -2454,7 +2818,7 @@ function parseCase(src) {
   const pu = /pupils?|perr?l/i.test(T) ? pick([
     [/fixed.{0,15}dilated|dilated.{0,15}fixed/i, "Fixed and dilated"],
     [/pinpoint/i, "Pinpoint"], [/unequal|anisocoria/i, "Unequal"],
-    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l/i, "Equal and reactive"]
+    [/sluggish/i, "Equal, sluggish"], [/equal|\bperr?l\i, "Equal and reactive"]
   ]) : null;
   if (pu) add("Pupils: " + pu, [["pupils", pu]]);
 
@@ -2565,37 +2929,46 @@ function parseCase(src) {
     const om = tail.match(ORGX);
     let organism = om ? om[1].trim() : "";
     if (!organism && tail && !/^(?:pending|no growth|negative|sterile|sent|ordered|awaiting)/i.test(tail)) {
-      organism = tail.split(/[,|(]/)[0].trim().slice(0, 60);
+      const cleaned = tail.replace(/\b(?:pending|no growth|negative|sent|ordered|sensitive to|susceptible to|resistant to)\b.*$/i, "").replace(/^[:\-\s]+|[:\-\s]+$/g, "");
+      if (cleaned && cleaned.length <= 60 && !/\b(?:bp|hr|temp|spo2|na|k|hb|wbc|plts)\b/i.test(cleaned)) organism = cleaned;
     }
-    const status = organism ? "Growth" : /no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending";
-    const cxDate = normDate(tail) || today;
-    const suscMatch = tail.match(/(?:sens(?:itive)?|susc(?:eptible)?|s)\s*[:\-]\s*([^;\n]+)/i);
-    const susceptible = suscMatch ? suscMatch[1].trim().slice(0, 80) : "";
-    add(`Culture: ${type}${organism ? " (" + organism + ")" : " [" + status + "]"}`, [], (p, over) => {
-      const ex = p.cultures.find(x => x.type === type);
-      if (!ex) {
-        p.cultures.push({ type, date: cxDate, status, organism, susceptible, editing: false });
-      } else if (over) {
-        if (organism) ex.organism = organism;
-        ex.status = status;
-        if (cxDate) ex.date = cxDate;
-        if (susceptible) ex.susceptible = susceptible;
+    const status = organism ? "Growth" : (/no growth|negative|sterile/i.test(tail) ? "No growth" : "Pending");
+    const sensM = tail.match(/(?:susceptible|sensitive)\s*(?:to)?\s*[:\-]?\s*([A-Za-z0-9,\s\-+\/]+)/i);
+    const susceptible = sensM ? sensM[1].trim() : "";
+    add(`${type} culture: ${organism || status}`, [], p => {
+      if (!p.cultures.some(c => c.type === type && (c.organism || c.status) === (organism || status))) {
+        p.cultures.push({ type, date: today, status, organism, susceptible, editing: false });
       }
     });
   }
+  if (!I.some(x => /culture:/i.test(x.label))) {
+    const om = cxPool.match(ORGX);
+    if (om) {
+      const organism = om[1].trim();
+      add(`Culture growth: ${organism}`, [], p => {
+        if (!p.cultures.some(c => c.organism === organism)) {
+          p.cultures.push({ type: "Blood", date: today, status: "Growth", organism, susceptible: "", editing: false });
+        }
+      });
+    }
+  }
 
-  const planFull = secVal("(?:daily\\s*plans?|plans?|recommendations?|management)");
-  if (planFull) {
-    const rawItems = planFull
-      .split(/\n+|(?<=\.)\s+(?=[A-Z0-9•\-*])|;\s+/)
-      .map(x => x.replace(/^[-*•\d.)\s]+/, "").trim())
-      .filter(Boolean)
-      .slice(0, 20);
-    if (rawItems.length) {
-      add(`Daily plan (${rawItems.length} item${rawItems.length > 1 ? "s" : ""})`, [], p => {
-        rawItems.forEach(text => {
-          if (!p.plans.some(x => x.text.toLowerCase() === text.toLowerCase())) {
-            p.plans.push({ text, done: false });
+  let planText = secVal("(?:plan|daily\\s*plan|recommendations?|management)");
+  if (!planText) {
+    const pm = T.match(/(?:^|\n)\s*plan\s*[:\-]\s*([\s\S]+)$/i);
+    if (pm) planText = pm[1].trim();
+  }
+  if (planText) {
+    const planItems = planText
+      .split(/\n+|(?=\s*(?:\d+[\.\)]\s+|[-•*]\s+))/)
+      .map(x => x.replace(/^\s*(?:\d+[\.\)]\s+|[-•*]\s+)/, "").trim())
+      .filter(x => x.length >= 2);
+    if (planItems.length) {
+      add(`Plan (${planItems.length} item${planItems.length > 1 ? "s" : ""})`, [], (p, over) => {
+        if (over || !p.plan) p.plan = planText.slice(0, 2000);
+        planItems.forEach(item => {
+          if (!p.plans.some(x => (x.text || "").toLowerCase() === item.toLowerCase())) {
+            p.plans.push({ text: item, done: false });
           }
         });
       });
@@ -2605,497 +2978,230 @@ function parseCase(src) {
   return I;
 }
 
-/* ---------- Patient data, rendering & interactive actions ---------- */
-function blankPatient(bed) {
-  return {
-    bed, age: "", ventSex: "", admissionDate: "", diagnosis: "", pastMedicalHistory: "", presentIllness: "", events: "",
-    sedation: "", pupils: "", seizures: "", cns: "", respSupport: "", spo2: "", breathSounds: "", ausc: "", resp: "",
-    ventMode: "", heightCm: "", ventRate: "", setVT: "", fio2Percent: "", setPEEP: "", pressureSupport: "",
-    peakPressure: "", plateauPressure: "", totalPeep: "", paO2: "", ieRatio: "", temp: "", sepsisTime: "",
-    sepsisMarker: "", sepsisValue: "", infection: "", acType: "", acMech: "", other: "", weight: "", duration: "",
-    fluidIn: "", fluidOut: "", plan: "", renal: "", labs: "", palpation: "", bowelSounds: "", feeding: "", stool: "",
-    rbs: "", abdNotes: "", edema: "", pulses: "", capRefill: "", limbTemp: "", dvtSigns: "", skin: "", extNotes: "",
-    checks: {}, scores: {}, sepsisM: {}, sepsisMarkerValues: {}, wean: {}, calc: { inputs: {} },
-    investigations: {
-      laboratory: LAB.map(([name, unit]) => ({ name, date: "", result: "", unit, trend: "", lastResult: "", last2: "", last3: "" })),
-      radiology: RAD.map(name => ({ name, date: "", result: "" })),
-      abg: {}
-    },
-    cardio: { vitals: { targetMap: "65" }, vasoactive: [], ecg: [], biomarkers: [], echo: { enabled: false } },
-    lines: [], abx: [], anticoag: [], cultures: [], meds: [], plans: [], scoreList: [], trend: [], history: []
-  };
+let _imp = null;
+function importPreview(asNew) {
+  const txt = $("caseTxt").value;
+  if (!txt.trim()) { alert("Paste or type some case text first."); return; }
+  if (!asNew && (active === null || !P())) { alert("Open a patient first, or click Preview as new bed."); return; }
+  const items = parseCase(txt);
+  if (!items.length) {
+    $("importOut").innerHTML = `<div class="out">Nothing could be extracted automatically. Try standard abbreviations such as BP 90/50, HR 118, Temp 38.7, SpO2 91%, pH 7.26, PaCO2 52, HCO3 19, Lactate 3.4, Na 138, K 4.6, Creat 1.9, Hb 9.4, WBC 18, Plts 140, norepinephrine, meropenem.</div>`;
+    return;
+  }
+  _imp = { items, asNew };
+  $("importOut").innerHTML = `<div class="out"><b>${items.length} item(s) found</b>${asNew && items.detectedBed ? ` · Bed/Patient: <b>${esc(items.detectedBed)}</b>` : ""} — untick anything wrong before applying:<br><br>${items.map((x, i) => `<label class="chk"><input type="checkbox" id="impc${i}" checked><span>${esc(x.label)}</span></label>`).join("")}<label class="chk"><input type="checkbox" id="impover"><span>Overwrite fields that already have a value</span></label><button class="pri" onclick="applyImportPreview()">Apply to ${asNew ? "new bed" : esc(P().bed || "patient")}</button></div>`;
 }
 
+function applyImportPreview() {
+  if (!_imp) return;
+  if (_imp.asNew) {
+    const detected = _imp.items.detectedBed || "";
+    const manualBed = ($("bed").value || "").trim();
+    const label = manualBed || detected || "Bed " + (data.length + 1);
+    data.push({ bed: label });
+    $("bed").value = "";
+    active = data.length - 1;
+  }
+  const p = P();
+  ensure(p);
+  const over = $("impover") && $("impover").checked;
+  _imp.items.forEach((it, i) => {
+    const cb = $("impc" + i);
+    if (cb && !cb.checked) return;
+    it.fields.forEach(([path, val]) => {
+      if (path === "bed" && _imp.asNew && p.bed && p.bed !== val) return;
+      const cur = getp(p, path);
+      if (over || cur === undefined || cur === "" || cur === false) setp(p, path, val);
+    });
+    if (it.apply) it.apply(p, over);
+  });
+  persist();
+  renderList();
+  openPatient(active);
+  $("importOut").innerHTML = `<div class="out"><span class="gd">Imported into ${esc(p.bed || "patient")}.</span> Check the highlighted red fields and every card against the chart.</div>`;
+}
+
+function autoImportCase(asNew) {
+  const txt = $("caseTxt").value;
+  if (!txt.trim()) { alert("Paste or type some case text first."); return; }
+  if (!asNew && (active === null || !P())) { alert("Open a patient first, or click Auto-import as new bed."); return; }
+  const items = parseCase(txt);
+  if (!items.length) {
+    $("importOut").innerHTML = `<div class="out">Nothing could be extracted automatically. Try standard abbreviations such as BP 90/50, HR 118, Temp 38.7, SpO2 91%, pH 7.26, PaCO2 52, HCO3 19, Lactate 3.4, Na 138, K 4.6, Creat 1.9, Hb 9.4, WBC 18, Plts 140, norepinephrine, meropenem.</div>`;
+    return;
+  }
+  if (asNew) {
+    const detected = items.detectedBed || "";
+    const manualBed = ($("bed").value || "").trim();
+    const label = manualBed || detected || "Bed " + (data.length + 1);
+    data.push({ bed: label });
+    $("bed").value = "";
+    active = data.length - 1;
+  }
+  const p = P();
+  ensure(p);
+  items.forEach(it => {
+    it.fields.forEach(([path, val]) => {
+      if (path === "bed" && asNew && p.bed && p.bed !== val) return;
+      const cur = getp(p, path);
+      if (cur === undefined || cur === "" || cur === false) setp(p, path, val);
+    });
+    if (it.apply) it.apply(p, false);
+  });
+  persist();
+  renderList();
+  openPatient(active);
+  $("importOut").innerHTML = `<div class="out"><span class="gd">⚡ Auto-imported ${items.length} item(s) into ${esc(p.bed || "patient")}.</span> Verify all fields against the clinical chart.</div>`;
+}
+
+/* ---------- Screen rendering & live updates ---------- */
 function renderList() {
-  const el = $("list");
-  if (!el) return;
-  el.innerHTML = data.length
-    ? data.map((p, i) => `<div class="pt"><button class="g" style="flex:1;text-align:left" onclick="openPatient(${i})">${esc(p.bed || "Bed")}${i === active ? " ✓" : ""}</button></div>`).join("")
-    : '<p class="small">No patients yet. Enter a non-identifying bed label and tap Add patient.</p>';
+  $("list").innerHTML = data.map((p, i) => {
+    ensure(p);
+    const n = (p.plans || []).filter(x => x.text && !x.done).length;
+    const d = dayN(p.admissionDate);
+    const sub = [d > 0 && "Day " + d, p.diagnosis && p.diagnosis.slice(0, 32), n && n + " open plan(s)"].filter(Boolean).join(" · ");
+    return `<div class="pt"><span><b>${esc(p.bed || "Unnamed")}</b>${sub ? `<div class="small">${esc(sub)}</div>` : ""}</span><button class="${i === active ? "pri" : ""}" onclick="openPatient(${i})">${i === active ? "Open" : "Select"}</button></div>`;
+  }).join("") || "<p>No patients added yet.</p>";
+  const s = $("jumpSel");
+  if (s) s.innerHTML = data.map((p, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(p.bed || "Unnamed")}</option>`).join("");
+}
+
+function addPatient() {
+  const b = $("bed").value.trim() || "Bed " + (data.length + 1);
+  data.push({ bed: b });
+  $("bed").value = "";
+  persist();
+  renderList();
+  openPatient(data.length - 1);
+}
+
+function openPatient(i) {
+  if (!data[i]) return;
+  active = i;
+  activeCardId = null;
+  const m = $("cardModal");
+  if (m) m.hidden = true;
+  document.body.style.overflow = "";
+  ensure(P());
+  $("rec").hidden = false;
+  $("infoBox").hidden = true;
+  renderList();
+  draw();
+}
+
+function draw() {
+  const p = P();
+  if (!p) return;
+  ensure(p);
+  const d = dayN(p.admissionDate);
+  $("heading").textContent = p.bed || "Patient record";
+  $("bedSub").textContent = [p.age && `${p.age}y`, p.ventSex, d > 0 && `ICU Day ${d}`, p.diagnosis].filter(Boolean).join(" · ") || "Tap any card below to inspect or edit";
+  renderSlider();
+  if (activeCardId) renderModalContent();
 }
 
 function renderOutputs() {
   const p = P();
   if (!p) return;
-  ensure(p);
-  const put = (id, html) => { const e = $(id); if (e) e.innerHTML = html; };
-
-  put("gcsOut", gcsHTML(p));
-  put("ctBrain", ctBox(p, /ct\s*brain/i, "Last CT brain"));
-  put("ctChest", ctBox(p, /ct\s*chest/i, "Last CT chest"));
-  put("invEcho", ctBox(p, /echo/i, "Last Echo (from Investigations)"));
-  put("abgOut", abgCalc(p));
-  put("ventOut", ventCalc(p));
-  put("cvOut", (() => {
-    const k = cardioCalc(p.cardio.vitals);
-    return `<b>Calculated hemodynamics</b><div class="r">MAP: <b>${k.map === null ? "—" : k.map.toFixed(1) + " mmHg"}</b> · Pulse pressure: <b>${k.pp === null ? "—" : k.pp.toFixed(0) + " mmHg"}</b> · Shock index: <b>${k.si === null ? "—" : k.si.toFixed(2)}</b></div>${k.al.map(x => `<div class="r a">⚠ ${esc(x)}</div>`).join("")}`;
-  })());
-  put("cvRec", recList(cvRecs(p)));
-  put("infRec", recList(infRecs(p)));
-  put("rbsOut", esc(rbsTxt(p)));
-  put("fluidOut2", (() => {
-    const w = parseFloat(p.weight), h = parseFloat(p.duration), out = parseFloat(p.fluidOut), inn = parseFloat(p.fluidIn);
-    const rate = w > 0 && h > 0 && out >= 0 ? out / (w * h) : null;
-    const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
-    return `<div class="r">Fluid balance: <b>${bal === null ? "—" : (bal > 0 ? "+" : "") + bal.toFixed(0) + " mL"}</b></div><div class="r">Urine output rate: <b>${rate === null ? "—" : rate.toFixed(2) + " mL/kg/h"}</b>${rate !== null && rate < 0.5 ? " · <span class='hi'>Below 0.5 mL/kg/h</span>" : ""}</div>`;
-  })());
-  put("scoreOut", scoreHTML(p));
-  put("recScores", recList(recScores(p).map(x => x[0] + ": " + x[1])));
-  put("wnOut", wnHTML(p));
-  put("calcOut", calcHTML(p));
-  put("medOut", medHTML(p));
-
-  const tsel = $("trSel");
-  if (tsel) {
-    if (!window._tr) window._tr = tsel.value;
-    put("trOut", trendHTML(p, tsel.value || window._tr));
-  }
+  const set = (id, h) => { const el = $(id); if (el) el.innerHTML = h; };
 
   p.investigations.laboratory.forEach((it, i) => {
-    const e = $("lf" + i);
-    if (e) {
-      const f = labFlag(it, p);
-      e.textContent = f[0];
-      e.className = "fl " + f[1];
-      e.title = f[2];
+    const f = labFlag(it, p), el = $("lf" + i);
+    if (el) {
+      el.textContent = f[0];
+      el.className = "fl " + f[1];
+      el.title = f[2];
     }
+    const inp = document.querySelector(`[data-p="investigations.laboratory.${i}.result"]`);
+    if (inp) inp.classList.toggle("abn", f[1] === "hi" || f[1] === "lo");
   });
+
+  const k = cardioCalc(p.cardio.vitals);
+  set("cvOut", `${k.al.length ? `<div class="al">${esc(k.al.join(" "))}</div>` : ""}MAP: <b>${k.map !== null ? k.map.toFixed(1) + " mmHg" : "—"}</b> · Shock index: <b>${k.si !== null ? k.si.toFixed(2) : "—"}</b> · Pulse pressure: <b>${k.pp !== null ? k.pp.toFixed(0) + " mmHg" : "—"}</b>`);
+  set("cvRec", recList(cvRecs(p)));
+  set("infRec", recList(infRecs(p)));
+  set("ventOut", ventCalc(p));
+  set("abgOut", abgCalc(p));
+  set("scoreOut", scoreHTML(p));
+  set("gcsOut", gcsHTML(p));
+  set("ctBrain", ctBox(p, /ct\s*brain/i, "CT brain"));
+  set("ctChest", ctBox(p, /ct\s*chest/i, "CT chest"));
+  set("invEcho", ctBox(p, /echo/i, "Echo"));
+  set("rbsOut", rbsTxt(p));
+  set("wnOut", wnHTML(p));
+  set("medOut", medHTML(p));
+  set("calcOut", calcHTML(p));
+
+  set("recScores", (() => {
+    const r = recScores(p);
+    return r.length
+      ? r.map(([n, m]) => `<div class="r"><b>${esc(n)}:</b> ${esc(m)} <button class="g sm" data-a="addsc:${esc(n)}">+ Add</button></div>`).join("") + `<p class="small">Suggestions based on entered data; add the scores useful for this patient.</p>`
+      : "No additional score suggested from the entered data.";
+  })());
 
   (p.scoreList || []).forEach((it, i) => {
-    const d = SD[it.name];
-    const st = $("st" + i), si = $("si" + i), sa = $("sa" + i);
-    let val = scoreVal(p, it);
+    const d = SD[it.name], a = autoScore(it.name, p);
+    let v;
     if (d && d.c) {
-      const state = scoreState(p, it);
-      val = state.val;
-      if (st) st.textContent = val !== null && val !== "" ? val : "—";
-      if (sa) sa.textContent = `(${state.n}/${d.c.length} components)`;
-    }
-    if (si && d && d.i && val !== null && String(val).trim() !== "") {
-      const msg = d.i(val);
-      si.textContent = msg;
-      si.hidden = !msg;
-    } else if (si) {
-      si.hidden = true;
-    }
-  });
-}
-
-function draw() {
-  if (active === null || !P()) {
-    $("rec").hidden = true;
-    if (activeCardId) closeCardModal();
-    return;
-  }
-  const p = P();
-  ensure(p);
-  $("rec").hidden = false;
-  $("heading").textContent = p.bed || "Patient";
-  const d = dayN(p.admissionDate);
-  const subParts = [
-    p.age && `${p.age}y`,
-    p.ventSex,
-    d > 0 && `ICU Day ${d}`,
-    p.diagnosis && p.diagnosis.slice(0, 60)
-  ].filter(Boolean);
-  $("bedSub").textContent = subParts.join(" · ") || "Open any card below to view or edit clinical details";
-  $("jumpSel").innerHTML = data.map((q, i) => `<option value="${i}"${i === active ? " selected" : ""}>${esc(q.bed || "Bed " + (i + 1))}</option>`).join("");
-
-  renderSlider();
-  if (activeCardId) {
-    renderModalContent();
-  }
-}
-
-function openPatient(i) {
-  if (!Number.isInteger(i) || i < 0 || i >= data.length) return;
-  if (active !== i && activeCardId) closeCardModal();
-  active = i;
-  draw();
-  renderList();
-  persist();
-}
-
-function addPatient() {
-  const input = $("bed"), bed = input.value.trim();
-  if (!bed) { alert("Enter a non-identifying bed label, such as Bed 01."); input.focus(); return; }
-  if (data.some(p => String(p.bed).toLowerCase() === bed.toLowerCase())) { alert("That bed label already exists."); return; }
-  const p = blankPatient(bed);
-  ensure(p);
-  data.push(p);
-  active = data.length - 1;
-  input.value = "";
-  persist();
-  draw();
-  renderList();
-}
-
-function delPatient() {
-  if (active === null || !P()) return;
-  if (!confirm("Delete " + P().bed + "? You can restore it from Recently deleted.")) return;
-  const p = data[active];
-  toTrash({ kind: "patient", bed: p.bed, item: p });
-  data.splice(active, 1);
-  active = data.length ? Math.min(active, data.length - 1) : null;
-  if (activeCardId) closeCardModal();
-  persist();
-  renderList();
-  draw();
-}
-
-/* ---------- Refined SBAR Handout ---------- */
-function sbarText(p) {
-  ensure(p);
-  const c = p.cardio, v = c.vitals, k = cardioCalc(v), pf = pfOf(p), g = scoreCalc(p), s = p.scores || {};
-  const inn = parseFloat(p.fluidIn), out = parseFloat(p.fluidOut), w = parseFloat(p.weight), dur = parseFloat(p.duration);
-  const bal = Number.isFinite(inn) && Number.isFinite(out) ? inn - out : null;
-  const uop = w > 0 && dur > 0 && out >= 0 ? out / (w * dur) : null;
-  const icuDay = dayN(p.admissionDate);
-
-  const demo = [
-    p.age && `${p.age}y`,
-    p.ventSex,
-    icuDay > 0 ? `ICU Day ${icuDay} (Adm ${p.admissionDate})` : (p.admissionDate && `Adm ${p.admissionDate}`),
-    p.weight && `${p.weight} kg`
-  ].filter(Boolean).join(" · ");
-
-  const abnLabs = p.investigations.laboratory
-    .map(it => {
-      const f = labFlag(it, p);
-      if (f[1] === "hi" || f[1] === "lo") return `${it.name} ${it.result}${f[1] === "hi" ? "↑" : "↓"}`;
-      if (String(it.result).trim() !== "" && ["creat", "urea", "na", "k", "hb", "plts", "wbc", "crp", "inr"].includes(it.name.trim().toLowerCase())) {
-        return `${it.name} ${it.result}`;
-      }
-      return "";
-    })
-    .filter(Boolean);
-
-  const a = p.investigations.abg;
-  const abgParts = [
-    a.pH && `pH ${a.pH}`,
-    a.PaCO2 && `PaCO₂ ${a.PaCO2}`,
-    a.HCO3 && `HCO₃⁻ ${a.HCO3}`,
-    a.PaO2 && `PaO₂ ${a.PaO2}`,
-    a.Lactate && `Lac ${a.Lactate}`
-  ].filter(Boolean);
-
-  const activePressors = c.vasoactive
-    .filter(x => x.trend !== "Stopped" && x.drug)
-    .map(x => `${x.drug}${x.dose ? " " + x.dose + " " + (x.unit || "") : ""}${x.trend ? " (" + x.trend.toLowerCase() + ")" : ""}`);
-
-  const activeAbx = p.abx
-    .filter(x => x.drug)
-    .map(x => {
-      const d = dayN(x.date);
-      return `${x.drug}${x.dose ? " " + x.dose : ""}${x.frequency ? " " + x.frequency : ""}${d ? " [D" + d + "]" : ""}`;
-    });
-
-  const posCultures = p.cultures
-    .filter(x => x.organism || x.status === "Pending")
-    .map(x => `${x.type || "Culture"}: ${x.organism || x.status}${x.susceptible ? " (S: " + x.susceptible + ")" : ""}`);
-
-  const lineList = p.lines
-    .filter(x => x.type)
-    .map(x => {
-      const d = dayN(x.date);
-      return `${x.type}${x.site ? " (" + x.site + ")" : ""}${d ? " D" + d : ""}`;
-    });
-
-  const cnsLine = [
-    g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`,
-    s.rass && `RASS ${s.rass}`,
-    p.sedation && p.sedation !== "None" && `Sedation: ${p.sedation}`,
-    p.pupils && `Pupils: ${p.pupils}`,
-    p.seizures && p.seizures !== "None" && p.seizures,
-    p.cns
-  ].filter(Boolean).join(" | ");
-
-  const cvLine = [
-    (v.sbp || v.dbp) && `BP ${v.sbp || "?"}/${v.dbp || "?"}`,
-    k.map !== null && `MAP ${k.map.toFixed(0)} (target ${v.targetMap || 65})`,
-    v.hr && `HR ${v.hr}`,
-    v.rhythm,
-    v.cvp && `CVP ${v.cvp}`,
-    k.si !== null && k.si >= 0.9 && `SI ${k.si.toFixed(2)}`,
-    activePressors.length && `Infusions: ${activePressors.join(", ")}`
-  ].filter(Boolean).join(" | ");
-
-  const respLine = [
-    p.respSupport,
-    p.spo2 && `SpO₂ ${p.spo2}%`,
-    p.breathSounds,
-    p.ventMode && `Mode ${p.ventMode}`,
-    p.setVT && `VT ${p.setVT} mL`,
-    p.ventRate && `RR ${p.ventRate}`,
-    p.setPEEP && `PEEP ${p.setPEEP}`,
-    p.fio2Percent && `FiO₂ ${p.fio2Percent}%`,
-    pf !== null && `P/F ${pf.toFixed(0)}`,
-    p.resp
-  ].filter(Boolean).join(" | ");
-
-  const renalLine = [
-    bal !== null && `Net balance ${bal > 0 ? "+" : ""}${bal.toFixed(0)} mL (In ${inn} / Out ${out})`,
-    uop !== null && `UO ${uop.toFixed(2)} mL/kg/h`,
-    p.feeding && `Feed: ${p.feeding}`,
-    p.rbs && `RBS ${p.rbs}`,
-    p.renal
-  ].filter(Boolean).join(" | ");
-
-  const infLine = [
-    p.temp && `Temp ${p.temp}°C`,
-    mkList(p).length && `Markers: ${mkList(p).join(", ")}`,
-    activeAbx.length && `Abx: ${activeAbx.join("; ")}`,
-    posCultures.length && `Micro: ${posCultures.join("; ")}`,
-    p.infection
-  ].filter(Boolean).join(" | ");
-
-  const vteLine = p.acType === "Pharmacological"
-    ? `VTE: ${p.anticoag.map(x => [x.drug, x.dose, x.frequency].filter(Boolean).join(" ")).join("; ") || "Pharmacological"}`
-    : p.acType === "Mechanical" ? `VTE: Mechanical (${p.acMech || "unspecified"})`
-    : p.acType === "None" ? "VTE: None" : "";
-
-  const openPlans = (p.plans || []).filter(x => x.text && !x.done).map(x => `• [ ] ${x.text}`);
-  const donePlans = (p.plans || []).filter(x => x.text && x.done).map(x => `• [x] ${x.text}`);
-  const tk = CHK.filter(([q]) => (p.checks || {})[q]).length;
-
-  const outLines = [
-    `════════════════════════════════════════`,
-    `ICU HANDOVER — ${p.bed || "BED"}${demo ? " (" + demo + ")" : ""}`,
-    `Generated: ${new Date().toLocaleString()}`,
-    `════════════════════════════════════════`,
-    ``,
-    `S — SITUATION`,
-    `• Diagnosis: ${p.diagnosis || "Not entered"}`,
-    p.events ? `• 24h Events: ${p.events}` : "",
-    g.n > 0 ? `• SOFA: ${g.total}${g.n < 6 ? " (" + g.n + "/6 scored)" : ""}` : "",
-    ``,
-    `B — BACKGROUND`,
-    p.pastMedicalHistory ? `• PMH: ${p.pastMedicalHistory}` : "",
-    p.presentIllness ? `• HPI: ${p.presentIllness}` : "",
-    (!p.pastMedicalHistory && !p.presentIllness) ? `• No background entered` : "",
-    ``,
-    `A — ASSESSMENT`,
-    cnsLine ? `• CNS: ${cnsLine}` : "",
-    cvLine ? `• CVS: ${cvLine}` : "",
-    respLine ? `• Resp: ${respLine}` : "",
-    renalLine ? `• Renal/Fluid: ${renalLine}` : "",
-    infLine ? `• Infection: ${infLine}` : "",
-    abgParts.length ? `• ABG: ${abgParts.join(" · ")}` : "",
-    abnLabs.length ? `• Key Labs: ${abnLabs.join(", ")}` : "",
-    (lineList.length || vteLine) ? `• Lines & VTE: ${[lineList.join(", "), vteLine].filter(Boolean).join(" | ")}` : "",
-    ``,
-    `R — RECOMMENDATION / PLAN`,
-    p.plan ? `• Notes: ${p.plan}` : "",
-    ...openPlans,
-    ...donePlans,
-    (!p.plan && !openPlans.length && !donePlans.length) ? `• No active plan items entered` : "",
-    `• Daily Checklist: ${tk}/${CHK.length} completed`,
-    ``,
-    `Verify all values against the bedside chart.`
-  ];
-
-  return outLines.filter((x, i, arr) => x !== "" && !(x === "" && arr[i - 1] === "")).join("\n");
-}
-
-function makeSBAR() { if (!P()) return; $("sbar").value = sbarText(P()); persist(); }
-function copySBAR() { const t = $("sbar") ? $("sbar").value : (P() ? sbarText(P()) : ""); copyText(t); }
-function copyText(t) {
-  if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(t).then(() => alert("Copied."), () => shareTxt(t));
-  } else {
-    const a = document.createElement("textarea");
-    a.value = t;
-    document.body.appendChild(a);
-    a.select();
-    try { document.execCommand("copy"); alert("Copied."); } catch (e) { alert("Copy unavailable. Use Share."); }
-    a.remove();
-  }
-}
-
-function showSheet() {
-  if (!data.length) { alert("No patients added yet."); return; }
-  $("sheetTxt").textContent = data.map(sbarText).join("\n\n");
-  $("sheet").hidden = false;
-  $("sheet").scrollIntoView({ behavior: "smooth" });
-}
-function copySheet() { copyText($("sheetTxt").textContent); }
-
-/* ---------- Import Preview & Auto-Import ---------- */
-let _impItems = null, _impAsNew = 0;
-
-function importPreview(asNew) {
-  const txt = $("caseTxt").value.trim();
-  if (!txt) { alert("Paste or dictate case text first."); return; }
-  if (!asNew && (active === null || !P())) { alert("Open a patient first, or choose 'as new bed'."); return; }
-  _impItems = parseCase(txt);
-  _impAsNew = asNew;
-  const out = $("importOut");
-  if (!_impItems.length) {
-    out.innerHTML = `<div class="al">No structured fields detected. Try including labels like Age, Sex, Diagnosis, BP, HR, Labs, ABG, Antibiotics, or Plan.</div>`;
-    return;
-  }
-  out.innerHTML = `<div class="out"><b>Detected ${_impItems.length} item(s):</b>${_impItems.map((it, idx) => `<label class="chk"><input type="checkbox" id="imp_chk_${idx}" checked><span>${esc(it.label)}</span></label>`).join("")}<label class="chk"><input type="checkbox" id="imp_over"><span>Overwrite existing non-empty fields</span></label><button onclick="applyImportPreview()">Apply selected</button></div>`;
-}
-
-function applyImportPreview() {
-  if (!_impItems) return;
-  const over = !!($("imp_over") && $("imp_over").checked);
-  let target;
-  if (_impAsNew) {
-    const bedLabel = _impItems.detectedBed || ("Bed " + String(data.length + 1).padStart(2, "0"));
-    let uniqueBed = bedLabel, n = 2;
-    while (data.some(x => String(x.bed).toLowerCase() === uniqueBed.toLowerCase())) {
-      uniqueBed = `${bedLabel} (${n++})`;
-    }
-    target = blankPatient(uniqueBed);
-    ensure(target);
-    data.push(target);
-    active = data.length - 1;
-  } else {
-    target = P();
-    if (!target) return;
-    ensure(target);
-  }
-
-  _impItems.forEach((it, idx) => {
-    const cb = $("imp_chk_" + idx);
-    if (cb && !cb.checked) return;
-    (it.fields || []).forEach(([path, val]) => {
-      if (_impAsNew && path === "bed") return;
-      const cur = getp(target, path);
-      if (over || cur === undefined || cur === null || String(cur).trim() === "" || cur === false) {
-        setp(target, path, val);
-      }
-    });
-    if (typeof it.apply === "function") it.apply(target, over);
-  });
-
-  persist();
-  renderList();
-  draw();
-  $("importOut").innerHTML = `<div class="r">✓ Imported into <b>${esc(target.bed)}</b>.</div>`;
-}
-
-function autoImportCase(asNew) {
-  const txt = $("caseTxt").value.trim();
-  if (!txt) { alert("Paste or dictate case text first."); return; }
-  if (!asNew && (active === null || !P())) { alert("Open a patient first, or choose 'Auto-import as new bed'."); return; }
-  _impItems = parseCase(txt);
-  _impAsNew = asNew;
-  if (!_impItems.length) {
-    $("importOut").innerHTML = `<div class="al">No structured fields detected.</div>`;
-    return;
-  }
-  applyImportPreview();
-}
-
-/* ---------- Backup Export / Import / Update ---------- */
-function exportOne() {
-  if (!P()) return;
-  dlJson(P(), (P().bed || "patient") + ".json");
-}
-function exportAll() {
-  dlJson(data, "icu-rounds-backup-" + new Date().toISOString().slice(0, 10) + ".json");
-}
-function dlJson(obj, name) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
-$("imp").addEventListener("change", function(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  const r = new FileReader();
-  r.onload = () => {
-    try {
-      const parsed = JSON.parse(r.result);
-      const arr = Array.isArray(parsed) ? parsed : [parsed];
-      let added = 0;
-      arr.forEach(item => {
-        if (item && typeof item === "object" && !Array.isArray(item)) {
-          ensure(item);
-          data.push(item);
-          added++;
-        }
+      const st = scoreState(p, it);
+      v = st.val;
+      const tot = $("st" + i);
+      if (tot) tot.textContent = v !== null ? v + (st.n < st.vals.length && !d.all ? ` (${st.n}/${st.vals.length})` : "") : "—";
+      const sa = $("sa" + i);
+      if (sa) sa.textContent = st.n ? `(${st.n}/${st.vals.length} entered or auto)` : "";
+      d.c.forEach((_, j) => {
+        const inp = document.querySelector(`[data-p="scoreList.${i}.comps.${j}"]`);
+        if (inp) inp.placeholder = st.vals[j] ?? "";
       });
-      if (added) {
-        active = data.length - 1;
-        persist();
-        renderList();
-        draw();
-        alert(`Imported ${added} patient(s).`);
-      } else {
-        alert("No valid patient records found in file.");
-      }
-    } catch (err) {
-      alert("Could not parse JSON backup file.");
+    } else {
+      v = scoreVal(p, it);
+      const sa = $("sa" + i);
+      if (sa) sa.textContent = !it.manual && a !== null ? "(auto-calculated)" : a !== null ? `(auto: ${a})` : "";
     }
-    e.target.value = "";
-  };
-  r.readAsText(f);
-});
+    const tx = d && v !== null && String(v).trim() !== "" ? d.i(v) : "";
+    const bx = $("si" + i);
+    if (bx) {
+      bx.hidden = !tx;
+      bx.textContent = tx;
+    }
+  });
 
-function forceUpdate() {
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then(regs => Promise.all(regs.map(r => r.unregister()))).finally(() => location.reload());
-  } else {
-    location.reload();
+  const ts = $("trSel");
+  if (ts) set("trOut", trendHTML(p, ts.value));
+
+  const w = parseFloat(p.weight), h = parseFloat(p.duration), inn = parseFloat(p.fluidIn), out = parseFloat(p.fluidOut);
+  const f = [];
+  if (Number.isFinite(inn) && Number.isFinite(out)) {
+    const b = inn - out;
+    f.push(`Fluid balance: <b>${b > 0 ? "+" : ""}${b} mL</b>`);
   }
+  if (w > 0 && h > 0 && Number.isFinite(out) && out >= 0) {
+    const r = out / (w * h);
+    f.push(`Output rate: <b>${r.toFixed(2)} mL/kg/h</b>${r < 0.5 ? ' <span class="w">(below 0.5 mL/kg/h)</span>' : ""}`);
+  }
+  set("fluidOut2", f.length ? f.join(" · ") : "Enter weight, duration and output to calculate rate.");
+
+  const ck = (id, cond) => { const el = document.querySelector(`[data-p="${id}"]`); if (el) el.classList.toggle("abn", !!cond); };
+  const sbp = parseFloat(p.cardio.vitals.sbp), hr = parseFloat(p.cardio.vitals.hr), spo = parseFloat(p.spo2), tmp = parseFloat(p.temp), rbs = parseFloat(p.rbs);
+  ck("cardio.vitals.sbp", sbp > 0 && (sbp < 90 || sbp > 180));
+  ck("cardio.vitals.hr", hr > 0 && (hr < 50 || hr > 120));
+  ck("spo2", spo > 0 && spo < 92);
+  ck("temp", tmp > 0 && (tmp >= 38.3 || tmp < 36));
+  ck("rbs", rbs > 0 && (rbs < 70 || rbs > 180));
+  ck("plateauPressure", parseFloat(p.plateauPressure) > 30);
 }
 
-/* ---------- Delegated Event Listeners inside Floating Card ---------- */
+/* ---------- Events ---------- */
 $("cards").addEventListener("input", e => {
-  const p = P();
-  if (!p) return;
   const path = e.target.dataset.p;
-  if (!path) return;
-  const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-  setp(p, path, val);
-  if (e.target.classList.contains("trend")) e.target.dataset.v = val;
+  if (!path || !P()) return;
+  const v = e.target.type === "checkbox" ? e.target.checked : e.target.value;
+  setp(P(), path, v);
+  if (/^scoreList\.(\d+)\.value$/.test(path)) P().scoreList[+RegExp.$1].manual = true;
+  if (e.target.classList.contains("trend")) e.target.dataset.v = v;
   persist();
-  renderOutputs();
-  renderSlider();
-});
-
-$("cards").addEventListener("change", e => {
-  const p = P();
-  if (!p) return;
-  if (e.target.id === "trSel") {
-    window._tr = e.target.value;
-    renderOutputs();
-    return;
-  }
-  const path = e.target.dataset.p;
-  if (!path) return;
-  const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
-  setp(p, path, val);
-  persist();
-  if (path === "calc.selected" || path.startsWith("sepsisM.") || path === "ventSex" || path === "admissionDate" || path === "diagnosis" || path.startsWith("plans.")) {
-    renderModalContent();
+  if (e.target.tagName === "SELECT" || e.target.type === "checkbox" || path === "admissionDate" || path === "diagnosis") {
     draw();
   } else {
     renderOutputs();
@@ -3103,108 +3209,258 @@ $("cards").addEventListener("change", e => {
   }
 });
 
-$("cards").addEventListener("click", e => {
-  const btn = e.target.closest("[data-a]");
-  if (!btn || !P()) return;
-  const p = P();
-  const [act, a1, a2] = btn.dataset.a.split(":");
-  const today = new Date().toISOString().slice(0, 10);
+$("cards").addEventListener("change", e => {
+  if (e.target.id === "trSel") {
+    window._tr = e.target.value;
+    renderOutputs();
+  }
+});
 
-  if (act === "add") {
-    const sel = $("sel_" + a1);
-    const chosen = sel ? sel.value : "";
-    if (sel && !chosen) { alert("Select an option first."); return; }
-    const arr = ARR(p, a1);
-    if (a1 === "vasoactive") arr.push({ drug: chosen, dose: "", unit: "mcg/kg/min", trend: "Stable", targetMap: "", response: "" });
-    else if (a1 === "anticoag") arr.push({ drug: chosen, dose: "", route: "", frequency: "", date: today, indication: "", editing: true });
-    else if (a1 === "abx") arr.push({ drug: "", dose: "", route: "", frequency: "", date: today, indication: "", note: "", editing: true });
-    else if (a1 === "lines") arr.push({ type: "", site: "", size: "", date: today, time: "", note: "", editing: true });
-    else if (a1 === "cultures") arr.push({ type: "", date: today, status: "Pending", organism: "", susceptible: "", editing: true });
-    else if (a1 === "ecg") arr.push({ date: today, time: "", rate: "", pr: "", qrs: "", qtc: "", stt: "", interpretation: "" });
-    else if (a1 === "biomarkers") arr.push({ test: "", date: today, time: "", result: "", unit: "", reference: "", trend: "" });
-    if (sel) sel.value = "";
-  } else if (act === "del") {
-    const idx = parseInt(a2, 10);
-    const arr = ARR(p, a1);
-    if (arr && arr[idx]) {
-      const removed = arr.splice(idx, 1)[0];
-      toTrash({ kind: "item", bed: p.bed, x: a1, item: removed });
+$("cards").addEventListener("click", e => {
+  const b = e.target.closest("[data-a]");
+  if (!b || !P()) return;
+  const p = P(), [a, x, idx] = b.dataset.a.split(":");
+
+  if (a === "add") {
+    const o = {};
+    if (LISTS[x].opts) {
+      const s = $("sel_" + x);
+      if (!s || !s.value) { alert("Choose an item from the list first."); return; }
+      o.drug = s.value;
     }
-  } else if (act === "entryedit") {
-    const idx = parseInt(a2, 10);
-    const arr = ARR(p, a1);
-    if (arr && arr[idx]) arr[idx].editing = !arr[idx].editing;
-  } else if (act === "addmed") {
-    p.meds.push({ drug: "", dose: "", route: "", frequency: "", date: today, indication: "", editing: true });
-  } else if (act === "mededit") {
-    const idx = parseInt(a1, 10);
-    if (p.meds[idx]) p.meds[idx].editing = !p.meds[idx].editing;
-  } else if (act === "ac") {
-    p.acType = p.acType === a1 ? "" : a1;
-  } else if (act === "echo") {
-    p.cardio.echo.enabled = (a1 === "on");
-  } else if (act === "addlab") {
-    const nm = prompt("Lab test name:");
-    if (nm && nm.trim()) {
-      const un = prompt("Unit (optional):") || "";
-      p.investigations.laboratory.push({ name: nm.trim(), date: today, result: "", unit: un.trim(), trend: "", lastResult: "", last2: "", last3: "" });
+    if (["abx", "lines", "anticoag", "cultures"].includes(x)) o.editing = true;
+    ARR(p, x).push(o);
+  }
+  if (a === "del") {
+    const it = ARR(p, x)[+idx];
+    if (it) toTrash({ kind: "item", bed: p.bed, x, item: it });
+    ARR(p, x).splice(+idx, 1);
+  }
+  if (a === "entryedit") {
+    const it = ARR(p, x)[+idx];
+    if (it) it.editing = !it.editing;
+  }
+  if (a === "echo") p.cardio.echo.enabled = x === "on";
+  if (a === "addlab") {
+    const n = prompt("Test name");
+    if (!n) return;
+    p.investigations.laboratory.push({ name: n.trim(), date: "", result: "", unit: prompt("Unit (optional)") || "", trend: "", lastResult: "", last2: "", last3: "" });
+  }
+  if (a === "addrad") {
+    const n = prompt("Investigation name");
+    if (!n) return;
+    p.investigations.radiology.push({ name: n.trim(), date: "", result: "" });
+  }
+  if (a === "addmed") p.meds.push({ category: "Other", drug: "", dose: "", route: "", frequency: "", date: "", indication: "", renal: "", editing: true });
+  if (a === "mededit") {
+    const m = p.meds[+x];
+    if (m) m.editing = !m.editing;
+  }
+  if (a === "addplan") p.plans.push({ text: "", done: false });
+  if (a === "clearplans") {
+    if (!p.plans.length) return;
+    if (!confirm("Remove all plan items from this patient?")) return;
+    p.plans = [];
+  }
+  if (a === "resetchk") p.checks = {};
+  if (a === "ac") {
+    p.acType = x;
+    if (x !== "Mechanical") p.acMech = "";
+    if (x !== "Pharmacological") p.anticoag = [];
+  }
+  if (a === "tpl") {
+    const k = $("tplSel").value;
+    if (!k) return;
+    const ex = new Set(p.plans.map(z => z.text));
+    TPL[k].forEach(t => { if (!ex.has(t)) p.plans.push({ text: t, done: false }); });
+  }
+  if (a === "addscore") {
+    const n = $("scoreSel").value;
+    if (!n) { alert("Select a score first."); return; }
+    if (p.scoreList.some(s => s.name === n)) { alert("This score is already added."); return; }
+    p.scoreList.push({ name: n, value: autoScore(n, p) ?? "", note: "" });
+  }
+  if (a === "addsc") {
+    if (!p.scoreList.some(s => s.name === x)) p.scoreList.push({ name: x, value: autoScore(x, p) ?? "", note: "" });
+  }
+  if (a === "autosc") {
+    const it = p.scoreList[+x], d = SD[it.name];
+    if (d && d.c) it.comps = {};
+    else {
+      it.manual = false;
+      const v = autoScore(it.name, p);
+      if (v !== null) it.value = v;
     }
-  } else if (act === "addrad") {
-    const nm = prompt("Imaging study name (e.g. CXR, CT abdomen):");
-    if (nm && nm.trim()) {
-      p.investigations.radiology.push({ name: nm.trim(), date: today, result: "" });
-    }
-  } else if (act === "snap") {
+  }
+  if (a === "snap") {
     p.trend.push({ t: new Date().toISOString().slice(0, 16), v: snap(p) });
     p.trend = p.trend.slice(-60);
-  } else if (act === "addscore") {
-    const sc = $("scoreSel").value;
-    if (!sc) { alert("Select a score first."); return; }
-    p.scoreList.push({ name: sc, value: "", note: "", comps: {} });
-  } else if (act === "autosc") {
-    const idx = parseInt(a1, 10);
-    const it = p.scoreList[idx];
-    if (it) {
-      it.comps = {};
-      it.manual = false;
-      const auto = autoScore(it.name, p);
-      if (auto !== null) it.value = String(auto);
-    }
-  } else if (act === "addplan") {
-    p.plans.push({ text: "", done: false });
-  } else if (act === "clearplans") {
-    if (p.plans.length && confirm("Remove all plan items?")) p.plans = [];
-  } else if (act === "tpl") {
-    const k = $("tplSel").value;
-    if (k && TPL[k]) {
-      TPL[k].forEach(text => {
-        if (!p.plans.some(x => x.text === text)) p.plans.push({ text, done: false });
-      });
-    }
-  } else if (act === "resetchk") {
-    p.checks = {};
-  } else if (act === "prevsbar") {
-    if (!p.history || !p.history.length) {
-      alert("No archived SBARs yet. Start a New day to archive today's SBAR.");
-    } else {
-      const last = p.history[p.history.length - 1];
-      $("sbar").value = `--- Archived SBAR (${last.d}) ---\n\n` + last.sbar;
-    }
-    persist();
+  }
+  if (a === "prevsbar") {
+    const sb = $("sbar");
+    if (sb) sb.value = p.history.length ? p.history.slice().reverse().map(h => `=== ${h.d} ===\n${h.sbar}`).join("\n\n") : "No archived SBAR yet. Use New day at the end of a shift to archive the day's summary.";
     return;
   }
 
   persist();
-  renderModalContent();
+  renderList();
   draw();
 });
 
-/* ---------- Startup ---------- */
+/* ---------- SBAR, handover sheet, backup ---------- */
+function sbarText(p) {
+  ensure(p);
+  const c = p.cardio, v = c.vitals, k = cardioCalc(v), a = p.investigations.abg, pf = pfOf(p), s = p.scores || {}, g = scoreCalc(p), w = p.wean || {};
+  const abg = ABGF.filter(([x]) => a[x]).map(([x, l]) => `${l.split(" ")[0]} ${a[x]}`).join(", ");
+  const lab = p.investigations.laboratory.filter(x => x.result).map(x => {
+    const f = labFlag(x, p);
+    return `${x.name} ${x.result}${x.unit ? " " + x.unit : ""}${f[1] === "hi" ? " ↑" : f[1] === "lo" ? " ↓" : ""}`;
+  }).join("; ");
+  const rad = p.investigations.radiology.filter(x => x.result || x.date).map(x => `${x.name}${x.date ? " (" + x.date + ")" : ""}: ${x.result || "done"}`).join("; ");
+
+  const medsByCat = {};
+  (p.meds || []).filter(x => x.drug).forEach(x => {
+    const cat = x.category || "Other";
+    if (!medsByCat[cat]) medsByCat[cat] = [];
+    medsByCat[cat].push(`${x.drug}${x.dose ? " " + x.dose : ""}${x.route ? " " + x.route : ""}${x.frequency ? " " + x.frequency : ""}${x.indication ? " (" + x.indication + ")" : ""}`);
+  });
+  const medsFormatted = Object.entries(medsByCat).map(([cat, list]) => `[${cat}] ${list.join(", ")}`).join("; ");
+
+  const out = parseFloat(p.fluidOut), inn = parseFloat(p.fluidIn), wt = parseFloat(p.weight), du = parseFloat(p.duration);
+  const bal = Number.isFinite(inn) && Number.isFinite(out) ? `${inn - out > 0 ? "+" : ""}${inn - out} mL` : "";
+  const uop = wt > 0 && du > 0 && out >= 0 ? `${(out / (wt * du)).toFixed(2)} mL/kg/h` : "";
+  const d = dayN(p.admissionDate);
+
+  const B = (t, L) => {
+    const f = L.filter(Boolean);
+    return f.length ? `${t}:\n` + f.map(x => "• " + x).join("\n") : "";
+  };
+
+  return [
+    B("SITUATION", [
+      `${p.bed || "Patient"}${p.age ? ", " + p.age + " y" : ""}${p.ventSex ? ", " + p.ventSex : ""}${d > 0 ? " (ICU day " + d + ")" : ""}`,
+      p.diagnosis && "Working diagnosis: " + p.diagnosis
+    ]),
+    B("BACKGROUND", [
+      p.admissionDate && "Admitted: " + p.admissionDate,
+      p.pastMedicalHistory && "Past medical history: " + p.pastMedicalHistory,
+      p.presentIllness && "HPI: " + p.presentIllness,
+      p.events && "Last 24 hours: " + p.events
+    ]),
+    B("ASSESSMENT", [
+      (g.gcs !== null || s.rass || p.sedation || p.pupils || p.seizures || p.cns) && "CNS: " + [g.gcs !== null && `GCS ${g.gcs} (E${s.gcsE}V${s.gcsV}M${s.gcsM})`, s.rass && "RASS " + s.rass, p.sedation, p.pupils, p.seizures, p.cns].filter(Boolean).join(", "),
+      (v.sbp || v.hr || k.map !== null || c.vasoactive.length || p.cv) && "Cardiovascular: " + [v.sbp && v.dbp && `BP ${v.sbp}/${v.dbp}`, k.map !== null && "MAP " + k.map.toFixed(0), v.hr && "HR " + v.hr, v.rhythm, k.si !== null && "SI " + k.si.toFixed(2), c.vasoactive.map(x => `${x.drug} ${x.dose || ""} ${x.unit || ""} (${x.trend || ""})`).join("; "), p.cv].filter(Boolean).join(", "),
+      (p.respSupport || p.spo2 || p.breathSounds || p.resp) && "Respiratory: " + [p.respSupport, p.spo2 && `SpO₂ ${p.spo2}%`, p.breathSounds, p.ausc, p.resp].filter(Boolean).join(", "),
+      p.ventMode && "Ventilator: " + [p.ventMode, p.setVT && "VT " + p.setVT, p.ventRate && "RR " + p.ventRate, p.setPEEP && "PEEP " + p.setPEEP, p.fio2Percent && `FiO₂ ${p.fio2Percent}%`, p.plateauPressure && "Pplat " + p.plateauPressure, pf !== null && "P/F " + pf.toFixed(0)].filter(Boolean).join(", "),
+      (WCRIT.some((_, i) => w["c" + i]) || w.sbt) && `Weaning: ${WCRIT.filter((_, i) => w["c" + i]).length}/${WCRIT.length} criteria` + (w.sbt ? ", SBT " + w.sbt : ""),
+      (p.palpation || p.feeding || p.rbs || p.abdNotes) && "Abdomen: " + [p.palpation, p.bowelSounds && "bowel sounds " + p.bowelSounds, p.feeding, p.stool, p.rbs && "RBS " + p.rbs, p.abdNotes].filter(Boolean).join(", "),
+      (p.edema || p.pulses || p.capRefill || p.limbTemp || p.dvtSigns || p.skin || p.extNotes) && "Extremities: " + [p.edema && "edema: " + p.edema, p.pulses && "pulses: " + p.pulses, p.capRefill && "CRT " + p.capRefill, p.limbTemp, p.dvtSigns === "Yes" && "DVT signs", p.skin && "skin: " + p.skin, p.extNotes].filter(Boolean).join(", "),
+      (p.temp || mkList(p).length || p.abx.length || p.cultures.length || p.infection) && "Infection: " + [p.temp && `T ${p.temp}°C`, ...mkList(p), p.abx.map(x => `${x.drug}${x.date ? " (day " + dayN(x.date) + ")" : ""}${x.indication ? " for " + x.indication : ""}`).join("; "), p.cultures.map(x => `${x.type || "Culture"} (${x.status || ""}): ${x.organism || ""}`).join("; "), p.infection].filter(Boolean).join(", "),
+      p.lines.length && "Lines/tubes: " + p.lines.map(x => `${x.type || "Line"}${x.site ? " (" + x.site + ")" : ""}${x.date ? " day " + dayN(x.date) : ""}`).join("; "),
+      lab && "Labs: " + lab,
+      abg && "ABG: " + abg,
+      rad && "Imaging: " + rad,
+      medsFormatted && "Medications: " + medsFormatted,
+      p.acType && "Anticoagulation: " + p.acType + (p.acMech ? " (" + p.acMech + ")" : "") + (p.anticoag.length ? " – " + p.anticoag.map(x => `${x.drug || ""} ${x.dose || ""}${x.date ? " day " + dayN(x.date) : ""}`).join("; ") : ""),
+      (bal || uop || p.renal) && "Fluid / renal: " + [bal && "balance " + bal, uop && "output " + uop, p.renal].filter(Boolean).join(", "),
+      (g.n > 0 || p.scoreList.length) && "Scores: " + [g.n > 0 && `SOFA ${g.total}${g.n < 6 ? " (partial)" : ""}`, ...p.scoreList.map(x => `${x.name} ${scoreVal(p, x)}`)].filter(Boolean).join("; "),
+      p.other && "Other: " + p.other
+    ]),
+    B("RECOMMENDATION / PLAN", [
+      p.plan,
+      ...p.plans.filter(x => x.text).map(x => `${x.done ? "[DONE] " : ""}${x.text}`),
+      `Daily checklist: ${CHK.filter(([q]) => (p.checks || {})[q]).length}/${CHK.length} ticked`
+    ])
+  ].filter(Boolean).join("\n\n");
+}
+
+function makeSBAR() {
+  if (active === null) return;
+  const sb = $("sbar");
+  if (sb) sb.value = sbarText(P());
+}
+
+function copySBAR() {
+  const sb = $("sbar");
+  const t = sb ? sb.value : (P() ? sbarText(P()) : "");
+  if (!t) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => alert("Copied."), () => alert("Could not copy automatically. Select the text and copy manually."));
+  else alert("Could not copy automatically. Select the text and copy manually.");
+}
+
+function showSheet() {
+  if (!data.length) { alert("No patients added yet."); return; }
+  $("sheetTxt").textContent = data.map(sbarText).join("\n\n====================================\n\n");
+  $("sheet").hidden = false;
+  $("sheet").scrollIntoView({ behavior: "smooth" });
+}
+
+function copySheet() {
+  if (navigator.clipboard) navigator.clipboard.writeText($("sheetTxt").textContent).then(() => alert("Copied."), () => alert("Could not copy automatically."));
+}
+
+function delPatient() {
+  if (active === null) return;
+  const p = P();
+  if (!confirm(`Delete ${p.bed || "this patient"}? It can be restored from Recently deleted.`)) return;
+  toTrash({ kind: "patient", bed: p.bed, item: p });
+  data.splice(active, 1);
+  persist();
+  active = null;
+  activeCardId = null;
+  $("cardModal").hidden = true;
+  document.body.style.overflow = "";
+  $("rec").hidden = true;
+  renderList();
+}
+
+function dl(obj, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+}
+
+const exportOne = () => active !== null && dl([P()], (P().bed || "patient") + ".json");
+const exportAll = () => dl(data, "icu-rounds-backup.json");
+
+function forceUpdate() {
+  if (!confirm("Update the app to the latest version? Your saved patients will NOT be deleted.")) return;
+  (navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(r => Promise.all(r.map(x => x.unregister()))) : Promise.resolve())
+    .then(() => window.caches ? caches.keys().then(k => Promise.all(k.map(x => caches.delete(x)))) : null)
+    .then(() => location.reload(true));
+}
+
+$("imp").onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const a = JSON.parse(r.result);
+      if (!Array.isArray(a)) throw 0;
+      const valid = a.filter(x => x && typeof x === "object" && !Array.isArray(x));
+      if (!valid.length) throw 0;
+      valid.forEach(ensure);
+      data.push(...valid);
+      bad = false;
+      persist();
+      renderList();
+      alert(`Imported ${valid.length} patient(s).`);
+    } catch (err) {
+      alert("Invalid backup file.");
+    }
+  };
+  r.readAsText(f);
+  e.target.value = "";
+};
+
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(() => {});
+
 renderList();
 renderTrash();
-if (data.length) {
-  openPatient(0);
-}
 </script>
 </body>
 </html>
